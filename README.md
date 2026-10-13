@@ -1,2 +1,29 @@
 # pingme.design
-web app for ping me design
+
+Design workspace for **PingMe**, a mobile app where vendors keep their clients posted on every service order.
+
+## What's here
+
+| Path | What it is |
+|---|---|
+| `index.html` + `app/` | Prototype site (replaces Figma): modules and screens on the left, phone preview in the centre, screen description on the right. |
+| `app/screens.js` | Screen registry. The one place to update a screen's status, description and reference images. |
+| `docs/requirements/` | Requirements: [overview](docs/requirements/00-overview.md), one doc per module, and the [screen tracker](docs/requirements/README.md). |
+| `design reference/` | Reference sketches the redesign starts from. |
+| `scripts/build-tracker.mjs` | Regenerates the tracker and module screen sections from `app/screens.js`. |
+
+## Run the prototype
+
+Any static server works:
+
+```sh
+npx serve .        # or: python3 -m http.server
+```
+
+Then open the printed URL. Each screen has its own link (e.g. `/#VORD-04`); use ↑/↓ to step through screens and **Dev mode** for acceptance criteria and file paths.
+
+## Track progress
+
+1. Set the screen's `status` in `app/screens.js` (`todo`, `reference`, `design`, `done`).
+2. When a redesigned screen exists as HTML, set its `html` path; the phone shows it instead of the reference image.
+3. Run `node scripts/build-tracker.mjs` and commit.
