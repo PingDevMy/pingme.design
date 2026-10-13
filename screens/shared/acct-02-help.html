@@ -96,6 +96,7 @@
 
   <script src="../kit.js"></script>
   <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
   <script>
     const D = PM.data;
     const $ = (id) => document.getElementById(id);
@@ -105,7 +106,8 @@
       ["I'm not getting notifications", "Check that PingMe is allowed to send notifications in your phone's settings, and look at Notification preferences in your Profile. Ready for pickup always uses at least one channel."],
       ["Can I cancel or reschedule a service?", "On-site services can be rescheduled or cancelled from the service status page until the technician starts. After that, call the shop."],
       ["Who can see my reviews?", "Reviews are public on the shop's page. You can edit a review for 7 days after posting. Shops can reply but can't delete reviews."],
-      ["How do I switch between Customer and Vendor?", "If your account has both roles, use Switch to Vendor on your Profile."],
+      ["How do I switch between Customer and Vendor mode?", "PingMe is one app with one account. In Customer mode, tap Switch to Vendor on your Profile. In Vendor mode, open the Shop tab, then Account, and tap Switch to Customer. No shop yet? Tap Run a shop? on your Profile to add one."],
+      ["Can I use my shop's account to track my own orders?", "Yes. Orders other shops make for your phone number show in Customer mode, separate from your shop's orders."],
     ];
     const esc = (t) => t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
     const hi = (t, q) => {
@@ -124,12 +126,14 @@
     $("q").addEventListener("input", renderFaq);
     renderFaq();
 
-    // Order picker: recent orders first, plus "not about an order".
-    const recent = D.orders.slice(0, 4);
-    $("orders").innerHTML = recent.map((o, i) => {
-      const s = D.shops[o.shop];
-      return `<label class="opt"><input type="radio" name="order" value="${o.id}"${i === 0 ? " checked" : ""} />${D.tile(s)}<span class="grow"><b class="ellipsis">${s.name}</b><span class="meta ellipsis" style="display:block">${o.id} · ${o.service}</span></span><span class="r"></span></label>`;
-    }).join("") + `<label class="opt"><input type="radio" name="order" value="" /><span class="tile" style="background:var(--canvas);color:var(--ink-3)"><svg class="i" data-icon="close"></svg></span><span class="grow"><b>Not about an order</b></span><span class="r"></span></label>`;
+    // Order picker: recent orders first, plus "not about an order". In Vendor mode it lists the shop's orders.
+    const V = PM.V;
+    const vendor = PM.mode() === "vendor";
+    const opt = (o, i, tile, title, sub) => `<label class="opt"><input type="radio" name="order" value="${o.id}"${i === 0 ? " checked" : ""} />${tile}<span class="grow"><b class="ellipsis">${title}</b><span class="meta ellipsis" style="display:block">${sub}</span></span><span class="r"></span></label>`;
+    $("orders").innerHTML = (vendor
+      ? V.orders.filter((o) => o.status !== "draft").slice(0, 4).map((o, i) => opt(o, i, V.catTile(o.category), V.esc(o.title), `${o.id} · ${V.esc(o.customer.name || "No customer yet")}`))
+      : D.orders.slice(0, 4).map((o, i) => { const s = D.shops[o.shop]; return opt(o, i, D.tile(s), s.name, `${o.id} · ${o.service}`); })
+    ).join("") + `<label class="opt"><input type="radio" name="order" value="" /><span class="tile" style="background:var(--canvas);color:var(--ink-3)"><svg class="i" data-icon="close"></svg></span><span class="grow"><b>Not about an order</b></span><span class="r"></span></label>`;
     $("topic").addEventListener("change", (e) => ($("f-order").hidden = e.target.selectedIndex > 1));
 
     $("msg").addEventListener("input", () => $("f-msg").classList.remove("invalid"));

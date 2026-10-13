@@ -69,15 +69,29 @@
   <script src="../kit.js"></script>
   <script>
     const $ = (id) => document.getElementById(id);
-    $("back").addEventListener("click", () => PM.go("ACCT-01"));
+    // Shared by both modes: customers come from Profile, vendors from the Shop tab.
+    const vendor = PM.mode() === "vendor";
+    $("back").addEventListener("click", () => PM.go(vendor ? "VSHOP-01" : "ACCT-01"));
     const chans = [["push", "Push", "bell"], ["sms", "SMS", "phone"], ["email", "Email", "mail"]];
-    const events = [
+    const customerEvents = [
       { id: "created", t: "New order added", d: "A shop creates an order for your number", icon: "receipt", tone: "", on: ["push"] },
       { id: "status", t: "Status changes", d: "Every step, with the shop's note", icon: "refresh", tone: "", on: ["push"] },
       { id: "ready", t: "Ready for pickup", d: "Your order is ready to collect", icon: "checkcircle", tone: "green", on: ["push", "sms"], must: true },
       { id: "msg", t: "Messages from shops", d: "Notes, delays and reminders", icon: "message", tone: "sky", on: ["push"] },
       { id: "done", t: "Receipts & rating", d: "When an order is completed", icon: "star", tone: "amber", on: ["push", "email"] },
     ];
+    const vendorEvents = [
+      { id: "reply", t: "Customer replies", d: "A client answers one of your messages", icon: "message", tone: "sky", on: ["push"], must: true },
+      { id: "claimed", t: "Order claimed", d: "A client scans the receipt QR into the app", icon: "qr", tone: "violet", on: ["push"] },
+      { id: "review", t: "New reviews", d: "Ratings and feedback on your shop", icon: "star", tone: "amber", on: ["push", "email"] },
+      { id: "paid", t: "Payments", d: "Card and DuitNow payments as they settle", icon: "receipt", tone: "", on: ["email"] },
+    ];
+    const events = vendor ? vendorEvents : customerEvents;
+    if (vendor) {
+      document.querySelector(".intro").textContent = "Choose how PingMe tells you about your shop. Your own orders from other shops follow your Customer mode settings.";
+      document.querySelector("#events").previousElementSibling.querySelector("h2").textContent = "Shop updates";
+      $("qh-note").textContent = "Customer replies still arrive during quiet hours, without sound.";
+    }
 
     $("events").innerHTML = events.map((e) => `
       <div class="card ev" data-ev="${e.id}">
@@ -86,7 +100,7 @@
           <div class="grow"><b>${e.t}</b><span class="meta">${e.d}</span>${e.must ? '<span class="lock"><svg class="i" data-icon="lock"></svg>Keeps at least one channel</span>' : ""}</div>
         </div>
         <div class="chans" role="group" aria-label="${e.t} channels">${chans.map(([k, l, ic]) => `<button class="ch" type="button" data-ch="${k}" aria-pressed="${e.on.includes(k)}"><svg class="i" data-icon="${ic}"></svg>${l}</button>`).join("")}</div>
-        <div class="warn">Ready for pickup needs at least one channel so you don't miss your order.</div>
+        <div class="warn">${e.t} needs at least one channel so you don't miss it.</div>
       </div>`).join("");
 
     $("events").addEventListener("click", (ev) => {

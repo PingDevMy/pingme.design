@@ -26,7 +26,7 @@ Vendor edits what customers see on the Shop Profile.
 
 - [ ] Changes show on the public Shop Profile immediately
 
-> This is the Shop tab. Edits enable Save; Preview opens the public Shop Profile. Settings links to Customer Messaging, Staff and Account.
+> This is the Shop tab. Edits enable Save; Preview opens the public Shop Profile. Settings links to Customer Messaging, Staff, Notification preferences and Account (where you switch to Customer mode).
 
 ### `VSHOP-02` Customer Messaging · 🔵 In design
 

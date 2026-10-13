@@ -1,5 +1,5 @@
 /*
- * Vendor app helpers, loaded after kit.js and data.js.
+ * Vendor mode helpers, loaded after kit.js and data.js.
  *  - PM.V.orders: the shop's sample orders. Changes made on one screen (status,
  *    messages, new orders) are kept for the browser session so the dashboard,
  *    list and details agree. PM.V.reset() restores the samples.

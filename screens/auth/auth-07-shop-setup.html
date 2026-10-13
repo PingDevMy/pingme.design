@@ -3,13 +3,11 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Vendor Sign Up · PingMe</title>
+  <title>Set Up Your Shop · PingMe</title>
   <link rel="stylesheet" href="../kit.css" />
   <style>
     .role-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 999px; background: var(--brand-50); color: var(--brand-700); font-size: 12.5px; font-weight: 600; }
     .role-chip svg.i { width: 16px; height: 16px; }
-    .step { display: none; }
-    .step.on { display: block; animation: rise 0.35s ease-out both; }
     .section { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); }
     .section-head { display: flex; align-items: baseline; justify-content: space-between; }
     .section-head h2 { margin: 0; font-size: 16px; }
@@ -34,6 +32,20 @@
     .summary small { color: var(--ink-2); font-size: 12.5px; }
     .summary a { margin-left: auto; font-size: 13px; }
     .terms { margin-top: 20px; }
+    /* Shop ready */
+    .done { position: fixed; inset: 0; background: #fff; display: flex; flex-direction: column; padding: 0 var(--gutter) calc(var(--safe-bottom) + 8px); opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 5; }
+    .done.on { opacity: 1; pointer-events: auto; }
+    .done .body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .done .h1 { margin-top: 22px; }
+    .next { width: 100%; margin-top: 24px; border: 1px solid var(--line); border-radius: var(--r-lg); text-align: left; overflow: hidden; }
+    .next header { padding: 12px 14px; background: var(--brand-50); color: var(--brand-700); font-size: 13.5px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+    .next header svg.i { width: 18px; height: 18px; }
+    .next ul { margin: 0; padding: 0; list-style: none; }
+    .next li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--line-2); }
+    .next .av { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; flex: none; }
+    .next .av svg.i { width: 18px; height: 18px; }
+    .next b { display: block; font-size: 14px; }
+    .next small { font-size: 12.5px; color: var(--ink-2); }
     .switch { margin-top: 12px; text-align: center; font-size: 14px; color: var(--ink-2); }
   </style>
 </head>
@@ -41,46 +53,16 @@
   <div class="page">
     <header class="topbar">
       <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
-      <div class="steps" style="width: 140px" id="steps" aria-label="Sign-up progress"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+      <div class="title">Set up your shop</div>
       <span style="width: 40px"></span>
     </header>
 
     <main class="content">
       <form id="form" novalidate>
-        <!-- Step 1: owner -->
-        <section class="step on" id="step-1" aria-labelledby="t1">
-          <span class="role-chip"><svg class="i" data-icon="store"></svg>Vendor account · 1 of 2</span>
-          <h1 class="h1" id="t1" style="margin-top: 12px">Tell us about you</h1>
-          <p class="lead">Your clients will see your shop, not these details.</p>
-
-          <div class="field" data-rule="name">
-            <label class="label" for="name">Owner name</label>
-            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="user"></svg><input id="name" autocomplete="name" placeholder="Hafiz Ismail" /><svg class="i ok" data-icon="check"></svg></div>
-            <div class="error"><svg class="i" data-icon="alert"></svg>Enter your name.</div>
-          </div>
-          <div class="field" data-rule="email">
-            <label class="label" for="email">Email</label>
-            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="mail"></svg><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="owner@yourshop.com" /><svg class="i ok" data-icon="check"></svg></div>
-            <div class="error"><svg class="i" data-icon="alert"></svg>That email doesn't look right.</div>
-          </div>
-          <div class="field" data-rule="phone">
-            <label class="label" for="phone">Mobile number</label>
-            <div class="control" style="margin-top: 6px"><span class="prefix">🇲🇾 +60</span><input id="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="12-345 6789" /><svg class="i ok" data-icon="check"></svg></div>
-            <div class="hint">We'll send a 6-digit code to verify it.</div>
-            <div class="error"><svg class="i" data-icon="alert"></svg>Enter a Malaysian mobile number, e.g. 12-345 6789.</div>
-          </div>
-          <div class="field" data-rule="password">
-            <label class="label" for="pw">Password</label>
-            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="lock"></svg><input id="pw" type="password" autocomplete="new-password" placeholder="8+ characters, with a number" /><button class="peek" type="button" data-peek aria-label="Show password"><svg class="i" data-icon="eye"></svg></button></div>
-            <div class="error"><svg class="i" data-icon="alert"></svg>Use at least 8 characters, including a number.</div>
-          </div>
-        </section>
-
-        <!-- Step 2: shop -->
-        <section class="step" id="step-2" aria-labelledby="t2">
-          <span class="role-chip"><svg class="i" data-icon="store"></svg>Vendor account · 2 of 2</span>
-          <h1 class="h1" id="t2" style="margin-top: 12px">Set up your shop</h1>
-          <p class="lead">Just the basics so you can start taking orders. Finish the rest in Shop Settings.</p>
+        <section aria-labelledby="t2">
+          <span class="role-chip"><svg class="i" data-icon="store"></svg>Adds Vendor mode to your account</span>
+          <h1 class="h1" id="t2" style="margin-top: 12px">Tell clients about your shop</h1>
+          <p class="lead">Just the basics so you can start taking orders. Your name, phone and sign-in stay the same; finish the rest in the Shop tab.</p>
 
           <div class="field" data-rule="shop">
             <label class="label" for="shop">Shop name</label>
@@ -135,55 +117,55 @@
 
           <label class="check terms">
             <input type="checkbox" id="terms" />
-            <span>I agree to PingMe's <a href="#">Terms of Service</a>, <a href="#">Vendor Terms</a> and <a href="#">Privacy Policy</a>.</span>
+            <span>I agree to PingMe's <a href="#">Vendor Terms</a>.</span>
           </label>
         </section>
       </form>
     </main>
 
     <footer class="foot">
-      <button class="btn primary" id="submit" type="button" disabled>Continue <svg class="i" data-icon="arrow"></svg></button>
-      <div class="switch">Already have an account? <a href="#" data-go="AUTH-04">Sign in</a></div>
+      <button class="btn primary" id="submit" type="button" disabled>Create my shop <svg class="i" data-icon="arrow"></svg></button>
     </footer>
   </div>
+
+  <!-- Shop ready -->
+  <section class="done" id="done" aria-live="polite">
+    <div class="body">
+      <div class="badge-icon ring"><svg class="i" data-icon="store"></svg></div>
+      <h1 class="h1" id="done-title">Your shop is ready</h1>
+      <p class="lead">Create your first order and your client gets a ping straight away.</p>
+      <div class="next">
+        <header><svg class="i" data-icon="sparkle"></svg>Next steps</header>
+        <ul>
+          <li><span class="av" style="background:var(--brand-50);color:var(--brand-700)"><svg class="i" data-icon="package"></svg></span><div><b>Create your first order</b><small>Takes under a minute</small></div></li>
+          <li><span class="av" style="background:#fef3c7;color:#b45309"><svg class="i" data-icon="image"></svg></span><div><b>Finish your shop profile</b><small>Logo, hours and services in the Shop tab</small></div></li>
+          <li><span class="av" style="background:#f1f5f9;color:var(--ink-2)"><svg class="i" data-icon="swap"></svg></span><div><b>Your own orders stay here too</b><small>Switch to Customer mode from Profile</small></div></li>
+        </ul>
+      </div>
+    </div>
+    <button class="btn primary" type="button" id="go-shop">Go to my shop <svg class="i" data-icon="arrow"></svg></button>
+  </section>
 
   <script src="../kit.js"></script>
   <script>
     const $ = (id) => document.getElementById(id);
-    let step = 1;
     let category = null;
     const touched = new Set();
     const rules = {
-      name: () => $("name").value.trim().length >= 2,
-      email: () => PM.emailRe.test($("email").value.trim()),
-      phone: () => /^1\d[\s-]?\d{3,4}[\s-]?\d{4}$/.test($("phone").value.trim()),
-      password: () => $("pw").value.length >= 8 && /\d/.test($("pw").value),
       shop: () => $("shop").value.trim().length >= 2,
       category: () => !!category,
       address: () => $("address").value.trim().length >= 6,
     };
 
     function validate() {
-      const fields = [...$("step-" + step).querySelectorAll("[data-rule]")];
       let all = true;
-      for (const f of fields) {
+      for (const f of document.querySelectorAll("[data-rule]")) {
         const ok = rules[f.dataset.rule]();
         all = all && ok;
         f.classList.toggle("valid", ok);
         f.classList.toggle("invalid", !ok && touched.has(f.dataset.rule));
       }
-      if (step === 2) all = all && $("terms").checked;
-      $("submit").disabled = !all;
-    }
-
-    function goStep(n) {
-      step = n;
-      document.querySelectorAll(".step").forEach((s) => s.classList.toggle("on", s.id === "step-" + n));
-      [...$("steps").children].forEach((b, i) => b.classList.toggle("on", i <= n));
-      $("submit").innerHTML = n === 1 ? 'Continue <svg class="i" data-icon="arrow"></svg>' : 'Create my shop <svg class="i" data-icon="arrow"></svg>';
-      PM.hydrateIcons($("submit"));
-      window.scrollTo({ top: 0 });
-      validate();
+      $("submit").disabled = !(all && $("terms").checked);
     }
 
     document.querySelectorAll("[data-rule] input").forEach((input) => {
@@ -211,18 +193,23 @@
     });
     $("terms").addEventListener("change", validate);
 
-    $("back").addEventListener("click", () => (step === 2 ? goStep(1) : PM.go("AUTH-03")));
+    // Opened from Choose Mode after sign-up, or from Profile ("Set up a shop").
+    const from = PM.store.get("shopFrom") === "ACCT-01" ? "ACCT-01" : "AUTH-06";
+    $("back").addEventListener("click", () => PM.go(from));
     $("submit").addEventListener("click", () => {
-      if (step === 1) return goStep(2);
       const btn = $("submit");
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Creating your shop';
-      PM.store.set("role", "vendor");
-      PM.store.set("phone", "+60 " + $("phone").value.trim());
-      PM.store.set("verifyFor", "vendor");
-      setTimeout(() => PM.go("AUTH-08"), 800);
+      setTimeout(() => {
+        PM.store.set("hasShop", "1");
+        PM.store.set("role", "vendor");
+        $("done-title").textContent = ($("shop").value.trim() || "Your shop") + " is ready";
+        PM.hydrateIcons($("done"));
+        $("done").classList.add("on");
+      }, 800);
     });
-    goStep(1);
+    $("go-shop").addEventListener("click", () => PM.go("VHOME-01"));
+    validate();
   </script>
 </body>
 </html>

@@ -4,15 +4,20 @@
 
 PingMe is a mobile app that lets a service vendor keep their clients informed. A laundry, tailor, repair shop or on-site technician logs each job in PingMe, and every time the job moves forward the client gets a ping: a push notification in the app, or an SMS with a tracking link if they don't have it installed. Clients stop calling to ask "is it ready yet?", and vendors stop answering that question.
 
-## Who uses it
+## One app, two modes
 
-| Role | What they do |
-|---|---|
-| **Vendor** | Creates orders, captures proof photos, moves orders through statuses, messages clients, hands over at pickup, watches revenue. |
-| **Customer** | Sees all their orders across vendors, follows each one live, gets notified, shows a QR at pickup, rates the vendor. |
-| **Guest customer** | Has no app. Follows an order through the SMS tracking link (web page). |
+Customers and vendors download the **same PingMe app** and sign up with the **same form**. The app then runs in one of two modes:
 
-One account can hold both roles and switch between them.
+| Mode | Who | What they do |
+|---|---|---|
+| **Customer mode** | Everyone | Sees all their orders across vendors, follows each one live, gets notified, shows a QR at pickup, rates the vendor. |
+| **Vendor mode** | Accounts that own (or staff) a shop | Creates orders, captures proof photos, moves orders through statuses, messages clients, hands over at pickup, watches revenue. |
+| **Guest customer** | No app | Follows an order through the SMS tracking link (web page). |
+
+- Every account can be a customer. Adding a shop (at sign-up, or later from Profile) turns on Vendor mode for that account.
+- Sign In opens the mode used last. Profile switches modes: Switch to Vendor in Customer mode, Switch to Customer in Vendor mode (Shop tab › Account).
+- Notifications, Profile, Help and Shop Profile are shared screens: each shows the version for the mode it was opened from.
+- The full screen flow is the tree in the prototype's left panel and in the [tracker](README.md#app-flow).
 
 ## Core flow
 
@@ -50,16 +55,16 @@ Requirements are split into modules so each can be designed and built on its own
 
 | # | Module | Role | Doc |
 |---|---|---|---|
-| 1 | Onboarding & Auth (`AUTH`) | Shared | [01-onboarding-auth.md](01-onboarding-auth.md) |
-| 2 | Customer Home (`CHOME`) | Customer | [02-customer-home.md](02-customer-home.md) |
-| 3 | Order Tracking (`CTRK`) | Customer | [03-customer-order-tracking.md](03-customer-order-tracking.md) |
-| 4 | Shop Profile (`SHOP`) | Customer (+ vendor owner view) | [04-shop-profile.md](04-shop-profile.md) |
-| 5 | Notifications (`NOTI`) | Shared | [05-notifications.md](05-notifications.md) |
-| 6 | Vendor Dashboard (`VHOME`) | Vendor | [06-vendor-dashboard.md](06-vendor-dashboard.md) |
-| 7 | Order Management (`VORD`) | Vendor | [07-vendor-orders.md](07-vendor-orders.md) |
-| 8 | Revenue & Analytics (`VREV`) | Vendor | [08-vendor-revenue.md](08-vendor-revenue.md) |
-| 9 | Shop Settings (`VSHOP`) | Vendor | [09-vendor-shop-settings.md](09-vendor-shop-settings.md) |
-| 10 | Account (`ACCT`) | Shared | [10-account.md](10-account.md) |
+| 1 | Onboarding & Auth (`AUTH`) | Get started | [01-onboarding-auth.md](01-onboarding-auth.md) |
+| 2 | Customer Home (`CHOME`) | Customer mode | [02-customer-home.md](02-customer-home.md) |
+| 3 | Order Tracking (`CTRK`) | Customer mode (+ web link) | [03-customer-order-tracking.md](03-customer-order-tracking.md) |
+| 4 | Shop Profile (`SHOP`) | Both modes (owner view in Vendor mode) | [04-shop-profile.md](04-shop-profile.md) |
+| 5 | Notifications (`NOTI`) | Both modes | [05-notifications.md](05-notifications.md) |
+| 6 | Vendor Dashboard (`VHOME`) | Vendor mode | [06-vendor-dashboard.md](06-vendor-dashboard.md) |
+| 7 | Order Management (`VORD`) | Vendor mode | [07-vendor-orders.md](07-vendor-orders.md) |
+| 8 | Revenue & Analytics (`VREV`) | Vendor mode | [08-vendor-revenue.md](08-vendor-revenue.md) |
+| 9 | Shop Settings (`VSHOP`) | Vendor mode | [09-vendor-shop-settings.md](09-vendor-shop-settings.md) |
+| 10 | Account (`ACCT`) | Both modes | [10-account.md](10-account.md) |
 
 Screen-by-screen status lives in the [tracker](README.md).
 

@@ -4,24 +4,87 @@
 
 Start with the [product overview](00-overview.md). Open `index.html` to browse the screens.
 
-**8 of 33 screens done** · ⚪ Not started: 0 · 🟠 Reference only: 0 · 🔵 In design: 25 · 🟢 Done: 8
+**4 of 33 screens done** · ⚪ Not started: 0 · 🟠 Reference only: 0 · 🔵 In design: 29 · 🟢 Done: 4
+
+## App flow
+
+Customers and vendors download the same app and use one account. After signing in, the app opens in **Customer mode** or **Vendor mode** (the one used last); Profile switches between them, and an account without a shop can add one. Screens marked *Both modes* show the version for the mode they were opened from.
+
+```text
+Get started · Launch, sign up and sign in
+├─ Splash (AUTH-01) 🟢
+│  ├─ [First open] Onboarding (AUTH-02) 🟢
+│  │  └─ [Get started] → Create Account (AUTH-04)
+│  └─ [Returning] Sign In (AUTH-03) 🔵
+│     ├─ [Forgot?] Forgot Password (AUTH-08) 🟢
+│     ├─ [New here] → Create Account (AUTH-04)
+│     ├─ [Last used: Customer] → Customer Home (CHOME-01)
+│     └─ [Last used: Vendor] → Vendor Dashboard (VHOME-01)
+└─ [Sign up] Create Account (AUTH-04) 🔵
+   └─ [Verify phone] Security Code (AUTH-05) 🟢
+      └─ [Verified] Choose Mode (AUTH-06) 🔵
+         ├─ [Track my orders] → Customer Home (CHOME-01)
+         └─ [Run my shop] Set Up Your Shop (AUTH-07) 🔵
+            └─ [Shop ready] → Vendor Dashboard (VHOME-01)
+
+Customer mode · Tabs: Home, Scan, Profile
+├─ [Tab] Home (CHOME-01) 🔵
+│  ├─ [Drop-off order] Order Tracking (drop-off) (CTRK-01) 🔵
+│  │  ├─ [View Shop] Shop Profile (SHOP-01) 🔵
+│  │  │  └─ [See all] All Reviews (SHOP-02) 🔵
+│  │  └─ [Completed] Rate & Review (CTRK-04) 🔵
+│  ├─ [On-site service] Service Status (on-site) (CTRK-02) 🔵
+│  ├─ [See all history] Order History (CTRK-03) 🔵
+│  └─ [Bell] Notification Inbox (NOTI-01) 🔵
+├─ [Tab] Scan Order QR (CHOME-02) 🔵
+│  └─ [Order claimed] → Order Tracking (drop-off) (CTRK-01)
+└─ [Tab] Profile (ACCT-01) 🔵
+   ├─ [Preferences] Notification Preferences (NOTI-02) 🔵
+   ├─ [Help] Help & Support (ACCT-02) 🔵
+   ├─ [Switch to Vendor] → Vendor Dashboard (VHOME-01)
+   └─ [No shop yet] → Set Up Your Shop (AUTH-07)
+
+Vendor mode · Tabs: Home, Orders, +, Revenue, Shop
+├─ [Tab] Dashboard (VHOME-01) 🔵
+│  └─ [Bell] Notification Inbox (NOTI-01) 🔵
+├─ [Tab] Order List (VORD-01) 🔵
+│  ├─ [Open order] Order Details (VORD-05) 🔵
+│  │  ├─ [Sheet] Update Status Sheet (VORD-02) 🔵
+│  │  └─ [Sheet] Notify Customer Sheet (VORD-03) 🔵
+│  └─ [Scan] Scan Pickup QR (VORD-06) 🔵
+├─ [+ tab] Create New Order (VORD-04) 🔵
+├─ [Tab] Revenue Analytics (VREV-01) 🔵
+│  └─ [See all] Transactions (VREV-02) 🔵
+└─ [Tab] Edit Shop Profile (VSHOP-01) 🔵
+   ├─ [Preview] Shop Profile (SHOP-01) 🔵
+   │  └─ [Manage reviews] All Reviews (SHOP-02) 🔵
+   ├─ [Settings] Customer Messaging (VSHOP-02) 🔵
+   ├─ [Settings] Staff & Technicians (VSHOP-03) 🔵
+   ├─ [Settings] Notification Preferences (NOTI-02) 🔵
+   └─ [Account] Profile (ACCT-01) 🔵
+      ├─ [Help] Help & Support (ACCT-02) 🔵
+      └─ [Switch to Customer] → Customer Home (CHOME-01)
+
+Outside the app · For customers without PingMe installed
+└─ [SMS link] Public Tracking Link (web) (CTRK-05) 🔵
+```
 
 ## Get started
 
-### [Onboarding & Auth](01-onboarding-auth.md) · 8/8
+### [Onboarding & Auth](01-onboarding-auth.md) · 4/8
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
 | `AUTH-01` | Splash | 🟢 Done | – |
 | `AUTH-02` | Onboarding | 🟢 Done | 1 image |
-| `AUTH-03` | Role Selection | 🟢 Done | 1 image |
-| `AUTH-04` | Sign In | 🟢 Done | 6 images |
-| `AUTH-05` | Customer Sign Up | 🟢 Done | 1 image |
-| `AUTH-06` | Vendor Sign Up | 🟢 Done | – |
-| `AUTH-07` | Forgot Password | 🟢 Done | 1 image |
-| `AUTH-08` | Security Code | 🟢 Done | 1 image |
+| `AUTH-03` | Sign In | 🔵 In design | 6 images |
+| `AUTH-04` | Create Account | 🔵 In design | 1 image |
+| `AUTH-05` | Security Code | 🟢 Done | 1 image |
+| `AUTH-06` | Choose Mode | 🔵 In design | 1 image |
+| `AUTH-07` | Set Up Your Shop | 🔵 In design | – |
+| `AUTH-08` | Forgot Password | 🟢 Done | 1 image |
 
-## Customer app
+## Customer mode
 
 ### [Customer Home](02-customer-home.md) · 0/2
 
@@ -40,14 +103,7 @@ Start with the [product overview](00-overview.md). Open `index.html` to browse t
 | `CTRK-04` | Rate & Review | 🔵 In design | – |
 | `CTRK-05` | Public Tracking Link (web) | 🔵 In design | – |
 
-### [Shop Profile](04-shop-profile.md) · 0/2
-
-| ID | Screen | Status | Reference |
-|---|---|---|---|
-| `SHOP-01` | Shop Profile | 🔵 In design | 1 image |
-| `SHOP-02` | All Reviews | 🔵 In design | – |
-
-## Vendor app
+## Vendor mode
 
 ### [Vendor Dashboard](06-vendor-dashboard.md) · 0/1
 
@@ -81,7 +137,14 @@ Start with the [product overview](00-overview.md). Open `index.html` to browse t
 | `VSHOP-02` | Customer Messaging | 🔵 In design | – |
 | `VSHOP-03` | Staff & Technicians | 🔵 In design | – |
 
-## Both apps
+## Both modes
+
+### [Shop Profile](04-shop-profile.md) · 0/2
+
+| ID | Screen | Status | Reference |
+|---|---|---|---|
+| `SHOP-01` | Shop Profile | 🔵 In design | 1 image |
+| `SHOP-02` | All Reviews | 🔵 In design | – |
 
 ### [Notifications](05-notifications.md) · 0/2
 

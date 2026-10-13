@@ -1,10 +1,14 @@
 /*
  * PingMe app UI kit helpers shared by the HTML screens.
  *  - <svg class="i" data-icon="name"></svg> is filled from the icon set below.
- *  - PM.go("AUTH-04") moves the prototype to another screen (keeps the site's
+ *  - PM.go("AUTH-03") moves the prototype to another screen (keeps the site's
  *    screen list in sync when shown in the phone frame).
  *  - [data-peek] buttons toggle the password field in the same .control.
- *  - PM.store keeps small bits of flow state (picked role, phone) between screens.
+ *  - PM.store keeps small bits of flow state (mode, phone) between screens.
+ *  - PM.mode() is the mode the one app is in: "customer" or "vendor". Screens that
+ *    belong to one mode set it with <body data-mode="...">; shared screens
+ *    (Notifications, Profile, Shop Profile) read it. PM.hasShop() says whether the
+ *    account has a shop, so it can switch to Vendor mode.
  *  - PM.toast("Saved") shows a short message (needs a .toast element, see app.css).
  */
 (function () {
@@ -154,9 +158,19 @@
     toastTimer = setTimeout(() => el.classList.remove("show"), 2200);
   }
 
+  // Customer and vendor share one app and one account; the mode decides which
+  // home, tab bar and inbox the user sees. The sample account has both.
+  const mode = () => (store.get("role") === "vendor" ? "vendor" : "customer");
+  const hasShop = () => store.get("hasShop") !== "0";
+  const own = document.body && document.body.dataset.mode;
+  if (own) {
+    store.set("role", own);
+    if (own === "vendor") store.set("hasShop", "1");
+  }
+
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const phoneRe = /^\+?[\d\s-]{8,15}$/;
-  window.PM = { go, store, hydrateIcons, wirePeek, shake, toast, emailRe, phoneRe };
+  window.PM = { go, store, mode, hasShop, hydrateIcons, wirePeek, shake, toast, emailRe, phoneRe };
 
   hydrateIcons();
   wirePeek();
