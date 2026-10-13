@@ -142,6 +142,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .sb-icons svg { stroke: none; fill: currentColor; height: 12px; width: auto; }
 .screen-body { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
 .screen-body img { display: block; width: 100%; height: auto; }
+.screen-body.has-frame { overflow: hidden; }
 .screen-body iframe { border: 0; width: 100%; height: 100%; display: block; }
 .home-indicator { position: absolute; bottom: 8px; left: 50%; width: 134px; height: 5px; border-radius: 3px; background: #0b0f17; transform: translateX(-50%); opacity: 0.85; }
 
