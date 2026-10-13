@@ -27,24 +27,25 @@ Get started · Launch, sign up and sign in
          └─ [Run my shop] Set Up Your Shop (AUTH-07) 🔵
             └─ [Shop ready] → Vendor Dashboard (VHOME-01)
 
-Customer mode · Tabs: Home, Scan, Profile
+Customer mode · Tabs: Home, Orders, Scan, Inbox, Profile
 ├─ [Tab] Home (CHOME-01) 🔵
 │  ├─ [Drop-off order] Order Tracking (drop-off) (CTRK-01) 🔵
 │  │  ├─ [View Shop] Shop Profile (SHOP-01) 🔵
 │  │  │  └─ [See all] All Reviews (SHOP-02) 🔵
 │  │  └─ [Completed] Rate & Review (CTRK-04) 🔵
-│  ├─ [On-site service] Service Status (on-site) (CTRK-02) 🔵
-│  ├─ [See all history] Order History (CTRK-03) 🔵
-│  └─ [Bell] Notification Inbox (NOTI-01) 🔵
+│  └─ [On-site service] Service Status (on-site) (CTRK-02) 🔵
+├─ [Tab] Order History (CTRK-03) 🔵
+│  └─ [Rate] Rate & Review (CTRK-04) 🔵
 ├─ [Tab] Scan Order QR (CHOME-02) 🔵
 │  └─ [Order claimed] → Order Tracking (drop-off) (CTRK-01)
+├─ [Tab] Notification Inbox (NOTI-01) 🔵
 └─ [Tab] Profile (ACCT-01) 🔵
    ├─ [Preferences] Notification Preferences (NOTI-02) 🔵
    ├─ [Help] Help & Support (ACCT-02) 🔵
    ├─ [Switch to Vendor] → Vendor Dashboard (VHOME-01)
    └─ [No shop yet] → Set Up Your Shop (AUTH-07)
 
-Vendor mode · Tabs: Home, Orders, +, Revenue, Shop
+Vendor mode · Tabs: Home, Orders, New, Revenue, Shop
 ├─ [Tab] Dashboard (VHOME-01) 🔵
 │  └─ [Bell] Notification Inbox (NOTI-01) 🔵
 ├─ [Tab] Order List (VORD-01) 🔵
@@ -52,7 +53,7 @@ Vendor mode · Tabs: Home, Orders, +, Revenue, Shop
 │  │  ├─ [Sheet] Update Status Sheet (VORD-02) 🔵
 │  │  └─ [Sheet] Notify Customer Sheet (VORD-03) 🔵
 │  └─ [Scan] Scan Pickup QR (VORD-06) 🔵
-├─ [+ tab] Create New Order (VORD-04) 🔵
+├─ [Tab] Create New Order (VORD-04) 🔵
 ├─ [Tab] Revenue Analytics (VREV-01) 🔵
 │  └─ [See all] Transactions (VREV-02) 🔵
 └─ [Tab] Edit Shop Profile (VSHOP-01) 🔵

@@ -12,7 +12,7 @@
 
 ## Open questions
 
-- Should the centre bottom-nav button be Scan, or a shortcut to the notification inbox?
+- ~~Should the centre bottom-nav button be Scan, or a shortcut to the notification inbox?~~ Decided: the tab bar matches Vendor mode's five slots (Home, Orders, Scan in the raised centre, Inbox, Profile).
 
 ## Screens
 
@@ -28,7 +28,7 @@ Customer landing screen: a greeting, how many orders are active, and each order'
 - Track Your Order Now (opens the most recent active order)
 - Your Order list with Pending / Completed tabs
 - Each order card: vendor, service, status pill, step X of Y, % complete, order number, date, Details
-- Bottom nav: Home, Scan (centre), Profile
+- Bottom tab bar (same layout as Vendor mode): Home, Orders, Scan (raised centre), Inbox, Profile
 
 **Pings:**
 

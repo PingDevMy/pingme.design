@@ -9,6 +9,9 @@
  *    belong to one mode set it with <body data-mode="...">; shared screens
  *    (Notifications, Profile, Shop Profile) read it. PM.hasShop() says whether the
  *    account has a shop, so it can switch to Vendor mode.
+ *  - <nav class="tabbar" data-tabbar="home"></nav> is filled with the bottom tab bar
+ *    for the current mode (same five-slot layout in both modes); the value
+ *    names the current tab, or "customerTab|vendorTab" on shared screens.
  *  - PM.toast("Saved") shows a short message (needs a .toast element, see app.css).
  */
 (function () {
@@ -167,6 +170,38 @@
     store.set("role", own);
     if (own === "vendor") store.set("hasShop", "1");
   }
+
+  // One bottom tab bar for both modes: four tabs around a raised centre action.
+  const tabs = {
+    customer: [
+      ["home", "Home", "home", "CHOME-01"],
+      ["orders", "Orders", "receipt", "CTRK-03"],
+      ["scan", "Scan", "scan", "CHOME-02"],
+      ["inbox", "Inbox", "bell", "NOTI-01"],
+      ["me", "Profile", "user", "ACCT-01"],
+    ],
+    vendor: [
+      ["home", "Home", "home", "VHOME-01"],
+      ["orders", "Orders", "receipt", "VORD-01"],
+      ["new", "New", "plus", "VORD-04"],
+      ["revenue", "Revenue", "chart", "VREV-01"],
+      ["shop", "Shop", "store", "VSHOP-01"],
+    ],
+  };
+  // data-tabbar="me|shop" gives the current tab per mode (customer|vendor); an
+  // empty value means that mode shows no tab bar on this screen.
+  document.querySelectorAll("nav[data-tabbar]").forEach((nav) => {
+    const parts = nav.dataset.tabbar.split("|");
+    const current = parts.length > 1 ? parts[mode() === "vendor" ? 1 : 0] : parts[0];
+    if (!current) {
+      nav.closest(".page")?.classList.remove("tabbed");
+      return nav.remove();
+    }
+    nav.setAttribute("aria-label", "Main");
+    nav.innerHTML = tabs[mode()].map(([key, label, icon, go], i) => i === 2
+      ? `<a href="#" class="center" data-go="${go}" aria-label="${key === "new" ? "Create new order" : "Scan order QR"}"><span class="fab"><svg class="i" data-icon="${icon}"></svg></span>${label}</a>`
+      : `<a href="#"${key === current ? ' aria-current="page"' : ` data-go="${go}"`}><svg class="i" data-icon="${icon}"></svg>${label}</a>`).join("");
+  });
 
   const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
   const phoneRe = /^\+?[\d\s-]{8,15}$/;
