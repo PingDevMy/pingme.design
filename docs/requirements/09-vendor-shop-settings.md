@@ -14,7 +14,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `VSHOP-01` Edit Shop Profile · ⚪ Not started
+### `VSHOP-01` Edit Shop Profile · 🔵 In design
 
 Vendor edits what customers see on the Shop Profile.
 
@@ -26,7 +26,9 @@ Vendor edits what customers see on the Shop Profile.
 
 - [ ] Changes show on the public Shop Profile immediately
 
-### `VSHOP-02` Customer Messaging · ⚪ Not started
+> This is the Shop tab. Edits enable Save; Preview opens the public Shop Profile. Settings links to Customer Messaging, Staff and Account.
+
+### `VSHOP-02` Customer Messaging · 🔵 In design
 
 Vendor sets the automatic messages sent at each status change, plus quick-reply templates.
 
@@ -38,10 +40,14 @@ Vendor sets the automatic messages sent at each status change, plus quick-reply 
 
 - [ ] Preview shows the message as the customer will see it
 
-### `VSHOP-03` Staff & Technicians · ⚪ Not started
+> Pick a status to edit its message; placeholder chips insert at the cursor and the preview fills them in. Quick replies here are the ones offered in the Notify sheet.
+
+### `VSHOP-03` Staff & Technicians · 🔵 In design
 
 Vendor invites staff and assigns technicians to on-site jobs.
 
 - Invite by phone, role (Admin, Staff, Technician), remove
+
+> Invite by phone with a role. Tap a member to change role or remove them; the owner row is fixed.
 
 <!-- screens:end -->

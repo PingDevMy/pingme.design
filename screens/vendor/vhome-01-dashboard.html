@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Dashboard · PingMe for Vendors</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .head { display: flex; align-items: center; gap: 12px; padding: 14px var(--gutter) 4px; }
+    .head .grow { flex: 1; min-width: 0; }
+    .head h1 { margin: 0; font-size: 20px; letter-spacing: -0.02em; }
+    .head .sub { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink-2); }
+    .head .sub svg.i { width: 14px; height: 14px; fill: #f59e0b; stroke: none; }
+    .head .btns { display: flex; gap: 8px; flex: none; }
+
+    .hero {
+      position: relative; overflow: hidden; margin-top: 14px; padding: 20px; border-radius: 24px; color: #fff; text-decoration: none; display: block;
+      background: linear-gradient(150deg, #13a4ba 0%, var(--brand-700) 70%); box-shadow: 0 14px 30px rgba(14, 143, 163, 0.28);
+    }
+    .hero:hover { text-decoration: none; }
+    .hero::after { content: ""; position: absolute; right: -60px; top: -70px; width: 220px; height: 220px; border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 240, 198, 0.3), transparent); pointer-events: none; }
+    .hero .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .hero .lbl { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255, 255, 255, 0.8); }
+    .hero .more { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; font-weight: 600; color: #fff; }
+    .hero .more svg.i { width: 16px; height: 16px; }
+    .hero .amt { margin-top: 6px; font-size: 38px; line-height: 1.1; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .hero .amt small { font-size: 22px; font-weight: 700; opacity: 0.85; }
+    .hero .delta { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 8px; font-size: 13px; color: rgba(255, 255, 255, 0.82); }
+    .hero .delta b { display: inline-flex; align-items: center; gap: 4px; height: 24px; padding: 0 8px; border-radius: 999px; background: rgba(127, 240, 198, 0.2); color: var(--mint); font-size: 12.5px; }
+    .hero .delta b svg.i { width: 14px; height: 14px; }
+
+    /* This week's sales: single series, so no legend; today is the solid bar. */
+    .week { position: relative; margin-top: 18px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.18); }
+    .week .wk { display: flex; justify-content: space-between; font-size: 12px; color: rgba(255, 255, 255, 0.75); margin-bottom: 8px; }
+    .week .wk b { color: #fff; font-weight: 600; }
+    .bars { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; align-items: end; height: 72px; }
+    .bars button { position: relative; height: 100%; border: 0; padding: 0; background: none; display: flex; align-items: flex-end; cursor: pointer; }
+    .bars button span { display: block; width: 100%; border-radius: 4px 4px 0 0; background: rgba(255, 255, 255, 0.35); transition: background 0.15s; }
+    .bars button.today span { background: #fff; }
+    .bars button:hover span, .bars button[aria-pressed="true"] span { background: var(--mint); }
+    .days { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; margin-top: 6px; font-size: 11px; text-align: center; color: rgba(255, 255, 255, 0.7); }
+    .days .today { color: #fff; font-weight: 700; }
+    .tip { position: absolute; top: 0; transform: translate(-50%, -4px); padding: 4px 8px; border-radius: 8px; background: var(--ink); color: #fff; font-size: 12px; font-weight: 600; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.12s; z-index: 2; }
+    .tip.show { opacity: 1; }
+
+    .counters { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+    .counter { display: block; padding: 14px; }
+    .counters .card + .card { margin-top: 0; }
+    .counter .row { justify-content: space-between; align-items: flex-start; }
+    .counter .tile { width: 38px; height: 38px; border-radius: 12px; }
+    .counter .tile svg.i { width: 19px; height: 19px; }
+    .counter b { display: block; margin-top: 12px; font-size: 28px; line-height: 1; font-weight: 800; letter-spacing: -0.02em; }
+    .counter span.lbl { display: block; margin-top: 4px; font-size: 13px; color: var(--ink-2); font-weight: 500; }
+    .counter .chev { width: 18px; height: 18px; color: var(--ink-3); }
+    .counter.ready { border-color: #a7f3d0; background: linear-gradient(180deg, #fff, #f0fdf8); }
+    .counter.ready .tile { background: var(--success-50); color: var(--success); }
+
+    .draft-strip { display: flex; align-items: center; gap: 10px; margin-top: 12px; padding: 12px 14px; border-radius: var(--r); background: #fffbeb; color: #92400e; font-size: 13.5px; font-weight: 500; text-decoration: none; }
+    .draft-strip:hover { text-decoration: none; background: #fef3c7; }
+    .draft-strip .grow { flex: 1; min-width: 0; }
+    .draft-strip svg.i { width: 18px; height: 18px; }
+
+    .ord { display: flex; align-items: center; gap: 12px; }
+    .ord .grow { flex: 1; min-width: 0; }
+    .ord b { display: block; font-size: 15px; }
+    .ord .meta { display: block; }
+    .ord .right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex: none; }
+    .ord .amt { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+    .ord .manage { display: inline-flex; align-items: center; gap: 2px; font-size: 13px; color: var(--brand-700); font-weight: 600; }
+    .ord .manage svg.i { width: 15px; height: 15px; }
+    .ord-foot { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--line); }
+    .ord-foot .meta { display: flex; align-items: center; gap: 6px; }
+    .ord-foot .meta svg.i { width: 14px; height: 14px; }
+    .ord-list .card { padding: 14px; }
+    .ord-list .card + .card { margin-top: 10px; }
+
+    @media (max-width: 360px) {
+      .hero { padding: 18px; }
+      .hero .amt { font-size: 32px; }
+      .ord .avatar { display: none; }
+    }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page tabbed">
+    <header class="head">
+      <span class="mark sm"><svg class="i" data-icon="bolt"></svg></span>
+      <div class="grow">
+        <h1 class="ellipsis" id="shop">Alex's Laundry Corner</h1>
+        <div class="sub"><svg class="i" data-icon="star"></svg><span id="rating"></span></div>
+      </div>
+      <div class="btns">
+        <button class="icon-btn" type="button" aria-label="Scan a pickup QR" data-go="VORD-06"><svg class="i" data-icon="scan"></svg></button>
+        <button class="icon-btn" type="button" aria-label="Notifications, 2 unread" data-go="NOTI-01"><svg class="i" data-icon="bell"></svg><span class="count">2</span></button>
+      </div>
+    </header>
+
+    <main class="content">
+      <section class="hero rise" aria-label="Revenue">
+        <div class="top">
+          <span class="lbl">Revenue · October</span>
+          <a href="#" class="more" data-go="VREV-01">Analytics<svg class="i" data-icon="chevron"></svg></a>
+        </div>
+        <div class="amt mono">RM 4,285<small>.50</small></div>
+        <div class="delta"><b><svg class="i" data-icon="arrow" style="transform: rotate(-45deg)"></svg>12.5%</b>vs RM 3,809 in September</div>
+        <div class="week">
+          <div class="wk"><span>Last 7 days</span><b id="wk-total"></b></div>
+          <div class="bars" id="bars" role="group" aria-label="Sales per day, last 7 days"></div>
+          <div class="days" id="days" aria-hidden="true"></div>
+          <div class="tip" id="tip" role="status"></div>
+        </div>
+      </section>
+
+      <div class="counters">
+        <a href="#" class="card tap counter rise" data-filter="active">
+          <div class="row"><span class="tile"><svg class="i" data-icon="package"></svg></span><svg class="i chev" data-icon="chevron"></svg></div>
+          <b id="n-active">0</b><span class="lbl">Active orders</span>
+        </a>
+        <a href="#" class="card tap counter ready rise" data-filter="ready">
+          <div class="row"><span class="tile"><svg class="i" data-icon="checkcircle"></svg></span><svg class="i chev" data-icon="chevron"></svg></div>
+          <b id="n-ready">0</b><span class="lbl">Ready for pickup</span>
+        </a>
+      </div>
+
+      <div id="drafts"></div>
+
+      <section class="section">
+        <div class="section-head"><h2>Recent orders</h2><a href="#" data-filter="all">View all</a></div>
+        <div class="ord-list" id="recent"></div>
+      </section>
+      <button class="text-btn proto" type="button" id="reset">Prototype: reset the sample orders</button>
+    </main>
+
+    <nav class="tabbar five" aria-label="Main">
+      <a href="#" aria-current="page"><svg class="i" data-icon="home"></svg>Home</a>
+      <a href="#" data-go="VORD-01"><svg class="i" data-icon="receipt"></svg>Orders</a>
+      <a href="#" class="scan" aria-label="Create new order" data-go="VORD-04"><svg class="i" data-icon="plus"></svg></a>
+      <a href="#" data-go="VREV-01"><svg class="i" data-icon="chart"></svg>Revenue</a>
+      <a href="#" data-go="VSHOP-01"><svg class="i" data-icon="store"></svg>Shop</a>
+    </nav>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const $ = (id) => document.getElementById(id);
+    $("shop").textContent = V.shop.name;
+    $("rating").textContent = `${V.shop.rating} · ${V.shop.reviews} reviews`;
+
+    // Sales over the last 7 days (RM); today (Tuesday) is still open.
+    const week = [["Wed", 412], ["Thu", 268], ["Fri", 355], ["Sat", 620], ["Sun", 498], ["Mon", 446], ["Tue", 236]];
+    const max = Math.max(...week.map((d) => d[1]));
+    $("wk-total").textContent = "RM " + week.reduce((a, d) => a + d[1], 0).toLocaleString("en-MY");
+    $("bars").innerHTML = week.map(([d, v], i) => `<button type="button" class="${i === 6 ? "today" : ""}" aria-label="${d}, RM ${v}" aria-pressed="false" data-i="${i}"><span style="height:${Math.max(6, (v / max) * 100)}%"></span></button>`).join("");
+    $("days").innerHTML = week.map(([d], i) => `<span class="${i === 6 ? "today" : ""}">${i === 6 ? "Today" : d[0]}</span>`).join("");
+    const tip = $("tip");
+    function show(btn) {
+      const [d, v] = week[btn.dataset.i];
+      document.querySelectorAll("#bars button").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      tip.textContent = `${d} · RM ${v}`;
+      const box = $("bars").getBoundingClientRect(), r = btn.getBoundingClientRect();
+      const x = r.left - box.left + r.width / 2;
+      const half = tip.offsetWidth / 2;
+      tip.style.left = Math.min(Math.max(x, half), box.width - half) + "px";
+      tip.classList.add("show");
+    }
+    function hide() {
+      tip.classList.remove("show");
+      document.querySelectorAll("#bars button").forEach((b) => b.setAttribute("aria-pressed", "false"));
+    }
+    $("bars").addEventListener("mouseover", (e) => { const b = e.target.closest("button"); b && show(b); });
+    $("bars").addEventListener("mouseleave", hide);
+    $("bars").addEventListener("click", (e) => { const b = e.target.closest("button"); b && show(b); });
+    $("bars").addEventListener("focusin", (e) => show(e.target.closest("button")));
+    $("bars").addEventListener("focusout", hide);
+
+    function render() {
+      const act = V.orders.filter(V.active);
+      $("n-active").textContent = act.length;
+      $("n-ready").textContent = act.filter((o) => o.status === "ready").length;
+      const drafts = V.orders.filter((o) => o.status === "draft");
+      $("drafts").innerHTML = drafts.length ? `<a href="#" class="draft-strip" data-filter="draft"><svg class="i" data-icon="edit"></svg><span class="grow"><b>${drafts.length} draft${drafts.length > 1 ? "s" : ""}</b> not sent yet. Customers aren't notified until you generate the QR.</span><svg class="i" data-icon="chevron"></svg></a>` : "";
+      const recent = V.orders.filter((o) => o.status !== "draft").slice(0, 4);
+      $("recent").innerHTML = recent.map((o) => `
+        <a href="#" class="card tap rise" data-open="${o.id}">
+          <div class="ord">
+            <span class="avatar sm">${V.initials(o.customer.name)}</span>
+            <div class="grow">
+              <b class="ellipsis">${V.esc(o.customer.name)}</b>
+              <span class="meta ellipsis">${o.id} · ${V.esc(o.title)} · ${o.qty} ${o.unit}</span>
+            </div>
+            <div class="right">
+              ${V.pill(o)}
+              <span class="amt">${PM.data.money(V.total(o))}</span>
+            </div>
+          </div>
+          <div class="ord-foot"><span class="meta ellipsis"><svg class="i" data-icon="clock"></svg>${o.created}</span><span class="manage">Manage<svg class="i" data-icon="chevron"></svg></span></div>
+        </a>`).join("");
+      PM.hydrateIcons(document.querySelector(".content"));
+    }
+
+    document.addEventListener("click", (e) => {
+      const f = e.target.closest("[data-filter]");
+      if (f) { e.preventDefault(); PM.store.set("vfilter", f.dataset.filter); return PM.go("VORD-01"); }
+      const o = e.target.closest("[data-open]");
+      if (o) { e.preventDefault(); PM.store.set("vorder", o.dataset.open); PM.go("VORD-05"); }
+    });
+    $("reset").addEventListener("click", () => { V.reset(); render(); PM.toast("Sample orders restored"); });
+
+    render();
+  </script>
+</body>
+</html>

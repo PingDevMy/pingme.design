@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Transactions · PingMe for Vendors</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .filters { margin-top: 12px; }
+    .filters + .filters { margin-top: 8px; }
+    .filters .lbl { flex: none; align-self: center; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); margin-right: 2px; }
+    .sum { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; margin: 18px 0 8px; font-size: 13px; color: var(--ink-2); }
+    .sum b { font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+    .group-h { margin: 18px 0 8px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+    .item .right { text-align: right; flex: none; }
+    .item .amt { display: block; font-weight: 700; font-variant-numeric: tabular-nums; }
+    .item .amt.neg { color: #b91c1c; }
+    .item .pill { height: 20px; font-size: 11px; margin-top: 3px; }
+    .item .grow b { display: block; font-size: 15px; }
+    @media (max-width: 360px) { .item .tile { display: none; } }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="VREV-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Transactions</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <label class="control search"><svg class="i" data-icon="search"></svg><input id="q" type="search" placeholder="Customer, service or order no." aria-label="Search transactions" /></label>
+      <div class="chips scroll filters" id="status" role="group" aria-label="Filter by status"></div>
+      <div class="chips scroll filters" id="dates" role="group" aria-label="Filter by date"></div>
+      <div class="sum"><span id="count"></span><b id="sum"></b></div>
+      <div id="list"></div>
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    const rm = (n) => "RM " + n.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const statuses = [["all", "All"], ["settled", "Settled"], ["processing", "Processing"], ["refunded", "Refunded"]];
+    const dates = [["all", "Any date", 999], ["today", "Today", 0], ["d7", "Last 7 days", 6], ["d30", "Last 30 days", 29]];
+    let st = "all", dt = "all", q = "";
+
+    const chips = (list, cur, key) => list.map(([k, l]) => `<button type="button" class="chip" data-${key}="${k}" aria-pressed="${k === cur}">${l}</button>`).join("");
+    const group = (t) => (t.day === 0 ? "Today" : t.day < 7 ? "This week" : t.day < 30 ? "Earlier this month" : "Older");
+
+    function render() {
+      $("status").innerHTML = chips(statuses, st, "s");
+      $("dates").innerHTML = chips(dates, dt, "d");
+      const maxDay = dates.find((d) => d[0] === dt)[2];
+      const needle = q.trim().toLowerCase();
+      const rows = V.transactions.filter((t) => (st === "all" || t.status === st) && t.day <= maxDay && (!needle || [t.who, t.what, t.order, t.id].join(" ").toLowerCase().includes(needle)));
+      $("count").textContent = `${rows.length} payment${rows.length === 1 ? "" : "s"}`;
+      $("sum").textContent = rows.length ? rm(rows.reduce((a, t) => a + t.amount, 0)) : "";
+      if (!rows.length) {
+        $("list").innerHTML = `<div class="card empty"><span class="badge-icon ring"><svg class="i" data-icon="receipt"></svg></span><h3>No transactions</h3><p>Nothing matches these filters. Try a wider date range.</p></div>`;
+      } else {
+        let html = "", last = "";
+        rows.forEach((t, i) => {
+          const g = group(t);
+          if (g !== last) { html += `${i ? "</div>" : ""}<div class="group-h">${g}</div><div class="list">`; last = g; }
+          const [label, cls] = V.txStatus[t.status];
+          html += `<a class="item" href="#" data-order="${t.order}">
+            ${V.catTile(t.cat, "sm")}
+            <span class="grow"><b class="ellipsis">${V.esc(t.what)}</b><small class="ellipsis">${V.esc(t.who)} · ${t.order} · ${t.method}</small><small>${t.at}</small></span>
+            <span class="right"><span class="amt${t.amount < 0 ? " neg" : ""}">${t.amount < 0 ? "−" : "+"}${rm(Math.abs(t.amount))}</span><span class="pill ${cls} plain">${label}</span></span>
+          </a>`;
+        });
+        $("list").innerHTML = html + "</div>";
+      }
+      PM.hydrateIcons($("list"));
+    }
+
+    $("status").addEventListener("click", (e) => { const b = e.target.closest("[data-s]"); if (b) { st = b.dataset.s; render(); } });
+    $("dates").addEventListener("click", (e) => { const b = e.target.closest("[data-d]"); if (b) { dt = b.dataset.d; render(); } });
+    $("q").addEventListener("input", (e) => { q = e.target.value; render(); });
+    $("list").addEventListener("click", (e) => {
+      const a = e.target.closest("[data-order]");
+      if (!a) return;
+      e.preventDefault();
+      V.openTx(a.dataset.order);
+    });
+
+    render();
+  </script>
+</body>
+</html>

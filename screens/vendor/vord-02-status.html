@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Update Status · PingMe for Vendors</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .sum .top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+    .sum .id { font-size: 12.5px; font-weight: 600; color: var(--ink-3); }
+    .sum h1 { margin: 10px 0 2px; font-size: 20px; letter-spacing: -0.02em; }
+    .sum .meta { display: block; }
+    .reopen { margin-top: 16px; }
+  </style>
+</head>
+<body class="canvas">
+  <!-- VORD-02: the Update Status sheet itself lives in ../vendor.js (shared with the order list and details). -->
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="VORD-05"><svg class="i" data-icon="back"></svg></button>
+      <div class="title" id="title">Order</div>
+      <span class="spacer"></span>
+    </header>
+    <main class="content">
+      <section class="card sum" id="sum"></section>
+      <section class="section">
+        <div class="section-head"><h2>Latest activity</h2></div>
+        <div class="card"><ol class="log" id="log"></ol></div>
+      </section>
+      <button class="btn primary reopen" type="button" id="reopen"><svg class="i" data-icon="refresh"></svg>Update status</button>
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const $ = (id) => document.getElementById(id);
+    // Shown over the order it was opened from; any in-progress order otherwise.
+    let o = V.order(PM.store.get("vorder"));
+    if (!o || !V.active(o)) o = V.orders.find((x) => x.status === "progress");
+    $("title").textContent = "Order #" + o.id.slice(4);
+
+    function render() {
+      $("sum").innerHTML = `
+        <div class="top">${V.pill(o)}<span class="id">${o.id}</span></div>
+        <h1 class="ellipsis">${V.esc(o.title)}</h1>
+        <span class="meta ellipsis">${V.esc(o.customer.name || "No customer yet")} · ${o.category} · ${PM.data.money(V.total(o))}</span>`;
+      $("log").innerHTML = V.logHtml(o.log.slice(0, 3));
+      PM.hydrateIcons(document.body);
+    }
+    function show() { V.statusSheet(o, render); }
+
+    $("reopen").addEventListener("click", show);
+    render();
+    setTimeout(show, 250);
+  </script>
+</body>
+</html>
