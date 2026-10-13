@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PingMe Prototype</title>
+  <meta name="description" content="PingMe screen-by-screen prototype: modules, phone preview and requirements." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="app/styles.css" />
+</head>
+<body>
+  <div class="layout">
+    <!-- Left: modules and screens -->
+    <aside class="panel nav" aria-label="Screens">
+      <header class="brand">
+        <div class="brand-row">
+          <span class="logo" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" /></svg>
+          </span>
+          <span class="brand-name">PingMe</span>
+        </div>
+        <span class="chip" id="version"></span>
+      </header>
+
+      <section class="progress" aria-label="Design progress">
+        <div class="progress-head">
+          <span>Screens done</span>
+          <strong id="progress-text"></strong>
+        </div>
+        <div class="bar" id="progress-bar"></div>
+        <div class="filters" id="filters" role="group" aria-label="Filter by status"></div>
+      </section>
+
+      <nav class="tree" id="nav-tree"></nav>
+
+      <footer class="nav-foot">
+        <a class="btn ghost" href="docs/requirements/README.md">Tracker</a>
+        <a class="btn ghost" href="docs/requirements/00-overview.md">Overview</a>
+      </footer>
+    </aside>
+
+    <!-- Centre: phone -->
+    <main class="stage">
+      <div class="phone" id="phone">
+        <div class="phone-screen">
+          <div class="statusbar">
+            <span>9:41</span>
+            <span class="island" aria-hidden="true"></span>
+            <span class="sb-icons" aria-hidden="true">
+              <svg viewBox="0 0 18 12"><rect x="0" y="8" width="3" height="4" rx="1"/><rect x="5" y="5" width="3" height="7" rx="1"/><rect x="10" y="2" width="3" height="10" rx="1"/><rect x="15" y="0" width="3" height="12" rx="1"/></svg>
+              <svg viewBox="0 0 26 12"><rect x="0.5" y="0.5" width="22" height="11" rx="3" fill="none" stroke="currentColor"/><rect x="2.5" y="2.5" width="16" height="7" rx="1.5"/><rect x="24" y="4" width="2" height="4" rx="1"/></svg>
+            </span>
+          </div>
+          <div class="screen-body" id="screen-body"></div>
+          <div class="home-indicator" aria-hidden="true"></div>
+        </div>
+      </div>
+
+      <div class="device-label">iPhone 18 Pro · 402 × 874 pt</div>
+
+      <div class="stage-controls">
+        <button class="icon-btn" id="prev" aria-label="Previous screen" title="Previous screen (↑)">
+          <svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6" /></svg>
+        </button>
+        <div class="refs" id="refs"></div>
+        <button class="icon-btn" id="next" aria-label="Next screen" title="Next screen (↓)">
+          <svg viewBox="0 0 24 24"><path d="m9 18 6-6-6-6" /></svg>
+        </button>
+      </div>
+    </main>
+
+    <!-- Right: screen description -->
+    <aside class="panel info" aria-live="polite">
+      <div class="info-top">
+        <span class="screen-id" id="screen-id"></span>
+        <button class="dev-toggle" id="dev-toggle" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5" /></svg>
+          Dev mode
+          <span class="dot" aria-hidden="true"></span>
+        </button>
+      </div>
+      <div class="info-body" id="info"></div>
+    </aside>
+  </div>
+
+  <script src="app/screens.js"></script>
+  <script src="app/app.js"></script>
+</body>
+</html>
