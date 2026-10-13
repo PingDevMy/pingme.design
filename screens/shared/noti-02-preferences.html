@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Notification Preferences · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .intro { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); }
+    .ev .head { display: flex; align-items: flex-start; gap: 12px; }
+    .ev .head .grow { flex: 1; min-width: 0; }
+    .ev b { display: block; font-size: 15px; }
+    .ev .meta { display: block; margin-top: 1px; }
+    .ev .lock { display: inline-flex; align-items: center; gap: 4px; margin-top: 6px; font-size: 12px; font-weight: 600; color: #b45309; }
+    .ev .lock svg.i { width: 13px; height: 13px; }
+    .chans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+    .ch { display: flex; align-items: center; justify-content: center; gap: 6px; height: 40px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--surface); font-size: 13.5px; font-weight: 600; color: var(--ink-3); padding: 0 6px; white-space: nowrap; }
+    .ch svg.i { width: 16px; height: 16px; }
+    .ch[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-50); color: var(--brand-700); }
+    .ev .warn { display: none; margin-top: 10px; font-size: 12.5px; color: #b45309; }
+    .ev.blocked .warn { display: block; }
+    .qh .row { justify-content: space-between; }
+    .qh .times { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+    .qh .times[hidden] { display: none; }
+    .qh .control { height: 48px; }
+    .qh .control select { appearance: none; cursor: pointer; }
+    .qh .times .label { display: block; margin-bottom: 6px; }
+    .qh p { margin: 12px 0 0; font-size: 12.5px; color: var(--ink-2); }
+    .saved { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-3); }
+    .saved svg.i { width: 14px; height: 14px; color: var(--success); }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Notifications</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <p class="intro">Choose how PingMe reaches you for each kind of update. SMS is used for orders when push can't reach you.</p>
+
+      <section class="section">
+        <div class="section-head"><h2>Order updates</h2><span class="saved"><svg class="i" data-icon="checkcircle"></svg>Saved</span></div>
+        <div id="events"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Quiet hours</h2></div>
+        <div class="card qh">
+          <div class="row">
+            <span class="tile violet"><svg class="i" data-icon="moon"></svg></span>
+            <div class="grow"><b style="display: block">Pause pings at night</b><span class="meta">Updates wait until quiet hours end</span></div>
+            <label class="switch"><input type="checkbox" id="qh" checked aria-label="Quiet hours" /><span></span></label>
+          </div>
+          <div class="times" id="times">
+            <div><span class="label">From</span><label class="control"><svg class="i" data-icon="clock"></svg><select id="from" aria-label="From"></select></label></div>
+            <div><span class="label">Until</span><label class="control"><svg class="i" data-icon="clock"></svg><select id="to" aria-label="Until"></select></label></div>
+          </div>
+          <p id="qh-note">Ready for pickup still arrives during quiet hours, without sound.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    $("back").addEventListener("click", () => PM.go("ACCT-01"));
+    const chans = [["push", "Push", "bell"], ["sms", "SMS", "phone"], ["email", "Email", "mail"]];
+    const events = [
+      { id: "created", t: "New order added", d: "A shop creates an order for your number", icon: "receipt", tone: "", on: ["push"] },
+      { id: "status", t: "Status changes", d: "Every step, with the shop's note", icon: "refresh", tone: "", on: ["push"] },
+      { id: "ready", t: "Ready for pickup", d: "Your order is ready to collect", icon: "checkcircle", tone: "green", on: ["push", "sms"], must: true },
+      { id: "msg", t: "Messages from shops", d: "Notes, delays and reminders", icon: "message", tone: "sky", on: ["push"] },
+      { id: "done", t: "Receipts & rating", d: "When an order is completed", icon: "star", tone: "amber", on: ["push", "email"] },
+    ];
+
+    $("events").innerHTML = events.map((e) => `
+      <div class="card ev" data-ev="${e.id}">
+        <div class="head">
+          <span class="tile ${e.tone}" ${e.tone === "green" ? 'style="background:var(--success-50);color:var(--success)"' : ""}><svg class="i" data-icon="${e.icon}"></svg></span>
+          <div class="grow"><b>${e.t}</b><span class="meta">${e.d}</span>${e.must ? '<span class="lock"><svg class="i" data-icon="lock"></svg>Keeps at least one channel</span>' : ""}</div>
+        </div>
+        <div class="chans" role="group" aria-label="${e.t} channels">${chans.map(([k, l, ic]) => `<button class="ch" type="button" data-ch="${k}" aria-pressed="${e.on.includes(k)}"><svg class="i" data-icon="${ic}"></svg>${l}</button>`).join("")}</div>
+        <div class="warn">Ready for pickup needs at least one channel so you don't miss your order.</div>
+      </div>`).join("");
+
+    $("events").addEventListener("click", (ev) => {
+      const b = ev.target.closest(".ch");
+      if (!b) return;
+      const card = b.closest(".ev");
+      const e = events.find((x) => x.id === card.dataset.ev);
+      const k = b.dataset.ch;
+      const on = e.on.includes(k);
+      if (on && e.must && e.on.length === 1) {
+        card.classList.add("blocked");
+        return PM.shake(b);
+      }
+      card.classList.remove("blocked");
+      e.on = on ? e.on.filter((x) => x !== k) : [...e.on, k];
+      b.setAttribute("aria-pressed", String(!on));
+      PM.toast("Preferences saved");
+    });
+
+    const hours = Array.from({ length: 24 }, (_, h) => {
+      const label = `${((h + 11) % 12) + 1}:00 ${h < 12 ? "AM" : "PM"}`;
+      return `<option value="${h}">${label}</option>`;
+    }).join("");
+    $("from").innerHTML = hours;
+    $("to").innerHTML = hours;
+    $("from").value = "22";
+    $("to").value = "7";
+    $("qh").addEventListener("change", (e) => {
+      $("times").hidden = !e.target.checked;
+      $("qh-note").hidden = !e.target.checked;
+      PM.toast(e.target.checked ? "Quiet hours on" : "Quiet hours off");
+    });
+    ["from", "to"].forEach((id) => $(id).addEventListener("change", () => PM.toast("Quiet hours updated")));
+
+    PM.hydrateIcons();
+  </script>
+</body>
+</html>

@@ -33,7 +33,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `NOTI-01` Notification Inbox · ⚪ Not started
+### `NOTI-01` Notification Inbox · 🔵 In design
 
 Every ping a user has received, newest first, with unread markers.
 
@@ -45,7 +45,9 @@ Every ping a user has received, newest first, with unread markers.
 
 - [ ] Bell icon badge equals unread count
 
-### `NOTI-02` Notification Preferences · ⚪ Not started
+> Customer view. Tapping a ping opens its order; the rating ping opens Rate & Review. The unread count matches the bell badge on Home.
+
+### `NOTI-02` Notification Preferences · 🔵 In design
 
 User chooses which pings arrive by push, SMS or email.
 
@@ -55,5 +57,7 @@ User chooses which pings arrive by push, SMS or email.
 **Acceptance:**
 
 - [ ] Order-ready pings cannot be fully turned off (at least one channel)
+
+> Customer view. Try turning off both channels for Ready for pickup.
 
 <!-- screens:end -->

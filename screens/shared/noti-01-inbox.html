@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Notifications · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .bar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin: 14px 0 4px; }
+    .bar span { font-size: 13px; color: var(--ink-2); }
+    .bar button { font-size: 13.5px; color: var(--brand-700); }
+    .bar button:disabled { color: var(--ink-3); cursor: default; }
+    .group { margin: 18px 0 8px; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); }
+    .feed { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); overflow: hidden; }
+    .n { position: relative; display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; gap: 12px; width: 100%; padding: 14px 16px; border: 0; background: none; text-align: left; color: inherit; font-weight: inherit; }
+    .n + .n { border-top: 1px solid var(--line-2); }
+    .n:hover { background: var(--canvas); }
+    .n.unread { background: linear-gradient(90deg, var(--brand-50), transparent 70%); }
+    .n .t { display: block; font-size: 14.5px; font-weight: 600; }
+    .n:not(.unread) .t { font-weight: 500; }
+    .n .b { display: block; margin-top: 2px; font-size: 13.5px; color: var(--ink-2); line-height: 1.45; }
+    .n .s { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-3); }
+    .n .side { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .n time { font-size: 12px; color: var(--ink-3); white-space: nowrap; }
+    .n .u { width: 9px; height: 9px; border-radius: 50%; background: var(--brand); }
+    .n:not(.unread) .u { visibility: hidden; }
+    .n .tile { position: relative; }
+    .n .tile .ch { position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--ink-2); box-shadow: 0 0 0 1px var(--line); }
+    .n .tile .ch svg.i { width: 11px; height: 11px; }
+    .tile.green { background: var(--success-50); color: var(--success); }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="CHOME-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Notifications</div>
+      <button class="icon-btn plain" type="button" aria-label="Notification settings" data-go="NOTI-02"><svg class="i" data-icon="settings"></svg></button>
+    </header>
+
+    <main class="content">
+      <div class="tabs" role="tablist" aria-label="Show">
+        <button type="button" role="tab" aria-selected="true" data-f="all">All</button>
+        <button type="button" role="tab" aria-selected="false" data-f="order">Orders</button>
+        <button type="button" role="tab" aria-selected="false" data-f="msg">Messages</button>
+      </div>
+      <div class="bar"><span id="unread"></span><button class="text-btn" type="button" id="all-read">Mark all as read</button></div>
+      <div id="list"></div>
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    let f = "all";
+    // kind: order (status change) or msg (vendor message). via: push or sms.
+    const items = [
+      { id: 1, day: "Today", kind: "order", order: "ORD-1204", icon: "checkcircle", tone: "green", t: "Ready for pickup", b: "Sunshine Dry Cleaners: your 2 suits are ready. Show your pickup QR at the counter.", at: "9:02 AM", via: "push", unread: true },
+      { id: 2, day: "Today", kind: "order", order: "SVC-88201", icon: "pin", tone: "sky", t: "Technician arrived", b: "Marcus from AquaPure Services has arrived at your location.", at: "10:47 AM", via: "push", unread: true },
+      { id: 3, day: "Today", kind: "msg", order: "ORD-0921", icon: "message", tone: "", t: "Message from Luxe Laundry Hub", b: "Hi Alex, one shirt has a stain we can pre-treat for free. We'll go ahead unless you say no.", at: "10:50 AM", via: "push", unread: true },
+      { id: 4, day: "Today", kind: "order", order: "ORD-0921", icon: "refresh", tone: "", t: "Order in progress", b: "Luxe Laundry Hub started your Wash & Press order.", at: "10:45 AM", via: "push" },
+      { id: 5, day: "Today", kind: "order", order: "ORD-0877", icon: "receipt", tone: "violet", t: "New order added", b: "The Tailor Studio created order ORD-0877 for your phone number.", at: "9:40 AM", via: "sms" },
+      { id: 6, day: "Earlier", kind: "order", order: "ORD-0712", icon: "star", tone: "amber", t: "How was PingClean Express?", b: "Your order ORD-0712 was picked up. Tap to rate it.", at: "4 Oct", via: "push", rate: true },
+      { id: 7, day: "Earlier", kind: "msg", order: "ORD-0712", icon: "message", tone: "", t: "Message from PingClean Express", b: "We're closed on Sunday for the public holiday. Pickups resume Monday 8 AM.", at: "3 Oct", via: "sms" },
+      { id: 8, day: "Earlier", kind: "order", order: "ORD-0650", icon: "checkcircle", tone: "green", t: "Order completed", b: "Fix-It Phone Repair: screen replacement done. Receipt saved to your history.", at: "30 Sep", via: "push" },
+    ];
+    // Newest first.
+    const rank = [3, 2, 4, 5, 1, 6, 7, 8];
+    items.sort((a, b) => rank.indexOf(a.id) - rank.indexOf(b.id));
+
+    function render() {
+      const shown = items.filter((n) => f === "all" || n.kind === f);
+      const unread = items.filter((n) => n.unread).length;
+      $("unread").textContent = unread ? `${unread} unread` : "You're all caught up";
+      $("all-read").disabled = !unread;
+      $("list").innerHTML = ["Today", "Earlier"].map((day) => {
+        const g = shown.filter((n) => n.day === day);
+        if (!g.length) return "";
+        return `<div class="group">${day}</div><div class="feed">${g.map((n) => `
+          <button class="n${n.unread ? " unread" : ""}" type="button" data-id="${n.id}">
+            <span class="tile ${n.tone}"><svg class="i" data-icon="${n.icon}"></svg><span class="ch" title="${n.via === "sms" ? "Sent by SMS" : "Push"}"><svg class="i" data-icon="${n.via === "sms" ? "phone" : "bell"}"></svg></span></span>
+            <span><span class="t">${n.t}</span><span class="b">${n.b}</span><span class="s">${n.order}${n.via === "sms" ? " · sent by SMS" : ""}</span></span>
+            <span class="side"><time>${n.at}</time><span class="u" aria-label="${n.unread ? "Unread" : ""}"></span></span>
+          </button>`).join("")}</div>`;
+      }).join("") || `<div class="empty"><span class="badge-icon ring"><svg class="i" data-icon="bell"></svg></span><h3>No notifications</h3><p>Pings about your orders show up here.</p></div>`;
+      PM.hydrateIcons($("list"));
+    }
+
+    document.querySelectorAll("[data-f]").forEach((b) => b.addEventListener("click", () => {
+      f = b.dataset.f;
+      document.querySelectorAll("[data-f]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+      render();
+    }));
+    $("all-read").addEventListener("click", () => { items.forEach((n) => (n.unread = false)); render(); });
+    $("list").addEventListener("click", (e) => {
+      const el = e.target.closest("[data-id]");
+      if (!el) return;
+      const n = items.find((x) => x.id === +el.dataset.id);
+      n.unread = false;
+      const o = D.order(n.order);
+      PM.store.set("order", o.id);
+      PM.go(n.rate ? "CTRK-04" : o.type === "onsite" ? "CTRK-02" : "CTRK-01");
+    });
+
+    render();
+  </script>
+</body>
+</html>

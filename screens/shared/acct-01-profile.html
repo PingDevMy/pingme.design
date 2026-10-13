@@ -1,0 +1,239 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Profile · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .me { text-align: center; padding: 18px 0 4px; }
+    .me .avatar { margin: 0 auto 12px; position: relative; }
+    .me .cam { position: absolute; right: -2px; bottom: -2px; width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; border: 0; padding: 0; background: var(--ink); color: #fff; box-shadow: 0 0 0 3px var(--canvas); }
+    .me .cam svg.i { width: 14px; height: 14px; }
+    .me h1 { margin: 0; font-size: 22px; letter-spacing: -0.02em; }
+    .me p { margin: 4px 0 0; font-size: 14px; color: var(--ink-2); }
+    .me .btn { width: auto; height: 38px; padding: 0 16px; font-size: 14px; margin-top: 14px; }
+    .role { display: flex; align-items: center; gap: 12px; margin-top: 20px; padding: 14px 16px; border-radius: var(--r-lg); color: #fff; background: linear-gradient(135deg, var(--ink), #1e293b); text-decoration: none; }
+    .role:hover { text-decoration: none; }
+    .role .grow { flex: 1; min-width: 0; }
+    .role b { display: block; font-size: 15px; }
+    .role small { display: block; font-size: 12.5px; color: rgba(255, 255, 255, 0.7); font-weight: 500; }
+    .role .tile { background: rgba(255, 255, 255, 0.12); color: var(--mint); }
+    .role .go { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 10px; background: #fff; color: var(--ink); font-size: 13px; font-weight: 700; flex: none; }
+    .role .go svg.i { width: 15px; height: 15px; }
+    .ver { margin-top: 20px; text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--ink-3); }
+    .sheet .actions { display: grid; gap: 10px; margin-top: 20px; }
+    .sheet .btn.danger { background: var(--danger); color: #fff; box-shadow: none; }
+    .sheet .btn.danger:disabled { background: #fca5a5; }
+    .sheet section[hidden] { display: none; }
+    .sheet ul { margin: 12px 0 0; padding-left: 18px; font-size: 13.5px; color: var(--ink-2); display: grid; gap: 4px; }
+    .code { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; margin-top: 16px; }
+    .code input { width: 100%; height: 52px; border: 1.5px solid var(--line); border-radius: 12px; text-align: center; font-size: 20px; font-weight: 700; outline: 0; }
+    .code input:focus { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-50); }
+    .code.bad input { border-color: var(--danger); }
+    .sheet .field:first-of-type { margin-top: 12px; }
+    #code-err { display: none; margin-top: 10px; }
+    #code-err.show { display: flex; }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page tabbed">
+    <main class="content">
+      <section class="me rise">
+        <span class="avatar lg" id="av">AT<button class="cam" type="button" aria-label="Change photo" id="photo"><svg class="i" data-icon="camera"></svg></button></span>
+        <h1 id="name">Alex Tan</h1>
+        <p id="contact"></p>
+        <button class="btn secondary" type="button" id="edit"><svg class="i" data-icon="edit"></svg>Edit profile</button>
+      </section>
+
+      <a class="role" href="#" data-go="VHOME-01">
+        <span class="tile"><svg class="i" data-icon="store"></svg></span>
+        <span class="grow"><b>Switch to Vendor</b><small>Manage Alex's Laundry Corner</small></span>
+        <span class="go"><svg class="i" data-icon="swap"></svg>Switch</span>
+      </a>
+
+      <section class="section">
+        <div class="section-head"><h2>Activity</h2></div>
+        <div class="list">
+          <a class="item" href="#" data-go="CTRK-03"><span class="ii"><svg class="i" data-icon="history"></svg></span><span class="grow">Order history<small>9 orders with 6 shops</small></span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#" data-go="NOTI-01"><span class="ii"><svg class="i" data-icon="bell"></svg></span><span class="grow">Notifications</span><span class="pill progress plain">3 new</span><svg class="i" data-icon="chevron"></svg></a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Settings</h2></div>
+        <div class="list">
+          <a class="item" href="#" data-go="NOTI-02"><span class="ii"><svg class="i" data-icon="settings"></svg></span><span class="grow">Notification preferences<small>Push, SMS, email and quiet hours</small></span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#" data-go="ACCT-02"><span class="ii"><svg class="i" data-icon="headset"></svg></span><span class="grow">Help &amp; Support</span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#"><span class="ii"><svg class="i" data-icon="shield"></svg></span><span class="grow">Privacy Policy</span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#"><span class="ii"><svg class="i" data-icon="receipt"></svg></span><span class="grow">Terms of Service</span><svg class="i" data-icon="chevron"></svg></a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="list">
+          <button class="item" type="button" id="signout"><span class="ii"><svg class="i" data-icon="logout"></svg></span><span class="grow">Sign out</span></button>
+          <button class="item danger" type="button" id="delete"><span class="ii"><svg class="i" data-icon="trash"></svg></span><span class="grow">Delete account</span></button>
+        </div>
+      </section>
+      <div class="ver">PINGME V2.4.0</div>
+    </main>
+
+    <nav class="tabbar" aria-label="Main">
+      <a href="#" data-go="CHOME-01"><svg class="i" data-icon="home"></svg>Home</a>
+      <a href="#" class="scan" aria-label="Scan order QR" data-go="CHOME-02"><svg class="i" data-icon="scan"></svg></a>
+      <a href="#" aria-current="page"><svg class="i" data-icon="user"></svg>Profile</a>
+    </nav>
+  </div>
+
+  <div class="sheet-bg" id="sheet-bg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Account">
+    <div class="grab"></div>
+
+    <section id="s-edit">
+      <h3>Edit profile</h3>
+      <form id="edit-form" novalidate>
+        <div class="field" id="f-name">
+          <label class="label" for="e-name">Full name</label>
+          <div class="control" style="margin-top: 6px"><svg class="i" data-icon="user"></svg><input id="e-name" autocomplete="name" /></div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter your name.</div>
+        </div>
+        <div class="field" id="f-email">
+          <label class="label" for="e-email">Email</label>
+          <div class="control" style="margin-top: 6px"><svg class="i" data-icon="mail"></svg><input id="e-email" type="email" autocomplete="email" /></div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter a valid email.</div>
+        </div>
+        <div class="field">
+          <div class="field-head"><span class="label">Phone number</span><a href="#" id="change-phone" class="small">Change</a></div>
+          <div class="control" style="background: var(--canvas)"><svg class="i" data-icon="phone"></svg><span id="e-phone" style="color: var(--ink)"></span></div>
+          <div class="hint">Changing your phone needs a new security code. Shops find your orders by this number.</div>
+        </div>
+        <div class="actions"><button class="btn primary" type="submit">Save changes</button></div>
+      </form>
+    </section>
+
+    <section id="s-signout" hidden>
+      <h3>Sign out?</h3>
+      <p class="lead small">You'll stop getting push pings on this phone. Shops can still reach you by SMS.</p>
+      <div class="actions">
+        <button class="btn primary" type="button" data-go="AUTH-04">Sign out</button>
+        <button class="btn ghost" type="button" data-close>Cancel</button>
+      </div>
+    </section>
+
+    <section id="s-delete" hidden>
+      <h3>Delete your account?</h3>
+      <p class="lead small">This can't be undone. You'll lose:</p>
+      <ul>
+        <li>Your order history and receipts</li>
+        <li>Reviews you've written (they'll show as "Former customer")</li>
+        <li>Your vendor shop, if you have one</li>
+      </ul>
+      <label class="check" style="margin-top: 16px"><input type="checkbox" id="understand" /><span>I understand my account and data will be deleted.</span></label>
+      <div class="actions">
+        <button class="btn danger" type="button" id="send-code" disabled>Send security code</button>
+        <button class="btn ghost" type="button" data-close>Keep my account</button>
+      </div>
+    </section>
+
+    <section id="s-code" hidden>
+      <h3>Enter the security code</h3>
+      <p class="lead small">We sent a 6-digit code to <b id="code-phone"></b>.</p>
+      <div class="code" id="code"></div>
+      <div class="alert danger" id="code-err" role="alert"><svg class="i" data-icon="alert"></svg><span>That code isn't right. Check the SMS and try again.</span></div>
+      <div class="actions">
+        <button class="btn danger" type="button" id="confirm-delete" disabled>Delete account</button>
+        <button class="btn ghost" type="button" data-close>Cancel</button>
+      </div>
+    </section>
+
+    <section id="s-gone" hidden style="text-align: center">
+      <span class="badge-icon ring" style="margin: 4px auto 14px"><svg class="i" data-icon="checkcircle"></svg></span>
+      <h3>Account deleted</h3>
+      <p class="lead small">Thanks for using PingMe. You can come back any time.</p>
+      <div class="actions"><button class="btn primary" type="button" data-go="AUTH-01">Done</button></div>
+    </section>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    const u = { ...D.user, phone: PM.store.get("phone") || D.user.phone };
+
+    function paint() {
+      $("name").textContent = u.name;
+      $("contact").textContent = `${u.phone} · ${u.email}`;
+      $("av").firstChild.textContent = u.name.split(" ").map((w) => w[0]).slice(0, 2).join("").toUpperCase();
+    }
+    paint();
+
+    const sections = ["s-edit", "s-signout", "s-delete", "s-code", "s-gone"];
+    function show(id) { sections.forEach((s) => ($(s).hidden = s !== id)); document.body.classList.add("open"); }
+    const close = () => document.body.classList.remove("open");
+    $("sheet-bg").addEventListener("click", () => { if ($("s-gone").hidden) close(); });
+    document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", close));
+
+    $("edit").addEventListener("click", () => {
+      $("e-name").value = u.name;
+      $("e-email").value = u.email;
+      $("e-phone").textContent = u.phone;
+      ["f-name", "f-email"].forEach((f) => $(f).classList.remove("invalid"));
+      show("s-edit");
+    });
+    $("change-phone").addEventListener("click", (e) => { e.preventDefault(); PM.store.set("verifyFor", "customer"); PM.go("AUTH-08"); });
+    $("edit-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const nOk = $("e-name").value.trim().length > 1;
+      const eOk = PM.emailRe.test($("e-email").value.trim());
+      $("f-name").classList.toggle("invalid", !nOk);
+      $("f-email").classList.toggle("invalid", !eOk);
+      if (!nOk || !eOk) return PM.shake(e.target);
+      u.name = $("e-name").value.trim();
+      u.email = $("e-email").value.trim();
+      paint();
+      close();
+      PM.toast("Profile updated");
+    });
+    $("photo").addEventListener("click", () => PM.toast("Opens your photo library"));
+
+    $("signout").addEventListener("click", () => show("s-signout"));
+    $("delete").addEventListener("click", () => { $("understand").checked = false; $("send-code").disabled = true; show("s-delete"); });
+    $("understand").addEventListener("change", (e) => ($("send-code").disabled = !e.target.checked));
+
+    // Security code step. Prototype: 000000 is a wrong code, anything else works.
+    $("code").innerHTML = Array.from({ length: 6 }, (_, i) => `<input inputmode="numeric" maxlength="1" aria-label="Digit ${i + 1}" />`).join("");
+    const boxes = [...$("code").querySelectorAll("input")];
+    const value = () => boxes.map((b) => b.value).join("");
+    boxes.forEach((b, i) => {
+      b.addEventListener("input", () => {
+        b.value = b.value.replace(/\D/g, "").slice(-1);
+        if (b.value && boxes[i + 1]) boxes[i + 1].focus();
+        $("code").classList.remove("bad");
+        $("code-err").classList.remove("show");
+        $("confirm-delete").disabled = value().length !== 6;
+      });
+      b.addEventListener("keydown", (e) => { if (e.key === "Backspace" && !b.value && boxes[i - 1]) boxes[i - 1].focus(); });
+    });
+    $("send-code").addEventListener("click", () => {
+      boxes.forEach((b) => (b.value = ""));
+      $("confirm-delete").disabled = true;
+      $("code-phone").textContent = u.phone;
+      show("s-code");
+      setTimeout(() => boxes[0].focus(), 250);
+    });
+    $("confirm-delete").addEventListener("click", () => {
+      if (value() === "000000") {
+        $("code").classList.add("bad");
+        $("code-err").classList.add("show");
+        return PM.shake($("code"));
+      }
+      show("s-gone");
+    });
+
+    PM.hydrateIcons();
+  </script>
+</body>
+</html>

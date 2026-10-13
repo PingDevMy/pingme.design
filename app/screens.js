@@ -201,7 +201,7 @@ window.PINGME = {
         {
           id: "CHOME-01",
           name: "Home",
-          status: "reference",
+          status: "design",
           summary: "Customer landing screen: a greeting, how many orders are active, and each order's progress.",
           points: [
             "Greeting 'Hi {name}' and 'Manage your active service order here'",
@@ -219,11 +219,13 @@ window.PINGME = {
             "Pull to refresh",
           ],
           refs: ["design reference/Customer/Screenshot 2026-10-13 134146.png"],
+          html: "screens/customer/chome-01-home.html",
+          note: "Tap a card or Track Your Order Now to open tracking. A few seconds after opening, The Tailor Studio starts an order to show a live update. Pull down to refresh; the link under the list previews the empty state.",
         },
         {
           id: "CHOME-02",
           name: "Scan Order QR",
-          status: "todo",
+          status: "design",
           summary: "Customer scans the QR on a vendor's receipt to claim an order into their app.",
           points: [
             "Camera viewfinder with torch toggle",
@@ -234,6 +236,8 @@ window.PINGME = {
             "An order can only be claimed by one customer account",
           ],
           refs: [],
+          html: "screens/customer/chome-02-scan.html",
+          note: "Tap the viewfinder to simulate a scan. Under Enter order code, any code like PINGME-1204-X99 works; a code ending in TAKEN shows the already-claimed error.",
         },
       ],
     },
@@ -247,7 +251,7 @@ window.PINGME = {
         {
           id: "CTRK-01",
           name: "Order Tracking (drop-off)",
-          status: "reference",
+          status: "design",
           summary: "Live status of a drop-off order such as laundry or tailoring.",
           points: [
             "Estimated ready time",
@@ -264,11 +268,13 @@ window.PINGME = {
             "Timeline matches the vendor's status history exactly",
           ],
           refs: ["design reference/Customer/Screenshot 2026-10-13 134157.png"],
+          html: "screens/customer/ctrk-01-tracking.html",
+          note: "Shows the order picked on Home. The link at the bottom simulates the shop's next update: In Progress, then Ready (pickup QR), then Completed (rating prompt).",
         },
         {
           id: "CTRK-02",
           name: "Service Status (on-site)",
-          status: "reference",
+          status: "design",
           summary: "Live status of an on-site service, such as an HVAC repair, with the assigned technician.",
           points: [
             "Stepper: Received, In Progress, QC, Done",
@@ -286,11 +292,13 @@ window.PINGME = {
             "Cancel is only allowed before In Progress",
           ],
           refs: ["design reference/Customer/Screenshot 2026-10-13 134224.png"],
+          html: "screens/customer/ctrk-02-service.html",
+          note: "The countdown ticks live. Manage is locked while the technician is working; the link at the bottom shows the visit before work starts, where reschedule and cancel are allowed.",
         },
         {
           id: "CTRK-03",
           name: "Order History",
-          status: "todo",
+          status: "design",
           summary: "All past orders, searchable, with re-order and rating.",
           points: [
             "List grouped by month with vendor, service, amount and final status",
@@ -299,11 +307,13 @@ window.PINGME = {
           ],
           criteria: [],
           refs: [],
+          html: "screens/customer/ctrk-03-history.html",
+          note: "Search by shop or order number. Rate opens Rate & Review for that order; tapping a row opens its tracking page.",
         },
         {
           id: "CTRK-04",
           name: "Rate & Review",
-          status: "todo",
+          status: "design",
           summary: "Customer rates a completed order and leaves feedback for the vendor.",
           points: [
             "Star rating, optional text, optional photo",
@@ -311,11 +321,13 @@ window.PINGME = {
           ],
           criteria: ["One review per order; editable for 7 days"],
           refs: [],
+          html: "screens/customer/ctrk-04-rate.html",
+          note: "Opens for the picked completed order (PingClean Express by default). An order already rated opens in edit mode.",
         },
         {
           id: "CTRK-05",
           name: "Public Tracking Link (web)",
-          status: "todo",
+          status: "design",
           summary: "Web page the SMS link opens, so customers without the app can still follow an order.",
           points: [
             "Order number, vendor, current status and timeline",
@@ -325,6 +337,8 @@ window.PINGME = {
             "Link is unguessable and stops working 30 days after completion",
           ],
           refs: [],
+          html: "screens/customer/ctrk-05-public-link.html",
+          note: "Web page, shown with mobile browser chrome. The link at the bottom shows the expired-link state.",
         },
       ],
     },
@@ -338,7 +352,7 @@ window.PINGME = {
         {
           id: "SHOP-01",
           name: "Shop Profile",
-          status: "reference",
+          status: "design",
           summary: "Public page for a vendor: who they are, where they are, and what customers say.",
           points: [
             "Logo, shop name, category, Open now / Closed badge",
@@ -351,11 +365,13 @@ window.PINGME = {
             "Customer sees the same page without the owner controls",
           ],
           refs: ["design reference/Customer/Screenshot 2026-10-13 134211.png"],
+          html: "screens/customer/shop-01-profile.html",
+          note: "Shows the shop of the picked order. Open / Closed follows the real time of day against opening hours. The link at the bottom shows the owner view.",
         },
         {
           id: "SHOP-02",
           name: "All Reviews",
-          status: "todo",
+          status: "design",
           summary: "Full list of reviews with filters by star rating.",
           points: [
             "Filter chips: All, 5, 4, 3, 2, 1, With photos",
@@ -363,6 +379,8 @@ window.PINGME = {
           ],
           criteria: [],
           refs: [],
+          html: "screens/customer/shop-02-reviews.html",
+          note: "The link at the bottom shows the owner view, where unanswered reviews get a public Reply.",
         },
       ],
     },
@@ -376,7 +394,7 @@ window.PINGME = {
         {
           id: "NOTI-01",
           name: "Notification Inbox",
-          status: "todo",
+          status: "design",
           summary: "Every ping a user has received, newest first, with unread markers.",
           points: [
             "Grouped Today / Earlier, unread dot, mark all as read",
@@ -385,11 +403,13 @@ window.PINGME = {
           ],
           criteria: ["Bell icon badge equals unread count"],
           refs: [],
+          html: "screens/shared/noti-01-inbox.html",
+          note: "Customer view. Tapping a ping opens its order; the rating ping opens Rate & Review. The unread count matches the bell badge on Home.",
         },
         {
           id: "NOTI-02",
           name: "Notification Preferences",
-          status: "todo",
+          status: "design",
           summary: "User chooses which pings arrive by push, SMS or email.",
           points: [
             "Per-event toggles for push, SMS and email",
@@ -397,6 +417,8 @@ window.PINGME = {
           ],
           criteria: ["Order-ready pings cannot be fully turned off (at least one channel)"],
           refs: [],
+          html: "screens/shared/noti-02-preferences.html",
+          note: "Customer view. Try turning off both channels for Ready for pickup.",
         },
       ],
     },
@@ -633,7 +655,7 @@ window.PINGME = {
         {
           id: "ACCT-01",
           name: "Profile",
-          status: "todo",
+          status: "design",
           summary: "User's own details and entry point to settings.",
           points: [
             "Photo, name, phone, email, edit",
@@ -643,15 +665,19 @@ window.PINGME = {
           ],
           criteria: ["Delete account asks for confirmation and a security code"],
           refs: [],
+          html: "screens/shared/acct-01-profile.html",
+          note: "Customer view. Delete account asks for confirmation, then a security code (000000 is treated as wrong).",
         },
         {
           id: "ACCT-02",
           name: "Help & Support",
-          status: "todo",
+          status: "design",
           summary: "FAQ and a way to contact PingMe support.",
           points: ["Searchable FAQ", "Contact form with order picker"],
           criteria: [],
           refs: [],
+          html: "screens/shared/acct-02-help.html",
+          note: "Search filters the FAQ. The order picker hides for topics that aren't about an order.",
         },
       ],
     },

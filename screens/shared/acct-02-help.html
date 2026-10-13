@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Help &amp; Support · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .hero h1 { margin: 6px 0 14px; font-size: 24px; letter-spacing: -0.02em; }
+    .faq { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); overflow: hidden; }
+    .faq details + details { border-top: 1px solid var(--line-2); }
+    .faq summary { list-style: none; display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; font-weight: 600; font-size: 14.5px; }
+    .faq summary::-webkit-details-marker { display: none; }
+    .faq summary span { flex: 1; min-width: 0; }
+    .faq summary svg.i { width: 18px; height: 18px; color: var(--ink-3); transition: transform 0.2s; }
+    .faq details[open] summary svg.i { transform: rotate(180deg); }
+    .faq details p { margin: 0; padding: 0 16px 16px; font-size: 14px; color: var(--ink-2); line-height: 1.55; }
+    .faq mark { background: #fef9c3; color: inherit; border-radius: 3px; }
+    .orders { display: grid; gap: 8px; margin-top: 6px; }
+    .opt { display: flex; align-items: center; gap: 12px; padding: 10px 12px; border: 1.5px solid var(--line); border-radius: var(--r); background: var(--surface); cursor: pointer; min-width: 0; }
+    .opt input { position: absolute; opacity: 0; pointer-events: none; }
+    .opt .grow { flex: 1; min-width: 0; }
+    .opt b { display: block; font-size: 14px; }
+    .opt .tile { width: 36px; height: 36px; border-radius: 11px; }
+    .opt .tile svg.i { width: 18px; height: 18px; }
+    .opt .r { width: 20px; height: 20px; border-radius: 50%; border: 1.5px solid var(--ink-3); flex: none; display: grid; place-items: center; }
+    .opt:has(input:checked) { border-color: var(--brand); background: var(--brand-50); }
+    .opt:has(input:checked) .r { border-color: var(--brand); background: var(--brand); }
+    .opt:has(input:checked) .r::after { content: ""; width: 7px; height: 7px; border-radius: 50%; background: #fff; }
+    .opt:has(input:focus-visible) { box-shadow: 0 0 0 4px var(--brand-50); }
+    .control select { appearance: none; cursor: pointer; }
+    .form .btn { margin-top: 18px; }
+    .sent { display: none; text-align: center; padding: 28px 8px 8px; }
+    .sent .badge-icon { margin: 0 auto 14px; background: var(--success-50); color: var(--success); }
+    .sent p { color: var(--ink-2); font-size: 14px; margin: 6px auto 0; max-width: 280px; }
+    .is-sent .sent { display: block; }
+    .is-sent .form { display: none; }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="ACCT-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Help &amp; Support</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <div class="hero">
+        <h1>How can we help?</h1>
+        <label class="control search">
+          <svg class="i" data-icon="search"></svg>
+          <input id="q" type="search" placeholder="Search questions" autocomplete="off" aria-label="Search questions" />
+        </label>
+      </div>
+
+      <section class="section">
+        <div class="section-head"><h2>Common questions</h2></div>
+        <div class="faq" id="faq"></div>
+      </section>
+
+      <section class="section" id="contact">
+        <div class="section-head"><h2>Contact PingMe support</h2></div>
+        <div class="card">
+          <form class="form" id="form" novalidate>
+            <div class="field" style="margin-top: 0">
+              <label class="label" for="topic">Topic</label>
+              <div class="control" style="margin-top: 6px"><svg class="i" data-icon="tag"></svg>
+                <select id="topic"><option>Problem with an order</option><option>Not getting pings</option><option>Account or sign-in</option><option>Something else</option></select>
+                <svg class="i" data-icon="down"></svg>
+              </div>
+            </div>
+            <div class="field" id="f-order">
+              <span class="label">Which order?</span>
+              <div class="orders" id="orders" role="radiogroup" aria-label="Order"></div>
+            </div>
+            <div class="field" id="f-msg">
+              <label class="label" for="msg">What happened?</label>
+              <div class="control area" style="margin-top: 6px"><textarea id="msg" maxlength="1000" placeholder="Tell us what went wrong and we'll get back to you by email."></textarea></div>
+              <div class="error"><svg class="i" data-icon="alert"></svg>Add a few words so we know how to help.</div>
+            </div>
+            <button class="btn primary" type="submit" id="send"><svg class="i" data-icon="send"></svg>Send message</button>
+          </form>
+          <div class="sent" aria-live="polite">
+            <span class="badge-icon ring"><svg class="i" data-icon="checkcircle"></svg></span>
+            <h3 style="margin: 0">Message sent</h3>
+            <p>We usually reply within one working day to <b id="email"></b>.</p>
+            <button class="btn secondary" type="button" id="again" style="margin-top: 18px">Send another</button>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    const faqs = [
+      ["Why don't I see my order?", "Orders appear when a shop adds your phone number. If they used a different number, scan the QR on your receipt or type its code from the Scan button on Home."],
+      ["How does the pickup QR work?", "When your order is Ready, its tracking page shows a pickup QR. The shop scans it at the counter to hand your items over and complete the order."],
+      ["I'm not getting notifications", "Check that PingMe is allowed to send notifications in your phone's settings, and look at Notification preferences in your Profile. Ready for pickup always uses at least one channel."],
+      ["Can I cancel or reschedule a service?", "On-site services can be rescheduled or cancelled from the service status page until the technician starts. After that, call the shop."],
+      ["Who can see my reviews?", "Reviews are public on the shop's page. You can edit a review for 7 days after posting. Shops can reply but can't delete reviews."],
+      ["How do I switch between Customer and Vendor?", "If your account has both roles, use Switch to Vendor on your Profile."],
+    ];
+    const esc = (t) => t.replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" })[c]);
+    const hi = (t, q) => {
+      if (!q) return esc(t);
+      const i = t.toLowerCase().indexOf(q.toLowerCase());
+      return i < 0 ? esc(t) : esc(t.slice(0, i)) + "<mark>" + esc(t.slice(i, i + q.length)) + "</mark>" + esc(t.slice(i + q.length));
+    };
+    function renderFaq() {
+      const q = $("q").value.trim();
+      const hits = faqs.filter(([a, b]) => !q || (a + " " + b).toLowerCase().includes(q.toLowerCase()));
+      $("faq").innerHTML = hits.length
+        ? hits.map(([a, b]) => `<details${q ? " open" : ""}><summary><span>${hi(a, q)}</span><svg class="i" data-icon="down"></svg></summary><p>${hi(b, q)}</p></details>`).join("")
+        : `<div class="empty" style="padding: 24px 16px"><h3>No matches</h3><p>Try other words, or send us a message below.</p></div>`;
+      PM.hydrateIcons($("faq"));
+    }
+    $("q").addEventListener("input", renderFaq);
+    renderFaq();
+
+    // Order picker: recent orders first, plus "not about an order".
+    const recent = D.orders.slice(0, 4);
+    $("orders").innerHTML = recent.map((o, i) => {
+      const s = D.shops[o.shop];
+      return `<label class="opt"><input type="radio" name="order" value="${o.id}"${i === 0 ? " checked" : ""} />${D.tile(s)}<span class="grow"><b class="ellipsis">${s.name}</b><span class="meta ellipsis" style="display:block">${o.id} · ${o.service}</span></span><span class="r"></span></label>`;
+    }).join("") + `<label class="opt"><input type="radio" name="order" value="" /><span class="tile" style="background:var(--canvas);color:var(--ink-3)"><svg class="i" data-icon="close"></svg></span><span class="grow"><b>Not about an order</b></span><span class="r"></span></label>`;
+    $("topic").addEventListener("change", (e) => ($("f-order").hidden = e.target.selectedIndex > 1));
+
+    $("msg").addEventListener("input", () => $("f-msg").classList.remove("invalid"));
+    $("email").textContent = D.user.email;
+    $("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      if ($("msg").value.trim().length < 5) { $("f-msg").classList.add("invalid"); return PM.shake($("f-msg")); }
+      const b = $("send");
+      b.disabled = true;
+      b.innerHTML = '<span class="spinner"></span>Sending';
+      setTimeout(() => {
+        document.body.classList.add("is-sent");
+        b.disabled = false;
+        b.innerHTML = '<svg class="i" data-icon="send"></svg>Send message';
+        PM.hydrateIcons(b);
+      }, 800);
+    });
+    $("again").addEventListener("click", () => { $("msg").value = ""; document.body.classList.remove("is-sent"); });
+
+    PM.hydrateIcons();
+  </script>
+</body>
+</html>

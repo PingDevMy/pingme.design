@@ -14,7 +14,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `ACCT-01` Profile · ⚪ Not started
+### `ACCT-01` Profile · 🔵 In design
 
 User's own details and entry point to settings.
 
@@ -27,11 +27,15 @@ User's own details and entry point to settings.
 
 - [ ] Delete account asks for confirmation and a security code
 
-### `ACCT-02` Help & Support · ⚪ Not started
+> Customer view. Delete account asks for confirmation, then a security code (000000 is treated as wrong).
+
+### `ACCT-02` Help & Support · 🔵 In design
 
 FAQ and a way to contact PingMe support.
 
 - Searchable FAQ
 - Contact form with order picker
+
+> Search filters the FAQ. The order picker hides for topics that aren't about an order.
 
 <!-- screens:end -->
