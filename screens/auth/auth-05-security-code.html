@@ -55,7 +55,7 @@
   <div class="page">
     <header class="topbar">
       <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
-      <div class="steps" style="width: 120px" id="steps" aria-label="Last step"><span class="on"></span><span class="on"></span><span class="on"></span></div>
+      <div class="steps" style="width: 120px" id="steps" aria-label="Step 2 of 3"><span class="on"></span><span class="on"></span><span></span></div>
       <span style="width: 40px"></span>
     </header>
 
@@ -103,7 +103,8 @@
   <script>
     const $ = (id) => document.getElementById(id);
     const boxes = [...document.querySelectorAll(".otp input")];
-    const role = PM.store.get("verifyFor") || PM.store.get("role") || "customer";
+    // signup: new account, continues to Choose Mode. phone: number changed from Profile.
+    const purpose = PM.store.get("verifyFor") === "phone" ? "phone" : "signup";
     const phone = PM.store.get("phone") || "+60 12-345 4291";
     let tries = 5;
     let timer;
@@ -111,7 +112,7 @@
     // Mask all but the last 4 digits: +60 1•-••• 4291
     const digits = phone.replace(/\D/g, "");
     $("num").textContent = "+60 " + digits.slice(2, 3) + "•-••• " + digits.slice(-4);
-    $("steps").innerHTML = role === "vendor" ? "<span class=on></span>".repeat(4) : "<span class=on></span>".repeat(3);
+    if (purpose === "phone") $("steps").style.visibility = "hidden";
 
     const code = () => boxes.map((b) => b.value).join("");
     function sync() {
@@ -196,24 +197,22 @@
 
     function success() {
       clearInterval(timer);
-      const vendor = role === "vendor";
-      $("done-lead").textContent = vendor
-        ? "Your shop is ready. Create your first order and your client gets a ping straight away."
-        : "You're all set. We'll ping you here every time an order moves.";
-      $("found").innerHTML = vendor
-        ? `<header><svg class="i" data-icon="store"></svg>Next steps</header><ul>
-             <li><span class="av" style="background:var(--brand-50);color:var(--brand-700)"><svg class="i" data-icon="package"></svg></span><div><b>Create your first order</b><small>Takes under a minute</small></div></li>
-             <li><span class="av" style="background:#fef3c7;color:#b45309"><svg class="i" data-icon="image"></svg></span><div><b>Finish your shop profile</b><small>Logo, hours and services</small></div></li></ul>`
-        : `<header><svg class="i" data-icon="package"></svg>We found 2 orders for this number</header><ul>
+      const signup = purpose === "signup";
+      $("done-lead").textContent = signup
+        ? "Shops can now reach you on this number. One more step and you're in."
+        : "Your new number is saved. Shops will use it from now on.";
+      // Any account can follow orders, so orders a shop already made for this number are linked here.
+      $("found").innerHTML = `<header><svg class="i" data-icon="package"></svg>We found 2 orders for this number</header><ul>
              <li><span class="av" style="background:var(--brand-50);color:var(--brand-700)"><svg class="i" data-icon="shirt"></svg></span><div><b>Bright Laundry</b><small>Wash &amp; Press · #A102</small></div><span class="pill" style="background:#ecfdf5;color:#047857">Ready</span></li>
              <li><span class="av" style="background:#f3e8ff;color:#7c3aed"><svg class="i" data-icon="scissors"></svg></span><div><b>Aminah Tailoring</b><small>Hemming · #T58</small></div><span class="pill" style="background:#eff6ff;color:#1d4ed8">In progress</span></li></ul>`;
-      $("go-home").innerHTML = (vendor ? "Go to my shop" : "See my orders") + ' <svg class="i" data-icon="arrow"></svg>';
+      $("found").hidden = !signup;
+      $("go-home").innerHTML = (signup ? "Continue" : "Back to Profile") + ' <svg class="i" data-icon="arrow"></svg>';
       PM.hydrateIcons($("done"));
       $("done").classList.add("on");
     }
-    $("go-home").addEventListener("click", () => PM.go(role === "vendor" ? "VHOME-01" : "CHOME-01"));
+    $("go-home").addEventListener("click", () => PM.go(purpose === "signup" ? "AUTH-06" : "ACCT-01"));
 
-    const backTo = () => PM.go(role === "vendor" ? "AUTH-06" : "AUTH-05");
+    const backTo = () => PM.go(purpose === "signup" ? "AUTH-04" : "ACCT-01");
     $("back").addEventListener("click", backTo);
     $("edit").addEventListener("click", (e) => { e.preventDefault(); backTo(); });
 

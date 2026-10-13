@@ -60,7 +60,6 @@
     .is-owner .owner-bar { display: flex; }
     .owner-bar svg.i { width: 16px; height: 16px; color: var(--mint); }
     .cta { margin-top: 16px; display: grid; gap: 10px; }
-    .proto { display: block; margin: 20px auto 0; font-size: 12px; font-weight: 500; color: var(--ink-3); }
   </style>
 </head>
 <body class="canvas">
@@ -120,7 +119,6 @@
         </a>
       </div>
 
-      <button class="text-btn proto" type="button" id="proto">Prototype: view as the shop owner</button>
     </main>
   </div>
 
@@ -129,8 +127,14 @@
   <script>
     const D = PM.data;
     const $ = (id) => document.getElementById(id);
+    // Shared by both modes: customers see the shop of the order they opened; in
+    // Vendor mode the owner sees their own shop with the owner controls.
+    const owner = PM.mode() === "vendor";
     const cur = D.current();
-    const s = D.shops[(cur && cur.shop) || "pingclean"];
+    const s = owner
+      ? { ...D.shops.luxe, id: "own", name: "Alex's Laundry Corner", category: "Laundry", address: "18 Jalan SS2/55, Petaling Jaya", rating: 4.8, reviews: 126 }
+      : D.shops[(cur && cur.shop) || "pingclean"];
+    document.body.classList.toggle("is-owner", owner);
 
     $("logo").className = `tile logo ${s.tone}`;
     $("logo").innerHTML = `<svg class="i" data-icon="${s.icon}"></svg>`;
@@ -141,7 +145,7 @@
     $("addr").href = "https://maps.google.com/?q=" + encodeURIComponent(s.address);
     $("tel-text").textContent = s.phone;
     $("tel").href = "tel:" + s.phone.replace(/[^\d+]/g, "");
-    $("back").addEventListener("click", () => PM.go(cur && cur.type === "onsite" ? "CTRK-02" : "CTRK-01"));
+    $("back").addEventListener("click", () => PM.go(owner ? "VSHOP-01" : cur && cur.type === "onsite" ? "CTRK-02" : "CTRK-01"));
 
     // Open / closed comes from the opening hours (08:00 – 21:00, closed Sunday).
     const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -198,10 +202,6 @@
     $("write").addEventListener("click", () => { PM.store.set("order", done.id); PM.go("CTRK-04"); });
 
     $("share").addEventListener("click", () => PM.toast("Shop link copied"));
-    $("proto").addEventListener("click", (e) => {
-      const on = document.body.classList.toggle("is-owner");
-      e.currentTarget.textContent = on ? "Prototype: view as a customer" : "Prototype: view as the shop owner";
-    });
 
     PM.hydrateIcons();
   </script>

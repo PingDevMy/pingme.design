@@ -1,26 +1,45 @@
 # 01 · Onboarding & Auth (`AUTH`)
 
-**Role:** Shared · **Goal:** get a new user into the right side of the app (Customer or Vendor) with a verified phone number, and get returning users back in fast.
+**Role:** Shared · **Goal:** get a new user into the one PingMe app with a verified phone number and into the right mode (Customer or Vendor), and get returning users back in fast.
+
+Customers and vendors download the same app. There is one sign-up form and one account; Vendor mode is unlocked by adding a shop to that account, at sign-up or later.
+
+## Flow
+
+```text
+Splash ─┬─ first open ─► Onboarding ─► Create Account ─► Security Code ─► Choose Mode ─┬─► Customer Home
+        │                                                                              └─► Set Up Your Shop ─► Vendor Dashboard
+        └─ returning ──► Sign In ─► home of the last-used mode (Customer Home or Vendor Dashboard)
+```
 
 ## Requirements
 
-- **AUTH-R1** First launch shows Onboarding, then Role Selection. Later launches go to Sign In, or straight home if a session exists.
+- **AUTH-R1** First launch shows Onboarding, then Create Account. Later launches go to Sign In, or straight to the last-used mode's home if a session exists.
 - **AUTH-R2** Sign in accepts email *or* phone plus password. Social sign-in is offered (Google plus one of Apple/GitHub).
-- **AUTH-R3** The user picks Customer or Vendor at sign-in; the primary button reflects the choice ("Sign In to Customer").
+- **AUTH-R3** Sign In has no Customer / Vendor choice. It opens the mode used last; an account without a shop always opens Customer Home.
 - **AUTH-R4** Every account verifies its phone number with a 6-digit SMS code. The phone number is how vendors reach customers, so it is required.
-- **AUTH-R5** When a customer verifies a phone number, any orders vendors already created for that number are attached to the account.
-- **AUTH-R6** Vendor sign-up also creates a minimal shop (name, category, address). Everything else can be completed later in Shop Settings.
-- **AUTH-R7** Password reset is by email link. The response never reveals whether an email is registered.
-- **AUTH-R8** Sessions persist until sign-out; tokens refresh silently.
+- **AUTH-R5** When a phone number is verified, any orders vendors already created for that number are attached to the account. This applies to every account, since shop owners can also be customers.
+- **AUTH-R6** After verifying, Choose Mode asks where to start: Track my orders (Customer Home) or Run my shop (Set Up Your Shop). The choice is not a lock-in.
+- **AUTH-R7** Set Up Your Shop creates a minimal shop (name, category, address; hours and logo optional) and turns on Vendor mode. It asks for nothing the account already has. It is also reachable later from Profile.
+- **AUTH-R8** Password reset is by email link. The response never reveals whether an email is registered.
+- **AUTH-R9** Sessions persist until sign-out; tokens refresh silently. The last-used mode is remembered per device.
 
 ## Data
 
-User: id, full name, email, phone (verified flag), password hash, roles [customer, vendor], avatar, created at.
+User: id, full name, email, phone (verified flag), password hash, avatar, last mode [customer, vendor], created at.
+Shop: id, owner user id, name, category, address, opening hours, logo. An account is a vendor when it owns (or is staff of) a shop.
+
+## Removed in the single-app redesign
+
+- **Customer Sign Up** and **Vendor Sign Up** were two forms that asked for the same name, email, phone and password. They are now one Create Account form (AUTH-04), and the vendor-only part became Set Up Your Shop (AUTH-07).
+- **Role Selection before sign-up** became Choose Mode after verification (AUTH-06): it only decides where you land.
+- **The Customer / Vendor toggle on Sign In** is gone; the app remembers the last-used mode.
 
 ## Open questions
 
 - Apple or GitHub as the second social provider? (References show both.)
-- Is email required, or is phone-only sign-up allowed for customers?
+- Is email required, or is phone-only sign-up allowed?
+- Should staff invited to a shop (VSHOP-03) land straight in Vendor mode for that shop on first sign-in?
 
 ## Screens
 
@@ -32,7 +51,7 @@ User: id, full name, email, phone (verified flag), password hash, roles [custome
 Brand splash shown while the app boots and restores the session.
 
 - PingMe logo with a short intro animation on first open
-- Restores a saved session and routes straight to the right home (Customer or Vendor)
+- Restores a saved session and routes straight to the home of the last-used mode (Customer or Vendor)
 - Falls through to Onboarding on first install, Sign In otherwise
 
 **Acceptance:**
@@ -52,73 +71,99 @@ Four swipeable intro slides that explain PingMe to customers and vendors.
 
 **Acceptance:**
 
-- [ ] Swipe and Next both advance; Skip jumps to Role Selection
+- [ ] Swipe and Next both advance; Skip and Get Started open Create Account
 - [ ] Shown only until the user finishes or skips it once
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135118.png)
 
-### `AUTH-03` Role Selection · 🟢 Done
+### `AUTH-03` Sign In · 🔵 In design
 
-New users choose whether they are a Customer or a Vendor before signing up.
+Returning users sign in once and land back in the mode they used last.
 
-- Two cards: I am a Customer, I am a Vendor, each with a one-line explanation
-- Continue is disabled until one card is selected
-- Help icon and 'Already have an account? Sign In'
-
-**Acceptance:**
-
-- [ ] Selected role carries into Sign Up and decides which sign-up form opens
-
-Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135051.png)
-
-### `AUTH-04` Sign In · 🟢 Done
-
-Returning users sign in with email or phone, choosing Customer or Vendor mode.
-
-- Role toggle: Customer (track and follow my orders) or Vendor (manage shop and orders)
 - Email or phone, password with show/hide, Forgot? link
-- Primary button names the role: 'Sign In to Customer' / 'Sign In to Vendor'
+- One Sign In button: no Customer / Vendor toggle, because one account holds both modes
+- Line under the button says where you'll land (your orders, or your shop dashboard)
 - Social sign-in (Google plus Apple or GitHub; final pair to be decided)
-- Footer: Sign Up link, app version, Privacy Policy, Terms of Service
+- Footer: Create an account link, app version, Privacy Policy, Terms of Service
 
 **Acceptance:**
 
 - [ ] Wrong credentials show an inline error without clearing the email field
-- [ ] An account holding both roles lands on the role picked in the toggle
+- [ ] Lands on the home of the last-used mode; accounts without a shop always land on Customer Home
 
-> Prototype: any email or phone signs in; the password "wrong" shows the failed sign-in state. Social pair shown as Google + Apple until the open question is settled.
+> Prototype: any email or phone signs in; the password "wrong" shows the failed sign-in state. You land in the mode last opened in this browser session (Vendor if you were just on a vendor screen).
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135010.png) · [2](../../design%20reference/authentication/Screenshot%202026-10-13%20135028.png) · [3](../../design%20reference/authentication/Screenshot%202026-10-13%20135046.png) · [4](../../design%20reference/Customer/Screenshot%202026-10-13%20134125.png) · [5](../../design%20reference/Customer/Screenshot%202026-10-06%20152222.png) · [6](../../design%20reference/Customer/Screenshot%202026-10-06%20152155.png)
 
-### `AUTH-05` Customer Sign Up · 🟢 Done
+### `AUTH-04` Create Account · 🔵 In design
 
-Customer creates an account with name, email, phone and password.
+One sign-up form for everyone: the same account follows orders and, later, runs a shop.
 
 - Full name, email, phone number, password, confirm password
 - Terms of Service and Privacy Policy checkbox
 - Create Account button, social sign-up (Google, Apple)
-- Phone number is verified with a Security Code before first use
+- Step 1 of 3: account, verify phone, choose where to start
 
 **Acceptance:**
 
 - [ ] Create Account stays disabled until all fields validate and terms are ticked
-- [ ] Phone number links any orders a vendor already created for that number
+- [ ] No role is asked here; shop details are only asked if the user picks Run my shop
+
+> Replaces the separate Customer Sign Up and Vendor Sign Up forms, which asked for the same owner details twice.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135038.png)
 
-### `AUTH-06` Vendor Sign Up · 🟢 Done
+### `AUTH-05` Security Code · 🟢 Done
 
-Vendor creates an account and a basic shop profile in one flow.
+Six-digit code sent by SMS to verify the phone number at sign-up or after changing it.
 
-- Owner name, email, phone, password
-- Shop name, service category (Laundry, Tailoring, Repair, Cleaning, HVAC, Other), address, opening hours
-- Shop logo upload (optional, can be done later)
+- Masked phone number with 'Wrong number? Edit'
+- Six digit boxes with auto-advance and paste support
+- Resend countdown, Resend SMS, Call me instead
+- Verify Now button; success shows orders shops already made for this number
 
 **Acceptance:**
 
-- [ ] Vendor can create orders right after sign-up; profile can be finished later
+- [ ] Resend is locked until the countdown ends
+- [ ] Code expires after 10 minutes; five wrong tries locks for 15 minutes
+- [ ] After sign-up it continues to Choose Mode; after a phone change it returns to Profile
 
-### `AUTH-07` Forgot Password · 🟢 Done
+> Prototype: 000000 is treated as a wrong code (five tries, then locked); any other six digits verify and show the success state.
+
+Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135106.png)
+
+### `AUTH-06` Choose Mode · 🔵 In design
+
+After verifying, new users pick where to start: their orders or their shop. Both stay one tap apart.
+
+- Two cards: Track my orders (Customer mode), Run my shop (Vendor mode)
+- Button names the next step: See my orders, or Set up my shop
+- 'Set up a shop later' link and a help sheet explaining that one account does both
+
+**Acceptance:**
+
+- [ ] Track my orders opens Customer Home; Run my shop opens Set Up Your Shop
+- [ ] Shown once per account; the choice can be changed any time from Profile
+
+> Moved from before sign-up to after it: the role no longer decides which form you fill in, only where you land.
+
+Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135051.png)
+
+### `AUTH-07` Set Up Your Shop · 🔵 In design
+
+Adds Vendor mode to the account with a minimal shop, from Choose Mode or later from Profile.
+
+- Shop name, service category (Laundry, Tailoring, Repair, Cleaning, HVAC, Other), address
+- Opening hours and shop logo (optional, can be done later)
+- Vendor Terms checkbox; no owner name, phone or password (the account already has them)
+- Success: shop is ready, next steps, Go to my shop
+
+**Acceptance:**
+
+- [ ] Vendor can create orders right after setup; profile can be finished later in the Shop tab
+- [ ] Back returns to where it was opened from (Choose Mode or Profile)
+
+### `AUTH-08` Forgot Password · 🟢 Done
 
 User requests a password reset link by email.
 
@@ -130,23 +175,5 @@ User requests a password reset link by email.
 - [ ] Always shows the same confirmation whether or not the email exists
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135100.png)
-
-### `AUTH-08` Security Code · 🟢 Done
-
-Six-digit code sent by SMS to verify a phone number or a sign-in.
-
-- Masked phone number with 'Wrong number? Edit'
-- Six digit boxes with auto-advance and paste support
-- Resend countdown, Resend SMS, Call me instead
-- Verify Now button
-
-**Acceptance:**
-
-- [ ] Resend is locked until the countdown ends
-- [ ] Code expires after 10 minutes; five wrong tries locks for 15 minutes
-
-> Prototype: 000000 is treated as a wrong code (five tries, then locked); any other six digits verify and show the success state.
-
-Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135106.png)
 
 <!-- screens:end -->

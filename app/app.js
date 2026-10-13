@@ -9,10 +9,35 @@
   const screens = [];
   for (const m of data.modules) for (const s of m.screens) screens.push({ ...s, module: m });
   const byId = Object.fromEntries(screens.map((s) => [s.id, s]));
+  const shared = (id) => byId[id].module.role === "shared";
+
+  // Every screen node in the flow tree is a stop. Shared screens appear once per
+  // mode, keyed "ID@mode", so opening one from a branch shows that mode's version.
+  const stops = [];
+  const byKey = {};
+  let uid = 0;
+  function index(node, sec) {
+    node.uid = "n" + uid++;
+    if (node.id) {
+      node.key = sec.mode && shared(node.id) ? `${node.id}@${sec.mode}` : node.id;
+      node.mode = sec.mode;
+      if (!byKey[node.key]) {
+        byKey[node.key] = { key: node.key, id: node.id, mode: sec.mode, sec };
+        stops.push(byKey[node.key]);
+      }
+    }
+    (node.kids || []).forEach((k) => index(k, sec));
+  }
+  for (const sec of data.flow) sec.kids.forEach((n) => index(n, sec));
 
   const store = {
     get(k) { try { return localStorage.getItem("pingme." + k); } catch { return null; } },
     set(k, v) { try { localStorage.setItem("pingme." + k, v); } catch { /* storage unavailable */ } },
+  };
+  // The app screens keep their mode in sessionStorage (screens/kit.js); same origin as the site.
+  const appMode = {
+    get() { try { return sessionStorage.getItem("pingme.flow.role") === "vendor" ? "vendor" : "customer"; } catch { return "customer"; } },
+    set(m) { try { sessionStorage.setItem("pingme.flow.role", m); } catch { /* storage unavailable */ } },
   };
 
   const state = {
@@ -20,7 +45,7 @@
     refIndex: 0,
     filter: "all",
     dev: store.get("dev") === "1",
-    open: new Set(),
+    closed: new Set(),
   };
 
   // Header + progress
@@ -41,32 +66,69 @@
       .join("");
   }
 
-  function visible(s) {
-    return state.filter === "all" || s.status === state.filter;
+  const secIcon = {
+    start: '<path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" />',
+    customer: '<circle cx="12" cy="8" r="4"/><path d="M4.5 21a7.5 7.5 0 0 1 15 0"/>',
+    vendor: '<path d="M3 9.5 4.5 4h15L21 9.5M3 9.5h18M3 9.5a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0M5 12.5V20h14v-7.5"/>',
+    web: '<circle cx="12" cy="12" r="9.5"/><path d="M2.5 12h19M12 2.5c2.5 2.6 3.8 5.8 3.8 9.5s-1.3 6.9-3.8 9.5c-2.5-2.6-3.8-5.8-3.8-9.5S9.5 5.1 12 2.5Z"/>',
+  };
+  const caret = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg>';
+  const jumpIcon = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
+
+  function secIds(sec) {
+    const ids = new Set();
+    const walk = (n) => { if (n.id) ids.add(n.id); (n.kids || []).forEach(walk); };
+    sec.kids.forEach(walk);
+    return [...ids];
+  }
+
+  function nodeHtml(n, sec) {
+    if (n.to) {
+      const t = byId[n.to];
+      const key = Object.values(byKey).find((x) => x.id === n.to && (!shared(n.to) || x.mode === sec.mode))?.key || n.to;
+      return `<li class="jump"><div class="node-row"><a class="node" href="#${key}" data-key="${key}" title="Goes to ${esc(t.name)} (${t.id})">
+        <span class="via">${esc(n.via)}</span><span class="nm">${jumpIcon}${esc(n.label || t.name)}</span></a><span class="tw" aria-hidden="true"></span></div></li>`;
+    }
+    const s = byId[n.id];
+    const kids = n.kids || [];
+    const open = !state.closed.has(n.uid);
+    const dim = state.filter !== "all" && s.status !== state.filter;
+    const cur = state.current === n.key;
+    return `<li class="${kids.length ? "has-kids" : ""}${open ? "" : " closed"}">
+      <div class="node-row">
+        <a class="node${dim ? " dim" : ""}${shared(n.id) ? " shared" : ""}" href="#${n.key}" data-key="${n.key}"${cur ? ' aria-current="page"' : ""}>
+          ${n.via ? `<span class="via">${esc(n.via)}</span>` : ""}
+          <span class="line"><span class="nm">${esc(s.name)}</span><span class="nid">${s.id}</span><span class="sdot ${s.status}" title="${esc(data.statuses[s.status].label)}"></span></span>
+        </a>
+        ${kids.length ? `<button class="tw" data-uid="${n.uid}" aria-expanded="${open}" aria-label="${open ? "Collapse" : "Expand"} ${esc(s.name)}">${caret}<span>${kids.length}</span></button>` : `<span class="tw" aria-hidden="true"></span>`}
+      </div>
+      ${kids.length ? `<ul class="ft">${kids.map((k) => nodeHtml(k, sec)).join("")}</ul>` : ""}
+    </li>`;
   }
 
   function renderTree() {
-    let html = "";
-    for (const role of data.roles) {
-      const mods = data.modules.filter((m) => m.role === role.id && m.screens.some(visible));
-      if (!mods.length) continue;
-      html += `<div class="role">${esc(role.label)}</div>`;
-      for (const m of mods) {
-        const open = state.open.has(m.id) || state.filter !== "all";
-        const done = m.screens.filter((s) => s.status === "done").length;
-        html += `<div class="module${open ? " open" : ""}" data-module="${m.id}">
-          <button aria-expanded="${open}"><span>${esc(m.name)}</span><span class="count">${done}/${m.screens.length}</span>
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9 18 6-6-6-6"/></svg></button>
-          <ul>${m.screens
-            .filter(visible)
-            .map(
-              (s) => `<li><a href="#${s.id}" data-id="${s.id}"${state.current === s.id ? ' aria-current="page"' : ""}>
-                <span>${esc(s.name)}</span><span class="sdot ${s.status}" title="${esc(data.statuses[s.status].label)}"></span></a></li>`
-            )
-            .join("")}</ul></div>`;
-      }
-    }
-    $("nav-tree").innerHTML = html || `<div class="empty-filter">No screens with this status yet.</div>`;
+    $("nav-tree").innerHTML = data.flow.map((sec) => {
+      const ids = secIds(sec);
+      const done = ids.filter((id) => byId[id].status === "done").length;
+      const open = !state.closed.has(sec.id);
+      return `<section class="flow-sec${open ? "" : " closed"}" data-sec="${sec.id}">
+        <button class="sec-head" data-uid="${sec.id}" aria-expanded="${open}">
+          <span class="sec-ic ${sec.id}"><svg viewBox="0 0 24 24" aria-hidden="true">${secIcon[sec.id] || ""}</svg></span>
+          <span class="sec-t"><b>${esc(sec.label)}</b><small>${esc(sec.hint || "")}</small></span>
+          <span class="count">${done}/${ids.length}</span>${caret}
+        </button>
+        <ul class="ft root">${sec.kids.map((n) => nodeHtml(n, sec)).join("")}</ul>
+      </section>`;
+    }).join("") + `<p class="legend"><span>${jumpIcon} goes to another branch</span><span><i></i> shared by both modes</span></p>`;
+  }
+
+  // Resolve a hash ("ID" or "ID@mode") to a stop. A bare ID for a shared screen
+  // picks the instance for the app's current mode.
+  function resolve(hash) {
+    if (byKey[hash]) return byKey[hash];
+    const id = hash.split("@")[0];
+    if (!byId[id]) return stops[0];
+    return byKey[shared(id) ? `${id}@${appMode.get()}` : id] || stops.find((x) => x.id === id);
   }
 
   function renderPhone(s) {
@@ -96,9 +158,9 @@
     else if (s.refs.length) refs.innerHTML = `<span>Reference sketch</span>`;
     else refs.innerHTML = `<span>No reference yet</span>`;
 
-    const i = screens.indexOf(s);
+    const i = stops.findIndex((x) => x.key === state.current);
     $("prev").disabled = i === 0;
-    $("next").disabled = i === screens.length - 1;
+    $("next").disabled = i === stops.length - 1;
   }
 
   // HTML screens are laid out at the real device width (402 pt) and scaled to
@@ -126,11 +188,12 @@
     return `<h3>${title}</h3><ul>${items.map((t) => `<li class="${cls}">${cls === "ping" ? bell : ""}${esc(t)}</li>`).join("")}</ul>`;
   }
 
-  function renderInfo(s) {
+  function renderInfo(s, stop) {
     const st = data.statuses[s.status];
     $("screen-id").textContent = s.id;
+    const where = stop.mode ? `${stop.mode === "vendor" ? "Vendor" : "Customer"} mode` : stop.sec.label;
     $("info").innerHTML = `
-      <div class="crumb">${esc(s.module.name)}</div>
+      <div class="crumb">${esc(where)} · ${esc(s.module.name)}</div>
       <h1>${esc(s.name)}</h1>
       <span class="status-pill"><span class="sdot ${s.status}"></span>${esc(st.label)}</span>
       <p class="summary">${esc(s.summary)}</p>
@@ -149,37 +212,39 @@
     $("info").scrollTop = 0;
   }
 
-  function select(id, { push = true } = {}) {
-    const s = byId[id] || screens[0];
-    if (state.current !== s.id) state.refIndex = 0;
-    state.current = s.id;
-    state.open.add(s.module.id);
-    if (push && location.hash.slice(1) !== s.id) history.replaceState(null, "", "#" + s.id);
+  function select(hash, { push = true } = {}) {
+    const stop = resolve(hash);
+    const s = byId[stop.id];
+    if (state.current !== stop.key) state.refIndex = 0;
+    state.current = stop.key;
+    // Shared screens read the mode from the session, so set it before the frame loads.
+    if (stop.mode) appMode.set(stop.mode);
+    if (push && location.hash.slice(1) !== stop.key) history.replaceState(null, "", "#" + stop.key);
     document.title = `${s.name} · PingMe Prototype`;
     renderTree();
     renderPhone(s);
-    renderInfo(s);
+    renderInfo(s, stop);
     document.querySelector('.tree a[aria-current="page"]')?.scrollIntoView({ block: "nearest" });
   }
 
   function step(delta) {
-    const i = screens.findIndex((s) => s.id === state.current);
-    const next = screens[i + delta];
-    if (next) select(next.id);
+    const i = stops.findIndex((x) => x.key === state.current);
+    const next = stops[i + delta];
+    if (next) select(next.key);
   }
 
   // Events
   $("nav-tree").addEventListener("click", (e) => {
-    const link = e.target.closest("a[data-id]");
+    const link = e.target.closest("a[data-key]");
     if (link) {
       e.preventDefault();
-      select(link.dataset.id);
+      select(link.dataset.key);
       return;
     }
-    const head = e.target.closest(".module > button");
-    if (head) {
-      const id = head.parentElement.dataset.module;
-      state.open.has(id) ? state.open.delete(id) : state.open.add(id);
+    const tw = e.target.closest("[data-uid]");
+    if (tw) {
+      const id = tw.dataset.uid;
+      state.closed.has(id) ? state.closed.delete(id) : state.closed.add(id);
       renderTree();
     }
   });
@@ -223,9 +288,9 @@
     touch = null;
     if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 2) step(dx < 0 ? 1 : -1);
   }, { passive: true });
-  window.addEventListener("hashchange", () => select(location.hash.slice(1), { push: false }));
+  window.addEventListener("hashchange", () => select(location.hash.slice(1)));
 
   $("dev-toggle").setAttribute("aria-pressed", String(state.dev));
   renderFilters();
-  select(location.hash.slice(1) || screens[0].id, { push: false });
+  select(location.hash.slice(1) || stops[0].key, { push: false });
 })();

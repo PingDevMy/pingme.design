@@ -9,12 +9,27 @@ import vm from "node:vm";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 const sandbox = { window: {} };
 vm.runInNewContext(readFileSync(join(root, "app/screens.js"), "utf8"), sandbox);
-const { modules, statuses, roles } = sandbox.window.PINGME;
+const { modules, statuses, roles, flow } = sandbox.window.PINGME;
 
 const icon = { todo: "⚪", reference: "🟠", design: "🔵", done: "🟢" };
 const badge = (s) => `${icon[s]} ${statuses[s].label}`;
 const all = modules.flatMap((m) => m.screens);
 const count = (s) => all.filter((x) => x.status === s).length;
+const byId = Object.fromEntries(all.map((s) => [s.id, s]));
+
+// The app flow as a text tree (same data as the prototype's left panel).
+function tree(nodes, pad = "") {
+  return nodes
+    .map((n, i) => {
+      const last = i === nodes.length - 1;
+      const via = n.via ? `[${n.via}] ` : "";
+      const line = n.to
+        ? `${pad}${last ? "└─" : "├─"} ${via}→ ${n.label || byId[n.to].name} (${n.to})`
+        : `${pad}${last ? "└─" : "├─"} ${via}${byId[n.id].name} (${n.id}) ${icon[byId[n.id].status]}`;
+      return [line, n.kids ? tree(n.kids, pad + (last ? "   " : "│  ")) : ""].filter(Boolean).join("\n");
+    })
+    .join("\n");
+}
 
 // Tracker
 let out = `# Screen tracker
@@ -26,6 +41,14 @@ Start with the [product overview](00-overview.md). Open \`index.html\` to browse
 **${count("done")} of ${all.length} screens done** · ${Object.keys(statuses)
   .map((s) => `${badge(s)}: ${count(s)}`)
   .join(" · ")}
+
+## App flow
+
+Customers and vendors download the same app and use one account. After signing in, the app opens in **Customer mode** or **Vendor mode** (the one used last); Profile switches between them, and an account without a shop can add one. Screens marked *Both modes* show the version for the mode they were opened from.
+
+\`\`\`text
+${flow.map((sec) => `${sec.label}${sec.hint ? ` · ${sec.hint}` : ""}\n${tree(sec.kids)}`).join("\n\n")}
+\`\`\`
 
 `;
 for (const role of roles) {

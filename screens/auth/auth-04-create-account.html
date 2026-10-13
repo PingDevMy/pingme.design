@@ -3,12 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Customer Sign Up · PingMe</title>
+  <title>Create Account · PingMe</title>
   <link rel="stylesheet" href="../kit.css" />
   <style>
-    .role-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 999px; background: var(--brand-50); color: var(--brand-700); font-size: 12.5px; font-weight: 600; }
-    .role-chip svg.i { width: 16px; height: 16px; }
-    .role-chip a { margin-left: 4px; font-weight: 500; color: var(--ink-2); }
     .meter { display: flex; gap: 4px; margin-top: 8px; }
     .meter span { flex: 1; height: 4px; border-radius: 4px; background: var(--line); transition: background 0.2s; }
     .meter-label { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
@@ -20,16 +17,16 @@
 <body>
   <div class="page">
     <header class="topbar">
-      <button class="icon-btn" type="button" aria-label="Back" data-go="AUTH-03"><svg class="i" data-icon="back"></svg></button>
-      <div class="steps" style="width: 120px" aria-label="Step 2 of 3"><span class="on"></span><span class="on"></span><span></span></div>
+      <button class="icon-btn" type="button" aria-label="Back" data-go="AUTH-02"><svg class="i" data-icon="back"></svg></button>
+      <div class="steps" style="width: 120px" aria-label="Step 1 of 3"><span class="on"></span><span></span><span></span></div>
       <span style="width: 40px"></span>
     </header>
 
     <main class="content">
       <div class="rise">
-        <span class="role-chip"><svg class="i" data-icon="user"></svg>Customer account <a href="#" data-go="AUTH-03">Change</a></span>
-        <h1 class="h1" style="margin-top: 12px">Create your account</h1>
-        <p class="lead">Shops reach you on your phone, so we'll verify it next.</p>
+        <div class="eyebrow">Get started</div>
+        <h1 class="h1" style="margin-top: 8px">Create your account</h1>
+        <p class="lead">One account follows your orders and, if you run a shop, manages it too. We'll verify your phone next.</p>
       </div>
 
       <div class="social" style="margin-top: 22px">
@@ -46,7 +43,7 @@
             <input id="name" autocomplete="name" placeholder="Nur Aisyah Rahman" />
             <svg class="i ok" data-icon="check"></svg>
           </div>
-          <div class="error"><svg class="i" data-icon="alert"></svg>Enter your name as shops should see it.</div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter your name as shops and clients should see it.</div>
         </div>
 
         <div class="field" data-rule="email">
@@ -101,7 +98,7 @@
 
     <footer class="foot">
       <button class="btn primary" id="submit" type="submit" form="form" disabled>Create Account</button>
-      <div class="switch">Already have an account? <a href="#" data-go="AUTH-04">Sign in</a></div>
+      <div class="switch">Already have an account? <a href="#" data-go="AUTH-03">Sign in</a></div>
     </footer>
   </div>
 
@@ -150,10 +147,12 @@
       const btn = $("submit");
       btn.disabled = true;
       btn.innerHTML = '<span class="spinner"></span>Creating account';
+      // A new account starts without a shop; the mode is chosen after verifying.
       PM.store.set("role", "customer");
+      PM.store.set("hasShop", "0");
       PM.store.set("phone", "+60 " + $("phone").value.trim());
-      PM.store.set("verifyFor", "customer");
-      setTimeout(() => PM.go("AUTH-08"), 800);
+      PM.store.set("verifyFor", "signup");
+      setTimeout(() => PM.go("AUTH-05"), 800);
     });
   </script>
 </body>

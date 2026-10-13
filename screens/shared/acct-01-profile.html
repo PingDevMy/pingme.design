@@ -22,6 +22,15 @@
     .role .tile { background: rgba(255, 255, 255, 0.12); color: var(--mint); }
     .role .go { display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 12px; border-radius: 10px; background: #fff; color: var(--ink); font-size: 13px; font-weight: 700; flex: none; }
     .role .go svg.i { width: 15px; height: 15px; }
+    .role.add { background: var(--surface); color: var(--ink); border: 1.5px dashed var(--line); }
+    .role.add small { color: var(--ink-2); }
+    .role.add .tile { background: var(--brand-50); color: var(--brand-700); }
+    .role.add .go { background: var(--brand); color: #fff; }
+    .modeline { display: inline-flex; align-items: center; gap: 6px; margin-top: 10px; padding: 3px 10px; border-radius: 999px; background: var(--brand-50); color: var(--brand-700); font-size: 12px; font-weight: 600; }
+    .modeline svg.i { width: 14px; height: 14px; }
+    .vendor-only { display: none; }
+    .is-vendor .vendor-only { display: grid; }
+    .is-vendor .customer-only { display: none; }
     .ver { margin-top: 20px; text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--ink-3); }
     .sheet .actions { display: grid; gap: 10px; margin-top: 20px; }
     .sheet .btn.danger { background: var(--danger); color: #fff; box-shadow: none; }
@@ -39,24 +48,27 @@
 </head>
 <body class="canvas">
   <div class="page tabbed">
+    <header class="appbar vendor-only">
+      <button class="icon-btn" type="button" aria-label="Back to Shop" data-go="VSHOP-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Account</div>
+      <span class="spacer"></span>
+    </header>
     <main class="content">
       <section class="me rise">
         <span class="avatar lg" id="av">AT<button class="cam" type="button" aria-label="Change photo" id="photo"><svg class="i" data-icon="camera"></svg></button></span>
         <h1 id="name">Alex Tan</h1>
         <p id="contact"></p>
+        <span class="modeline" id="modeline"></span><br />
         <button class="btn secondary" type="button" id="edit"><svg class="i" data-icon="edit"></svg>Edit profile</button>
       </section>
 
-      <a class="role" href="#" data-go="VHOME-01">
-        <span class="tile"><svg class="i" data-icon="store"></svg></span>
-        <span class="grow"><b>Switch to Vendor</b><small>Manage Alex's Laundry Corner</small></span>
-        <span class="go"><svg class="i" data-icon="swap"></svg>Switch</span>
-      </a>
+      <!-- One app, one account: switch mode here, or add a shop to unlock Vendor mode. -->
+      <a class="role" href="#" id="mode-card"></a>
 
       <section class="section">
         <div class="section-head"><h2>Activity</h2></div>
         <div class="list">
-          <a class="item" href="#" data-go="CTRK-03"><span class="ii"><svg class="i" data-icon="history"></svg></span><span class="grow">Order history<small>9 orders with 6 shops</small></span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item customer-only" href="#" data-go="CTRK-03"><span class="ii"><svg class="i" data-icon="history"></svg></span><span class="grow">Order history<small>9 orders with 6 shops</small></span><svg class="i" data-icon="chevron"></svg></a>
           <a class="item" href="#" data-go="NOTI-01"><span class="ii"><svg class="i" data-icon="bell"></svg></span><span class="grow">Notifications</span><span class="pill progress plain">3 new</span><svg class="i" data-icon="chevron"></svg></a>
         </div>
       </section>
@@ -80,10 +92,17 @@
       <div class="ver">PINGME V2.4.0</div>
     </main>
 
-    <nav class="tabbar" aria-label="Main">
+    <nav class="tabbar customer-only" aria-label="Main">
       <a href="#" data-go="CHOME-01"><svg class="i" data-icon="home"></svg>Home</a>
       <a href="#" class="scan" aria-label="Scan order QR" data-go="CHOME-02"><svg class="i" data-icon="scan"></svg></a>
       <a href="#" aria-current="page"><svg class="i" data-icon="user"></svg>Profile</a>
+    </nav>
+    <nav class="tabbar five vendor-only" aria-label="Main">
+      <a href="#" data-go="VHOME-01"><svg class="i" data-icon="home"></svg>Home</a>
+      <a href="#" data-go="VORD-01"><svg class="i" data-icon="receipt"></svg>Orders</a>
+      <a href="#" class="scan" aria-label="Create new order" data-go="VORD-04"><svg class="i" data-icon="plus"></svg></a>
+      <a href="#" data-go="VREV-01"><svg class="i" data-icon="chart"></svg>Revenue</a>
+      <a href="#" aria-current="page"><svg class="i" data-icon="store"></svg>Shop</a>
     </nav>
   </div>
 
@@ -117,7 +136,7 @@
       <h3>Sign out?</h3>
       <p class="lead small">You'll stop getting push pings on this phone. Shops can still reach you by SMS.</p>
       <div class="actions">
-        <button class="btn primary" type="button" data-go="AUTH-04">Sign out</button>
+        <button class="btn primary" type="button" data-go="AUTH-03">Sign out</button>
         <button class="btn ghost" type="button" data-close>Cancel</button>
       </div>
     </section>
@@ -170,6 +189,24 @@
     }
     paint();
 
+    // Shared by both modes: the mode decides the tab bar, the switch card and the order history link.
+    const vendor = PM.mode() === "vendor";
+    document.body.classList.toggle("is-vendor", vendor);
+    $("modeline").innerHTML = `<svg class="i" data-icon="${vendor ? "store" : "user"}"></svg>${vendor ? "Vendor mode" : "Customer mode"}`;
+    const card = $("mode-card");
+    if (vendor) {
+      card.dataset.go = "CHOME-01";
+      card.innerHTML = `<span class="tile"><svg class="i" data-icon="user"></svg></span><span class="grow"><b>Switch to Customer</b><small>Follow your own orders from other shops</small></span><span class="go"><svg class="i" data-icon="swap"></svg>Switch</span>`;
+    } else if (PM.hasShop()) {
+      card.dataset.go = "VHOME-01";
+      card.innerHTML = `<span class="tile"><svg class="i" data-icon="store"></svg></span><span class="grow"><b>Switch to Vendor</b><small>Manage Alex's Laundry Corner</small></span><span class="go"><svg class="i" data-icon="swap"></svg>Switch</span>`;
+    } else {
+      card.classList.add("add");
+      card.addEventListener("click", () => PM.store.set("shopFrom", "ACCT-01"));
+      card.dataset.go = "AUTH-07";
+      card.innerHTML = `<span class="tile"><svg class="i" data-icon="store"></svg></span><span class="grow"><b>Run a shop?</b><small>Add your shop to this account to log jobs and ping clients</small></span><span class="go"><svg class="i" data-icon="plus"></svg>Set up</span>`;
+    }
+
     const sections = ["s-edit", "s-signout", "s-delete", "s-code", "s-gone"];
     function show(id) { sections.forEach((s) => ($(s).hidden = s !== id)); document.body.classList.add("open"); }
     const close = () => document.body.classList.remove("open");
@@ -183,7 +220,7 @@
       ["f-name", "f-email"].forEach((f) => $(f).classList.remove("invalid"));
       show("s-edit");
     });
-    $("change-phone").addEventListener("click", (e) => { e.preventDefault(); PM.store.set("verifyFor", "customer"); PM.go("AUTH-08"); });
+    $("change-phone").addEventListener("click", (e) => { e.preventDefault(); PM.store.set("verifyFor", "phone"); PM.go("AUTH-05"); });
     $("edit-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const nOk = $("e-name").value.trim().length > 1;
@@ -194,6 +231,24 @@
       u.name = $("e-name").value.trim();
       u.email = $("e-email").value.trim();
       paint();
+
+    // Shared by both modes: the mode decides the tab bar, the switch card and the order history link.
+    const vendor = PM.mode() === "vendor";
+    document.body.classList.toggle("is-vendor", vendor);
+    $("modeline").innerHTML = `<svg class="i" data-icon="${vendor ? "store" : "user"}"></svg>${vendor ? "Vendor mode" : "Customer mode"}`;
+    const card = $("mode-card");
+    if (vendor) {
+      card.dataset.go = "CHOME-01";
+      card.innerHTML = `<span class="tile"><svg class="i" data-icon="user"></svg></span><span class="grow"><b>Switch to Customer</b><small>Follow your own orders from other shops</small></span><span class="go"><svg class="i" data-icon="swap"></svg>Switch</span>`;
+    } else if (PM.hasShop()) {
+      card.dataset.go = "VHOME-01";
+      card.innerHTML = `<span class="tile"><svg class="i" data-icon="store"></svg></span><span class="grow"><b>Switch to Vendor</b><small>Manage Alex's Laundry Corner</small></span><span class="go"><svg class="i" data-icon="swap"></svg>Switch</span>`;
+    } else {
+      card.classList.add("add");
+      card.addEventListener("click", () => PM.store.set("shopFrom", "ACCT-01"));
+      card.dataset.go = "AUTH-07";
+      card.innerHTML = `<span class="tile"><svg class="i" data-icon="store"></svg></span><span class="grow"><b>Run a shop?</b><small>Add your shop to this account to log jobs and ping clients</small></span><span class="go"><svg class="i" data-icon="plus"></svg>Set up</span>`;
+    }
       close();
       PM.toast("Profile updated");
     });

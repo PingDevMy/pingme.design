@@ -40,7 +40,6 @@
     .composer .btn { width: auto; height: 38px; padding: 0 14px; font-size: 14px; }
     .composer .note { font-size: 12px; color: var(--ink-3); margin-right: auto; }
     body:not(.is-owner) .owner { display: none; }
-    .proto { display: block; margin: 20px auto 0; font-size: 12px; font-weight: 500; color: var(--ink-3); }
   </style>
 </head>
 <body class="canvas">
@@ -65,7 +64,6 @@
       </div>
 
       <div id="list"></div>
-      <button class="text-btn proto" type="button" id="proto">Prototype: view as the shop owner</button>
     </main>
   </div>
 
@@ -74,8 +72,14 @@
   <script>
     const D = PM.data;
     const $ = (id) => document.getElementById(id);
+    // Shared by both modes: customers see the shop of the order they opened; in
+    // Vendor mode the owner sees their own shop with the owner controls.
+    const owner = PM.mode() === "vendor";
     const cur = D.current();
-    const s = D.shops[(cur && cur.shop) || "pingclean"];
+    const s = owner
+      ? { ...D.shops.luxe, id: "own", name: "Alex's Laundry Corner", category: "Laundry", address: "18 Jalan SS2/55, Petaling Jaya", rating: 4.8, reviews: 126 }
+      : D.shops[(cur && cur.shop) || "pingclean"];
+    document.body.classList.toggle("is-owner", owner);
     let filter = "all";
 
     const grad = ["#f472b6,#db2777", "#60a5fa,#2563eb", "#fbbf24,#d97706", "#34d399,#059669", "#a78bfa,#7c3aed", "#f87171,#dc2626"];
@@ -166,10 +170,6 @@
       PM.toast("Reply posted");
     });
 
-    $("proto").addEventListener("click", (e) => {
-      const on = document.body.classList.toggle("is-owner");
-      e.currentTarget.textContent = on ? "Prototype: view as a customer" : "Prototype: view as the shop owner";
-    });
 
     PM.hydrateIcons();
     render();

@@ -149,7 +149,7 @@ a.item:hover, button.item:hover { background: var(--canvas); text-decoration: no
 .control.area { height: auto; align-items: flex-start; padding: 12px 14px; }
 .control textarea { flex: 1; min-width: 0; min-height: 96px; border: 0; outline: 0; resize: none; background: transparent; font: inherit; font-size: 15px; color: var(--ink); }
 
-/* Vendor app ------------------------------------------------------------- */
+/* Vendor mode ------------------------------------------------------------ */
 
 /* Five-tab bar: Home, Orders, New order (raised, centre), Revenue, Shop. */
 .tabbar.five { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto minmax(0, 1fr) minmax(0, 1fr); padding-left: 10px; padding-right: 10px; }

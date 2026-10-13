@@ -29,11 +29,140 @@ window.PINGME = {
     done: { label: "Done" },
   },
 
+  // One app, one account, two modes. Modules are grouped by the mode they belong to.
   roles: [
     { id: "start", label: "Get started" },
-    { id: "customer", label: "Customer app" },
-    { id: "vendor", label: "Vendor app" },
-    { id: "shared", label: "Both apps" },
+    { id: "customer", label: "Customer mode" },
+    { id: "vendor", label: "Vendor mode" },
+    { id: "shared", label: "Both modes" },
+  ],
+
+  /*
+   * The app's screen flow, drawn as the tree in the left panel and listed in the
+   * tracker. A node is a screen ({ id, via, kids }) or a link to a screen in
+   * another branch ({ to, via, label }). `via` is what the user taps or what happens to
+   * get there. Shared screens (Notifications, Profile, Shop Profile) appear in
+   * both modes; opening one from a mode's branch shows that mode's version.
+   */
+  flow: [
+    {
+      id: "start",
+      label: "Get started",
+      hint: "Launch, sign up and sign in",
+      kids: [
+        {
+          id: "AUTH-01",
+          kids: [
+            { id: "AUTH-02", via: "First open", kids: [{ to: "AUTH-04", via: "Get started" }] },
+            {
+              id: "AUTH-03", via: "Returning",
+              kids: [
+                { id: "AUTH-08", via: "Forgot?" },
+                { to: "AUTH-04", via: "New here" },
+                { to: "CHOME-01", via: "Last used: Customer", label: "Customer Home" },
+                { to: "VHOME-01", via: "Last used: Vendor", label: "Vendor Dashboard" },
+              ],
+            },
+          ],
+        },
+        {
+          id: "AUTH-04", via: "Sign up",
+          kids: [
+            {
+              id: "AUTH-05", via: "Verify phone",
+              kids: [
+                {
+                  id: "AUTH-06", via: "Verified",
+                  kids: [
+                    { to: "CHOME-01", via: "Track my orders", label: "Customer Home" },
+                    { id: "AUTH-07", via: "Run my shop", kids: [{ to: "VHOME-01", via: "Shop ready", label: "Vendor Dashboard" }] },
+                  ],
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "customer",
+      mode: "customer",
+      label: "Customer mode",
+      hint: "Tabs: Home, Scan, Profile",
+      kids: [
+        {
+          id: "CHOME-01", via: "Tab",
+          kids: [
+            {
+              id: "CTRK-01", via: "Drop-off order",
+              kids: [
+                { id: "SHOP-01", via: "View Shop", kids: [{ id: "SHOP-02", via: "See all" }] },
+                { id: "CTRK-04", via: "Completed" },
+              ],
+            },
+            { id: "CTRK-02", via: "On-site service" },
+            { id: "CTRK-03", via: "See all history" },
+            { id: "NOTI-01", via: "Bell" },
+          ],
+        },
+        { id: "CHOME-02", via: "Tab", kids: [{ to: "CTRK-01", via: "Order claimed" }] },
+        {
+          id: "ACCT-01", via: "Tab",
+          kids: [
+            { id: "NOTI-02", via: "Preferences" },
+            { id: "ACCT-02", via: "Help" },
+            { to: "VHOME-01", via: "Switch to Vendor", label: "Vendor Dashboard" },
+            { to: "AUTH-07", via: "No shop yet" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "vendor",
+      mode: "vendor",
+      label: "Vendor mode",
+      hint: "Tabs: Home, Orders, +, Revenue, Shop",
+      kids: [
+        { id: "VHOME-01", via: "Tab", kids: [{ id: "NOTI-01", via: "Bell" }] },
+        {
+          id: "VORD-01", via: "Tab",
+          kids: [
+            {
+              id: "VORD-05", via: "Open order",
+              kids: [
+                { id: "VORD-02", via: "Sheet" },
+                { id: "VORD-03", via: "Sheet" },
+              ],
+            },
+            { id: "VORD-06", via: "Scan" },
+          ],
+        },
+        { id: "VORD-04", via: "+ tab" },
+        { id: "VREV-01", via: "Tab", kids: [{ id: "VREV-02", via: "See all" }] },
+        {
+          id: "VSHOP-01", via: "Tab",
+          kids: [
+            { id: "SHOP-01", via: "Preview", kids: [{ id: "SHOP-02", via: "Manage reviews" }] },
+            { id: "VSHOP-02", via: "Settings" },
+            { id: "VSHOP-03", via: "Settings" },
+            { id: "NOTI-02", via: "Settings" },
+            {
+              id: "ACCT-01", via: "Account",
+              kids: [
+                { id: "ACCT-02", via: "Help" },
+                { to: "CHOME-01", via: "Switch to Customer", label: "Customer Home" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "web",
+      label: "Outside the app",
+      hint: "For customers without PingMe installed",
+      kids: [{ id: "CTRK-05", via: "SMS link" }],
+    },
   ],
 
   modules: [
@@ -50,7 +179,7 @@ window.PINGME = {
           summary: "Brand splash shown while the app boots and restores the session.",
           points: [
             "PingMe logo with a short intro animation on first open",
-            "Restores a saved session and routes straight to the right home (Customer or Vendor)",
+            "Restores a saved session and routes straight to the home of the last-used mode (Customer or Vendor)",
             "Falls through to Onboarding on first install, Sign In otherwise",
           ],
           criteria: [
@@ -72,7 +201,7 @@ window.PINGME = {
             "Last slide: Get Started plus 'Already have an account? Sign in'",
           ],
           criteria: [
-            "Swipe and Next both advance; Skip jumps to Role Selection",
+            "Swipe and Next both advance; Skip and Get Started open Create Account",
             "Shown only until the user finishes or skips it once",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135118.png"],
@@ -80,35 +209,19 @@ window.PINGME = {
         },
         {
           id: "AUTH-03",
-          name: "Role Selection",
-          status: "done",
-          summary: "New users choose whether they are a Customer or a Vendor before signing up.",
-          points: [
-            "Two cards: I am a Customer, I am a Vendor, each with a one-line explanation",
-            "Continue is disabled until one card is selected",
-            "Help icon and 'Already have an account? Sign In'",
-          ],
-          criteria: [
-            "Selected role carries into Sign Up and decides which sign-up form opens",
-          ],
-          refs: ["design reference/authentication/Screenshot 2026-10-13 135051.png"],
-          html: "screens/auth/auth-03-role.html",
-        },
-        {
-          id: "AUTH-04",
           name: "Sign In",
-          status: "done",
-          summary: "Returning users sign in with email or phone, choosing Customer or Vendor mode.",
+          status: "design",
+          summary: "Returning users sign in once and land back in the mode they used last.",
           points: [
-            "Role toggle: Customer (track and follow my orders) or Vendor (manage shop and orders)",
             "Email or phone, password with show/hide, Forgot? link",
-            "Primary button names the role: 'Sign In to Customer' / 'Sign In to Vendor'",
+            "One Sign In button: no Customer / Vendor toggle, because one account holds both modes",
+            "Line under the button says where you'll land (your orders, or your shop dashboard)",
             "Social sign-in (Google plus Apple or GitHub; final pair to be decided)",
-            "Footer: Sign Up link, app version, Privacy Policy, Terms of Service",
+            "Footer: Create an account link, app version, Privacy Policy, Terms of Service",
           ],
           criteria: [
             "Wrong credentials show an inline error without clearing the email field",
-            "An account holding both roles lands on the role picked in the toggle",
+            "Lands on the home of the last-used mode; accounts without a shop always land on Customer Home",
           ],
           refs: [
             "design reference/authentication/Screenshot 2026-10-13 135010.png",
@@ -118,45 +231,86 @@ window.PINGME = {
             "design reference/Customer/Screenshot 2026-10-06 152222.png",
             "design reference/Customer/Screenshot 2026-10-06 152155.png",
           ],
-          html: "screens/auth/auth-04-sign-in.html",
-          note: "Prototype: any email or phone signs in; the password \"wrong\" shows the failed sign-in state. Social pair shown as Google + Apple until the open question is settled.",
+          html: "screens/auth/auth-03-sign-in.html",
+          note: "Prototype: any email or phone signs in; the password \"wrong\" shows the failed sign-in state. You land in the mode last opened in this browser session (Vendor if you were just on a vendor screen).",
         },
         {
-          id: "AUTH-05",
-          name: "Customer Sign Up",
-          status: "done",
-          summary: "Customer creates an account with name, email, phone and password.",
+          id: "AUTH-04",
+          name: "Create Account",
+          status: "design",
+          summary: "One sign-up form for everyone: the same account follows orders and, later, runs a shop.",
           points: [
             "Full name, email, phone number, password, confirm password",
             "Terms of Service and Privacy Policy checkbox",
             "Create Account button, social sign-up (Google, Apple)",
-            "Phone number is verified with a Security Code before first use",
+            "Step 1 of 3: account, verify phone, choose where to start",
           ],
           criteria: [
             "Create Account stays disabled until all fields validate and terms are ticked",
-            "Phone number links any orders a vendor already created for that number",
+            "No role is asked here; shop details are only asked if the user picks Run my shop",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135038.png"],
-          html: "screens/auth/auth-05-customer-sign-up.html",
+          html: "screens/auth/auth-04-create-account.html",
+          note: "Replaces the separate Customer Sign Up and Vendor Sign Up forms, which asked for the same owner details twice.",
+        },
+        {
+          id: "AUTH-05",
+          name: "Security Code",
+          status: "done",
+          summary: "Six-digit code sent by SMS to verify the phone number at sign-up or after changing it.",
+          points: [
+            "Masked phone number with 'Wrong number? Edit'",
+            "Six digit boxes with auto-advance and paste support",
+            "Resend countdown, Resend SMS, Call me instead",
+            "Verify Now button; success shows orders shops already made for this number",
+          ],
+          criteria: [
+            "Resend is locked until the countdown ends",
+            "Code expires after 10 minutes; five wrong tries locks for 15 minutes",
+            "After sign-up it continues to Choose Mode; after a phone change it returns to Profile",
+          ],
+          refs: ["design reference/authentication/Screenshot 2026-10-13 135106.png"],
+          html: "screens/auth/auth-05-security-code.html",
+          note: "Prototype: 000000 is treated as a wrong code (five tries, then locked); any other six digits verify and show the success state.",
         },
         {
           id: "AUTH-06",
-          name: "Vendor Sign Up",
-          status: "done",
-          summary: "Vendor creates an account and a basic shop profile in one flow.",
+          name: "Choose Mode",
+          status: "design",
+          summary: "After verifying, new users pick where to start: their orders or their shop. Both stay one tap apart.",
           points: [
-            "Owner name, email, phone, password",
-            "Shop name, service category (Laundry, Tailoring, Repair, Cleaning, HVAC, Other), address, opening hours",
-            "Shop logo upload (optional, can be done later)",
+            "Two cards: Track my orders (Customer mode), Run my shop (Vendor mode)",
+            "Button names the next step: See my orders, or Set up my shop",
+            "'Set up a shop later' link and a help sheet explaining that one account does both",
           ],
           criteria: [
-            "Vendor can create orders right after sign-up; profile can be finished later",
+            "Track my orders opens Customer Home; Run my shop opens Set Up Your Shop",
+            "Shown once per account; the choice can be changed any time from Profile",
           ],
-          refs: [],
-          html: "screens/auth/auth-06-vendor-sign-up.html",
+          refs: ["design reference/authentication/Screenshot 2026-10-13 135051.png"],
+          html: "screens/auth/auth-06-choose-mode.html",
+          note: "Moved from before sign-up to after it: the role no longer decides which form you fill in, only where you land.",
         },
         {
           id: "AUTH-07",
+          name: "Set Up Your Shop",
+          status: "design",
+          summary: "Adds Vendor mode to the account with a minimal shop, from Choose Mode or later from Profile.",
+          points: [
+            "Shop name, service category (Laundry, Tailoring, Repair, Cleaning, HVAC, Other), address",
+            "Opening hours and shop logo (optional, can be done later)",
+            "Vendor Terms checkbox; no owner name, phone or password (the account already has them)",
+            "Success: shop is ready, next steps, Go to my shop",
+          ],
+          criteria: [
+            "Vendor can create orders right after setup; profile can be finished later in the Shop tab",
+            "Back returns to where it was opened from (Choose Mode or Profile)",
+          ],
+          refs: [],
+          html: "screens/auth/auth-07-shop-setup.html",
+        },
+        {
+          id: "AUTH-08",
           name: "Forgot Password",
           status: "done",
           summary: "User requests a password reset link by email.",
@@ -168,26 +322,7 @@ window.PINGME = {
             "Always shows the same confirmation whether or not the email exists",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135100.png"],
-          html: "screens/auth/auth-07-forgot-password.html",
-        },
-        {
-          id: "AUTH-08",
-          name: "Security Code",
-          status: "done",
-          summary: "Six-digit code sent by SMS to verify a phone number or a sign-in.",
-          points: [
-            "Masked phone number with 'Wrong number? Edit'",
-            "Six digit boxes with auto-advance and paste support",
-            "Resend countdown, Resend SMS, Call me instead",
-            "Verify Now button",
-          ],
-          criteria: [
-            "Resend is locked until the countdown ends",
-            "Code expires after 10 minutes; five wrong tries locks for 15 minutes",
-          ],
-          refs: ["design reference/authentication/Screenshot 2026-10-13 135106.png"],
-          html: "screens/auth/auth-08-security-code.html",
-          note: "Prototype: 000000 is treated as a wrong code (five tries, then locked); any other six digits verify and show the success state.",
+          html: "screens/auth/auth-08-forgot-password.html",
         },
       ],
     },
@@ -345,7 +480,7 @@ window.PINGME = {
 
     {
       id: "SHOP",
-      role: "customer",
+      role: "shared",
       name: "Shop Profile",
       doc: "docs/requirements/04-shop-profile.md",
       screens: [
@@ -359,14 +494,15 @@ window.PINGME = {
             "Address and opening hours",
             "Social proof: average rating, review count, 5-to-1 star breakdown",
             "Recent feedback with name, rating, text, time and Helpful",
-            "Owner view adds edit, Manage All Reviews and Customer Messaging",
+            "In Vendor mode the owner sees their own shop with edit, Manage All Reviews and Customer Messaging",
           ],
           criteria: [
             "Customer sees the same page without the owner controls",
+            "Back returns to the order it was opened from, or to the Shop tab in Vendor mode",
           ],
           refs: ["design reference/Customer/Screenshot 2026-10-13 134211.png"],
           html: "screens/customer/shop-01-profile.html",
-          note: "Shows the shop of the picked order. Open / Closed follows the real time of day against opening hours. The link at the bottom shows the owner view.",
+          note: "Customer mode shows the shop of the picked order. Open it from the Vendor mode branch (or Preview in the Shop tab) for the owner view. Open / Closed follows the real time of day against opening hours.",
         },
         {
           id: "SHOP-02",
@@ -375,12 +511,12 @@ window.PINGME = {
           summary: "Full list of reviews with filters by star rating.",
           points: [
             "Filter chips: All, 5, 4, 3, 2, 1, With photos",
-            "Vendor can reply publicly to a review (owner view)",
+            "Vendor can reply publicly to a review (Vendor mode)",
           ],
           criteria: [],
           refs: [],
           html: "screens/customer/shop-02-reviews.html",
-          note: "The link at the bottom shows the owner view, where unanswered reviews get a public Reply.",
+          note: "In Vendor mode unanswered reviews get a public Reply.",
         },
       ],
     },
@@ -399,12 +535,12 @@ window.PINGME = {
           points: [
             "Grouped Today / Earlier, unread dot, mark all as read",
             "Tapping opens the related order",
-            "Customer: status changes and vendor messages. Vendor: new reviews, claimed orders, customer replies",
+            "Customer mode: status changes and shop messages. Vendor mode: customer replies, claimed orders, payments, new reviews",
           ],
-          criteria: ["Bell icon badge equals unread count"],
+          criteria: ["Bell icon badge equals unread count", "Each mode shows only its own pings; back returns to that mode's home"],
           refs: [],
           html: "screens/shared/noti-01-inbox.html",
-          note: "Customer view. Tapping a ping opens its order; the rating ping opens Rate & Review. The unread count matches the bell badge on Home.",
+          note: "Shows the inbox of the mode it was opened from. Customer: a ping opens its order and the rating ping opens Rate & Review. Vendor: a ping opens the order, the payment or the reviews.",
         },
         {
           id: "NOTI-02",
@@ -412,13 +548,13 @@ window.PINGME = {
           status: "design",
           summary: "User chooses which pings arrive by push, SMS or email.",
           points: [
-            "Per-event toggles for push, SMS and email",
+            "Per-event toggles for push, SMS and email, with events for the current mode",
             "Quiet hours",
           ],
-          criteria: ["Order-ready pings cannot be fully turned off (at least one channel)"],
+          criteria: ["Order-ready pings (customer) and customer replies (vendor) cannot be fully turned off (at least one channel)"],
           refs: [],
           html: "screens/shared/noti-02-preferences.html",
-          note: "Customer view. Try turning off both channels for Ready for pickup.",
+          note: "Customer mode is opened from Profile, Vendor mode from the Shop tab. Try turning off both channels for Ready for pickup.",
         },
       ],
     },
@@ -639,7 +775,7 @@ window.PINGME = {
           criteria: ["Changes show on the public Shop Profile immediately"],
           refs: [],
           html: "screens/vendor/vshop-01-profile.html",
-          note: "This is the Shop tab. Edits enable Save; Preview opens the public Shop Profile. Settings links to Customer Messaging, Staff and Account.",
+          note: "This is the Shop tab. Edits enable Save; Preview opens the public Shop Profile. Settings links to Customer Messaging, Staff, Notification preferences and Account (where you switch to Customer mode).",
         },
         {
           id: "VSHOP-02",
@@ -683,21 +819,22 @@ window.PINGME = {
           summary: "User's own details and entry point to settings.",
           points: [
             "Photo, name, phone, email, edit",
-            "Switch to Vendor / Customer when the account has both roles",
-            "Links: Notification preferences, Help & Support, Privacy, Terms",
+            "Mode badge and a switch card: Switch to Vendor, Switch to Customer, or Run a shop? when the account has no shop yet",
+            "Customer mode: it's the Profile tab. Vendor mode: opened from the Shop tab as Account, with the vendor tab bar",
+            "Links: Order history (Customer mode), Notifications, Notification preferences, Help & Support, Privacy, Terms",
             "Sign out, delete account",
           ],
-          criteria: ["Delete account asks for confirmation and a security code"],
+          criteria: ["Delete account asks for confirmation and a security code", "Switching mode keeps the user signed in and opens that mode's home"],
           refs: [],
           html: "screens/shared/acct-01-profile.html",
-          note: "Customer view. Delete account asks for confirmation, then a security code (000000 is treated as wrong).",
+          note: "Shows the mode it was opened from. After signing up without a shop, the card offers Run a shop? instead. Delete account asks for confirmation, then a security code (000000 is treated as wrong).",
         },
         {
           id: "ACCT-02",
           name: "Help & Support",
           status: "design",
           summary: "FAQ and a way to contact PingMe support.",
-          points: ["Searchable FAQ", "Contact form with order picker"],
+          points: ["Searchable FAQ, including how to switch modes", "Contact form with order picker (your orders in Customer mode, your shop's orders in Vendor mode)"],
           criteria: [],
           refs: [],
           html: "screens/shared/acct-02-help.html",

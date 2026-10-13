@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>Role Selection · PingMe</title>
+  <title>Choose Mode · PingMe</title>
   <link rel="stylesheet" href="../kit.css" />
   <style>
     .roles { display: grid; gap: 14px; margin-top: 28px; }
@@ -42,22 +42,23 @@
 <body>
   <div class="page">
     <header class="topbar">
-      <button class="icon-btn" type="button" aria-label="Back" data-go="AUTH-02"><svg class="i" data-icon="back"></svg></button>
+      <span style="width: 40px"></span>
+      <div class="steps" style="width: 120px" aria-label="Step 3 of 3"><span class="on"></span><span class="on"></span><span class="on"></span></div>
       <button class="icon-btn plain" type="button" aria-label="Help choosing" id="help"><svg class="i" data-icon="help"></svg></button>
     </header>
 
     <main class="content">
       <div class="rise">
-        <div class="eyebrow">Get started</div>
-        <h1 class="h1" style="margin-top: 8px">How will you use PingMe?</h1>
-        <p class="lead">Pick one to set up your account. You can add the other later from your profile.</p>
+        <div class="eyebrow">Almost there</div>
+        <h1 class="h1" style="margin-top: 8px">Where do you want to start?</h1>
+        <p class="lead">Your account works for both. Pick where to land now and switch any time from Profile.</p>
       </div>
 
-      <div class="roles" role="radiogroup" aria-label="Account type">
+      <div class="roles" role="radiogroup" aria-label="Start in">
         <button class="role rise" type="button" role="radio" aria-checked="false" data-role="customer" style="animation-delay: 0.05s">
           <span class="ic"><svg class="i" data-icon="user"></svg></span>
           <span>
-            <span class="rt">I'm a Customer</span>
+            <span class="rt">Track my orders</span>
             <span class="rd">Follow orders from the shops I use and get pinged when they move.</span>
             <span class="rl">
               <span class="ri"><svg class="i" data-icon="check"></svg>Live order status with photos</span>
@@ -69,8 +70,8 @@
         <button class="role rise" type="button" role="radio" aria-checked="false" data-role="vendor" style="animation-delay: 0.1s">
           <span class="ic"><svg class="i" data-icon="store"></svg></span>
           <span>
-            <span class="rt">I'm a Vendor</span>
-            <span class="rd">Run my shop, log each job and keep my clients posted automatically.</span>
+            <span class="rt">Run my shop</span>
+            <span class="rd">Log each job and keep my clients posted automatically. Takes one short form.</span>
             <span class="rl">
               <span class="ri"><svg class="i" data-icon="check"></svg>Orders, QR tags and status updates</span>
               <span class="ri"><svg class="i" data-icon="check"></svg>Push and SMS pings to clients</span>
@@ -83,18 +84,18 @@
 
     <footer class="foot">
       <button class="btn primary" id="continue" type="button" disabled>Continue</button>
-      <div class="alt">Already have an account? <a href="#" data-go="AUTH-04">Sign in</a></div>
+      <div class="alt">Not sure? Start with your orders. <a href="#" id="later">Set up a shop later</a></div>
     </footer>
   </div>
 
   <div class="sheet-bg" id="sheet-bg"></div>
   <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
     <div class="grab"></div>
-    <h3 id="sheet-title">Which one am I?</h3>
+    <h3 id="sheet-title">Which one should I pick?</h3>
     <dl>
-      <div><dt>Customer</dt><dd>You drop things off or book a service, and want to know when it's done. Shops reach you by your phone number.</dd></div>
-      <div><dt>Vendor</dt><dd>You run a laundry, tailor, repair shop or on-site service and want to update clients without calls.</dd></div>
-      <div><dt>Both?</dt><dd>One account can hold both. Start with one and switch any time from your profile.</dd></div>
+      <div><dt>Track my orders</dt><dd>You drop things off or book a service, and want to know when it's done. Shops reach you by your phone number.</dd></div>
+      <div><dt>Run my shop</dt><dd>You run a laundry, tailor, repair shop or on-site service and want to update clients without calls. You'll add your shop's name, category and address next.</dd></div>
+      <div><dt>Both?</dt><dd>It's one app and one account. Shop owners still get their own orders from other shops. Switch between the two from Profile.</dd></div>
     </dl>
     <button class="btn secondary" type="button" id="close-sheet">Got it</button>
   </section>
@@ -109,14 +110,17 @@
       role = r;
       cards.forEach((c) => c.setAttribute("aria-checked", String(c.dataset.role === r)));
       cta.disabled = false;
-      cta.innerHTML = `Continue as ${r === "vendor" ? "Vendor" : "Customer"} <svg class="i" data-icon="arrow"></svg>`;
+      cta.innerHTML = `${r === "vendor" ? "Set up my shop" : "See my orders"} <svg class="i" data-icon="arrow"></svg>`;
       PM.hydrateIcons(cta);
     }
     cards.forEach((c) => c.addEventListener("click", () => pick(c.dataset.role)));
+    // Customer mode needs nothing more; Vendor mode first needs a shop.
     cta.addEventListener("click", () => {
-      PM.store.set("role", role);
-      PM.go(role === "vendor" ? "AUTH-06" : "AUTH-05");
+      if (role === "vendor") { PM.store.set("shopFrom", "AUTH-06"); return PM.go("AUTH-07"); }
+      PM.store.set("role", "customer");
+      PM.go("CHOME-01");
     });
+    document.getElementById("later").addEventListener("click", (e) => { e.preventDefault(); PM.store.set("role", "customer"); PM.go("CHOME-01"); });
 
     const toggle = (on) => document.body.classList.toggle("open", on);
     document.getElementById("help").addEventListener("click", () => toggle(true));

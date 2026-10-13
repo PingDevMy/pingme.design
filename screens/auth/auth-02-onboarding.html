@@ -119,7 +119,7 @@
   <div class="wrap">
     <header class="top">
       <span class="brand"><span class="mark sm"><svg class="i" data-icon="bolt"></svg></span>PingMe</span>
-      <button class="text-btn" id="skip" type="button" data-go="AUTH-03">Skip</button>
+      <button class="text-btn" id="skip" type="button" data-go="AUTH-04">Skip</button>
     </header>
 
     <div class="track" id="track" aria-roledescription="carousel" aria-label="About PingMe">
@@ -225,7 +225,7 @@
     <footer class="controls">
       <div class="dots" id="dots" role="tablist" aria-label="Choose slide"></div>
       <button class="btn primary" id="next" type="button">Next <svg class="i" data-icon="arrow"></svg></button>
-      <div class="signin" id="signin">Already have an account? <a href="#" data-go="AUTH-04">Sign in</a></div>
+      <div class="signin" id="signin">Already have an account? <a href="#" data-go="AUTH-03">Sign in</a></div>
     </footer>
   </div>
   <script src="../kit.js"></script>
@@ -279,7 +279,7 @@
     next.addEventListener("click", () => {
       if (index < slides.length - 1) return show(index + 1);
       PM.store.set("onboarded", "1");
-      PM.go("AUTH-03");
+      PM.go("AUTH-04");
     });
     skip.addEventListener("click", () => PM.store.set("onboarded", "1"));
     document.addEventListener("keydown", (e) => {

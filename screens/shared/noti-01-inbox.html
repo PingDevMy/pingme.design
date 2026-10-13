@@ -35,7 +35,7 @@
 <body class="canvas">
   <div class="page">
     <header class="appbar sticky">
-      <button class="icon-btn" type="button" aria-label="Back" data-go="CHOME-01"><svg class="i" data-icon="back"></svg></button>
+      <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
       <div class="title">Notifications</div>
       <button class="icon-btn plain" type="button" aria-label="Notification settings" data-go="NOTI-02"><svg class="i" data-icon="settings"></svg></button>
     </header>
@@ -58,7 +58,10 @@
     const $ = (id) => document.getElementById(id);
     let f = "all";
     // kind: order (status change) or msg (vendor message). via: push or sms.
-    const items = [
+    // The inbox is shared by both modes; each mode shows its own pings.
+    const vendor = PM.mode() === "vendor";
+    $("back").addEventListener("click", () => PM.go(vendor ? "VHOME-01" : "CHOME-01"));
+    const customerItems = [
       { id: 1, day: "Today", kind: "order", order: "ORD-1204", icon: "checkcircle", tone: "green", t: "Ready for pickup", b: "Sunshine Dry Cleaners: your 2 suits are ready. Show your pickup QR at the counter.", at: "9:02 AM", via: "push", unread: true },
       { id: 2, day: "Today", kind: "order", order: "SVC-88201", icon: "pin", tone: "sky", t: "Technician arrived", b: "Marcus from AquaPure Services has arrived at your location.", at: "10:47 AM", via: "push", unread: true },
       { id: 3, day: "Today", kind: "msg", order: "ORD-0921", icon: "message", tone: "", t: "Message from Luxe Laundry Hub", b: "Hi Alex, one shirt has a stain we can pre-treat for free. We'll go ahead unless you say no.", at: "10:50 AM", via: "push", unread: true },
@@ -68,9 +71,18 @@
       { id: 7, day: "Earlier", kind: "msg", order: "ORD-0712", icon: "message", tone: "", t: "Message from PingClean Express", b: "We're closed on Sunday for the public holiday. Pickups resume Monday 8 AM.", at: "3 Oct", via: "sms" },
       { id: 8, day: "Earlier", kind: "order", order: "ORD-0650", icon: "checkcircle", tone: "green", t: "Order completed", b: "Fix-It Phone Repair: screen replacement done. Receipt saved to your history.", at: "30 Sep", via: "push" },
     ];
+    // Vendor pings: customer replies, claimed orders, reviews and payments. go: screen it opens.
+    const vendorItems = [
+      { id: 1, day: "Today", kind: "msg", order: "ORD-1204", icon: "message", tone: "", t: "Sarah Jenkins replied", b: "Great, can I collect at 6:30 instead of 6?", at: "11:58 AM", via: "push", unread: true, go: "VORD-05" },
+      { id: 2, day: "Today", kind: "order", order: "ORD-1206", icon: "qr", tone: "violet", t: "Order claimed in the app", b: "Nurul Aina scanned the receipt QR, so pings now go to the app instead of SMS.", at: "11:24 AM", via: "push", unread: true, go: "VORD-05" },
+      { id: 3, day: "Today", kind: "order", order: "ORD-1201", icon: "receipt", tone: "green", t: "Payment received", b: "RM 42.00 by card for Wash & press · 6 kg.", at: "9:31 AM", via: "push", go: "VREV-02" },
+      { id: 4, day: "Earlier", kind: "msg", order: "ORD-1190", icon: "star", tone: "amber", t: "New 5-star review", b: "Elena Rodriguez: \u201cDuvet came back spotless and smelling great.\u201d", at: "Sat", via: "push", go: "SHOP-02" },
+      { id: 5, day: "Earlier", kind: "order", order: "ORD-1181", icon: "alert", tone: "rose", t: "Order cancelled", b: "Priya Nair's zip replacement was cancelled and refunded.", at: "Wed", via: "push", go: "VORD-05" },
+    ];
     // Newest first.
     const rank = [3, 2, 4, 5, 1, 6, 7, 8];
-    items.sort((a, b) => rank.indexOf(a.id) - rank.indexOf(b.id));
+    customerItems.sort((a, b) => rank.indexOf(a.id) - rank.indexOf(b.id));
+    const items = vendor ? vendorItems : customerItems;
 
     function render() {
       const shown = items.filter((n) => f === "all" || n.kind === f);
@@ -86,7 +98,7 @@
             <span><span class="t">${n.t}</span><span class="b">${n.b}</span><span class="s">${n.order}${n.via === "sms" ? " · sent by SMS" : ""}</span></span>
             <span class="side"><time>${n.at}</time><span class="u" aria-label="${n.unread ? "Unread" : ""}"></span></span>
           </button>`).join("")}</div>`;
-      }).join("") || `<div class="empty"><span class="badge-icon ring"><svg class="i" data-icon="bell"></svg></span><h3>No notifications</h3><p>Pings about your orders show up here.</p></div>`;
+      }).join("") || `<div class="empty"><span class="badge-icon ring"><svg class="i" data-icon="bell"></svg></span><h3>No notifications</h3><p>${vendor ? "Pings about your shop's orders show up here." : "Pings about your orders show up here."}</p></div>`;
       PM.hydrateIcons($("list"));
     }
 
@@ -101,6 +113,10 @@
       if (!el) return;
       const n = items.find((x) => x.id === +el.dataset.id);
       n.unread = false;
+      if (vendor) {
+        PM.store.set("vorder", n.order);
+        return PM.go(n.go);
+      }
       const o = D.order(n.order);
       PM.store.set("order", o.id);
       PM.go(n.rate ? "CTRK-04" : o.type === "onsite" ? "CTRK-02" : "CTRK-01");
