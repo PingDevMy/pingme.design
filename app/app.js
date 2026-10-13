@@ -136,7 +136,6 @@
     state.open.add(s.module.id);
     if (push && location.hash.slice(1) !== s.id) history.replaceState(null, "", "#" + s.id);
     document.title = `${s.name} · PingMe Prototype`;
-    $("nav-toggle-label").textContent = `${s.module.name} › ${s.name}`;
     renderTree();
     renderPhone(s);
     renderInfo(s);
@@ -155,8 +154,6 @@
     if (link) {
       e.preventDefault();
       select(link.dataset.id);
-      document.querySelector(".nav").classList.remove("expanded");
-      $("nav-toggle").setAttribute("aria-expanded", "false");
       return;
     }
     const head = e.target.closest(".module > button");
@@ -187,16 +184,25 @@
     $("dev-toggle").setAttribute("aria-pressed", String(state.dev));
     $("info").classList.toggle("dev-on", state.dev);
   });
-  $("nav-toggle").addEventListener("click", () => {
-    const nav = document.querySelector(".nav");
-    const open = nav.classList.toggle("expanded");
-    $("nav-toggle").setAttribute("aria-expanded", String(open));
-  });
   document.addEventListener("keydown", (e) => {
     if (e.target.closest("input, textarea")) return;
     if (e.key === "ArrowDown" || e.key === "j") { e.preventDefault(); step(1); }
     if (e.key === "ArrowUp" || e.key === "k") { e.preventDefault(); step(-1); }
   });
+  // On phones only the app screen is shown; swipe left/right to change screens.
+  let touch = null;
+  $("screen-body").addEventListener("touchstart", (e) => {
+    const t = e.touches[0];
+    touch = { x: t.clientX, y: t.clientY };
+  }, { passive: true });
+  $("screen-body").addEventListener("touchend", (e) => {
+    if (!touch) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touch.x;
+    const dy = t.clientY - touch.y;
+    touch = null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 2) step(dx < 0 ? 1 : -1);
+  }, { passive: true });
   window.addEventListener("hashchange", () => select(location.hash.slice(1), { push: false }));
 
   $("dev-toggle").setAttribute("aria-pressed", String(state.dev));

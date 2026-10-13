@@ -22,6 +22,8 @@ npx serve .        # or: python3 -m http.server
 
 Then open the printed URL. Each screen has its own link (e.g. `/#VORD-04`); use ↑/↓ to step through screens and **Dev mode** for acceptance criteria and file paths.
 
+On a phone the site shows only the app screen, full-screen, so it feels like the real app. Swipe left or right to move between screens, or open a screen link directly.
+
 ## Track progress
 
 1. Set the screen's `status` in `app/screens.js` (`todo`, `reference`, `design`, `done`).
