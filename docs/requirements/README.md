@@ -4,7 +4,7 @@
 
 Start with the [product overview](00-overview.md). Open `index.html` to browse the screens.
 
-**8 of 33 screens done** · ⚪ Not started: 6 · 🟠 Reference only: 6 · 🔵 In design: 13 · 🟢 Done: 8
+**8 of 33 screens done** · ⚪ Not started: 0 · 🟠 Reference only: 0 · 🔵 In design: 25 · 🟢 Done: 8
 
 ## Get started
 
@@ -53,33 +53,33 @@ Start with the [product overview](00-overview.md). Open `index.html` to browse t
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `VHOME-01` | Dashboard | 🟠 Reference only | 2 images |
+| `VHOME-01` | Dashboard | 🔵 In design | 2 images |
 
 ### [Order Management](07-vendor-orders.md) · 0/6
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `VORD-01` | Order List | 🟠 Reference only | 1 image |
-| `VORD-02` | Update Status Sheet | 🟠 Reference only | 1 image |
-| `VORD-03` | Notify Customer Sheet | ⚪ Not started | – |
-| `VORD-04` | Create New Order | 🟠 Reference only | 1 image |
-| `VORD-05` | Order Details | 🟠 Reference only | 1 image |
-| `VORD-06` | Scan Pickup QR | ⚪ Not started | – |
+| `VORD-01` | Order List | 🔵 In design | 1 image |
+| `VORD-02` | Update Status Sheet | 🔵 In design | 1 image |
+| `VORD-03` | Notify Customer Sheet | 🔵 In design | – |
+| `VORD-04` | Create New Order | 🔵 In design | 1 image |
+| `VORD-05` | Order Details | 🔵 In design | 1 image |
+| `VORD-06` | Scan Pickup QR | 🔵 In design | – |
 
 ### [Revenue & Analytics](08-vendor-revenue.md) · 0/2
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `VREV-01` | Revenue Analytics | 🟠 Reference only | 1 image |
-| `VREV-02` | Transactions | ⚪ Not started | – |
+| `VREV-01` | Revenue Analytics | 🔵 In design | 1 image |
+| `VREV-02` | Transactions | 🔵 In design | – |
 
 ### [Shop Settings](09-vendor-shop-settings.md) · 0/3
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `VSHOP-01` | Edit Shop Profile | ⚪ Not started | – |
-| `VSHOP-02` | Customer Messaging | ⚪ Not started | – |
-| `VSHOP-03` | Staff & Technicians | ⚪ Not started | – |
+| `VSHOP-01` | Edit Shop Profile | 🔵 In design | – |
+| `VSHOP-02` | Customer Messaging | 🔵 In design | – |
+| `VSHOP-03` | Staff & Technicians | 🔵 In design | – |
 
 ## Both apps
 

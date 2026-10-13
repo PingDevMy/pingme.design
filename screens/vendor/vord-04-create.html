@@ -1,0 +1,269 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Create New Order · PingMe for Vendors</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 0; }
+    .group { margin-top: 20px; }
+    .group > .label { display: flex; align-items: center; gap: 8px; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); font-weight: 700; }
+    .group > .label svg.i { width: 16px; height: 16px; color: var(--brand-700); }
+    .group .card { margin-top: 10px; }
+    .group .card .field:first-child { margin-top: 0; }
+    .cats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .cats button { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 12px 4px; border: 1.5px solid var(--line); border-radius: var(--r); background: var(--surface); font-size: 13.5px; font-weight: 600; color: var(--ink-2); }
+    .cats button .tile { width: 38px; height: 38px; border-radius: 12px; }
+    .cats button[aria-pressed="true"] { border-color: var(--brand); background: var(--brand-50); color: var(--brand-700); }
+    .field.invalid .cats button { border-color: var(--danger); }
+    .two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; }
+    .stepper { display: grid; grid-template-columns: 40px minmax(0, 1fr) 40px; align-items: center; height: 52px; border: 1.5px solid var(--line); border-radius: var(--r); padding: 0 5px; }
+    .stepper button { width: 40px; height: 40px; border: 0; border-radius: 10px; background: var(--canvas); display: grid; place-items: center; color: var(--ink); }
+    .stepper input { width: 100%; min-width: 0; border: 0; outline: 0; text-align: center; font-size: 17px; font-weight: 700; background: transparent; }
+    .unit { margin-top: 8px; }
+    .unit .chip { padding: 5px 11px; font-size: 13px; }
+    .total { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; padding: 12px 14px; border-radius: var(--r); background: var(--brand-50); }
+    .total span { font-size: 13.5px; color: var(--brand-700); font-weight: 600; }
+    .total b { font-size: 20px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .paidrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+    .paidrow .grow { flex: 1; min-width: 0; font-size: 14px; font-weight: 500; }
+    .paidrow small { display: block; font-size: 12.5px; color: var(--ink-3); font-weight: 400; }
+
+    .photos { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+    .photos .ph, .photos .add { position: relative; aspect-ratio: 1; border-radius: var(--r); overflow: hidden; }
+    .photos .add { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border: 1.5px dashed var(--brand); background: var(--brand-50); color: var(--brand-700); font-size: 12.5px; font-weight: 600; cursor: pointer; text-align: center; padding: 4px; }
+    .photos .add input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+    .photos .ph img, .photos .ph .fake { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .photos .ph .fake { background: linear-gradient(135deg, #cbd5e1, #94a3b8); display: grid; place-items: center; color: #fff; }
+    .photos .ph time { position: absolute; left: 4px; right: 4px; bottom: 4px; padding: 2px 6px; border-radius: 6px; background: rgba(15, 23, 42, 0.7); color: #fff; font-size: 10.5px; font-weight: 600; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .photos .ph button { position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; background: rgba(15, 23, 42, 0.7); color: #fff; }
+    .photos .ph button svg.i { width: 13px; height: 13px; }
+
+    .foot { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr); gap: 10px; box-shadow: 0 -8px 20px rgba(15, 23, 42, 0.05); }
+    .foot .btn { height: 52px; font-size: 15px; white-space: nowrap; padding: 0 8px; }
+
+    .done { text-align: center; }
+    .done .qr { width: min(200px, 58vw); aspect-ratio: 1; margin: 16px auto 10px; padding: 12px; background: #fff; border-radius: 18px; box-shadow: var(--shadow); border: 1px solid var(--line-2); }
+    .done .qr svg { display: block; width: 100%; height: 100%; }
+    .done .code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; letter-spacing: 0.08em; font-size: 15px; }
+    .done .alert { text-align: left; margin-top: 14px; }
+    .done .row2 { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 16px; }
+    .done .row2 .btn { height: 48px; font-size: 14.5px; }
+    @media (max-width: 360px) {
+      .two { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Close" id="back"><svg class="i" data-icon="close"></svg></button>
+      <div class="title">Create New Order</div>
+      <span class="spacer"></span>
+    </header>
+
+    <form class="content" id="form" novalidate>
+      <div class="field" id="f-title" style="margin-top: 4px">
+        <label class="label" for="title">Order title</label>
+        <div class="control" style="margin-top: 6px"><svg class="i" data-icon="tag"></svg><input id="title" placeholder="e.g. Silk suit alteration" maxlength="60" /></div>
+        <div class="error"><svg class="i" data-icon="alert"></svg>Give the order a short title.</div>
+      </div>
+
+      <div class="field" id="f-cat">
+        <span class="label">Service category</span>
+        <div class="cats" id="cats" role="group" aria-label="Service category" style="margin-top: 6px"></div>
+        <div class="error"><svg class="i" data-icon="alert"></svg>Pick a service category.</div>
+      </div>
+
+      <section class="group">
+        <span class="label"><svg class="i" data-icon="user"></svg>Customer <span class="opt" style="text-transform: none; letter-spacing: 0">(optional)</span></span>
+        <div class="card">
+          <div class="field">
+            <label class="label" for="name">Full name</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="user"></svg><input id="name" autocomplete="off" placeholder="Customer's name" /></div>
+          </div>
+          <div class="field" id="f-phone">
+            <label class="label" for="phone">Phone number</label>
+            <div class="control" style="margin-top: 6px"><span class="prefix">🇲🇾 +60</span><input id="phone" type="tel" inputmode="tel" placeholder="12-345 6789" /></div>
+            <div class="hint">We text them a tracking link. Leave both blank and the customer scans the order QR instead.</div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter a valid phone number, or leave it blank.</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="group">
+        <span class="label"><svg class="i" data-icon="package"></svg>Items &amp; price</span>
+        <div class="card">
+          <div class="two">
+            <div class="field">
+              <label class="label" for="qty">Quantity</label>
+              <div class="stepper" style="margin-top: 6px">
+                <button type="button" aria-label="Less" data-step="-1">−</button>
+                <input id="qty" inputmode="decimal" value="1" aria-label="Quantity" />
+                <button type="button" aria-label="More" data-step="1">+</button>
+              </div>
+            </div>
+            <div class="field">
+              <label class="label" for="price">Unit price</label>
+              <div class="control" style="margin-top: 6px"><span class="prefix">RM</span><input id="price" inputmode="decimal" placeholder="0.00" /></div>
+            </div>
+          </div>
+          <div class="chips unit" id="units" role="group" aria-label="Unit"></div>
+          <div class="total"><span>Order total</span><b id="total">RM 0.00</b></div>
+          <div class="paidrow">
+            <span class="grow">Paid now<small>Otherwise collected at pickup</small></span>
+            <label class="switch"><input type="checkbox" id="paid" aria-label="Paid now" /><span></span></label>
+          </div>
+        </div>
+      </section>
+
+      <section class="group">
+        <span class="label"><svg class="i" data-icon="camera"></svg>Item proof</span>
+        <div class="card">
+          <p class="small muted" style="margin: 0 0 12px">Photograph the item's condition at drop-off. Each photo keeps its capture time.</p>
+          <div class="photos" id="photos"></div>
+        </div>
+      </section>
+    </form>
+
+    <div class="foot">
+      <button class="btn secondary" type="button" id="draft">Save as Draft</button>
+      <button class="btn primary" type="button" id="go"><svg class="i" data-icon="qr"></svg>Generate QR</button>
+    </div>
+  </div>
+
+  <div class="sheet-bg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Order created">
+    <div class="grab"></div>
+    <div class="done" id="done"></div>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const $ = (id) => document.getElementById(id);
+    let cat = "";
+    let unit = "pieces";
+    let photos = [];
+    const units = { Laundry: ["kg", "pieces"], Tailoring: ["pieces", "suits"], Repair: ["pieces", "pairs"] };
+
+    $("cats").innerHTML = Object.keys(V.cats).map((c) => `<button type="button" data-cat="${c}" aria-pressed="false">${V.catTile(c)}${c}</button>`).join("");
+    PM.hydrateIcons($("cats"));
+    function renderUnits() {
+      const list = units[cat] || ["pieces", "kg", "pairs"];
+      if (!list.includes(unit)) unit = list[0];
+      $("units").innerHTML = list.map((u) => `<button type="button" class="chip" data-unit="${u}" aria-pressed="${u === unit}">${u}</button>`).join("");
+    }
+    const num = (v) => Math.max(0, parseFloat(String(v).replace(/[^\d.]/g, "")) || 0);
+    function updateTotal() { $("total").textContent = PM.data.money(num($("qty").value) * num($("price").value)); }
+
+    function renderPhotos() {
+      $("photos").innerHTML = photos.map((p, i) => `
+        <div class="ph">${p.url ? `<img src="${p.url}" alt="Proof photo ${i + 1}" />` : `<span class="fake"><svg class="i" data-icon="image"></svg></span>`}
+          <time>${p.at}</time>
+          <button type="button" aria-label="Remove photo ${i + 1}" data-rm="${i}"><svg class="i" data-icon="close"></svg></button>
+        </div>`).join("") + (photos.length < 6 ? `<label class="add"><svg class="i" data-icon="camera"></svg>Add photo<input type="file" accept="image/*" capture="environment" id="file" /></label>` : "");
+      PM.hydrateIcons($("photos"));
+    }
+    const now = () => new Date().toLocaleTimeString("en-MY", { hour: "numeric", minute: "2-digit" });
+
+    $("cats").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-cat]");
+      if (!b) return;
+      cat = b.dataset.cat;
+      $("cats").querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+      $("f-cat").classList.remove("invalid");
+      renderUnits();
+    });
+    $("units").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-unit]");
+      if (!b) return;
+      unit = b.dataset.unit;
+      renderUnits();
+    });
+    document.querySelectorAll("[data-step]").forEach((b) => b.addEventListener("click", () => {
+      $("qty").value = Math.max(1, num($("qty").value) + Number(b.dataset.step));
+      updateTotal();
+    }));
+    $("qty").addEventListener("input", updateTotal);
+    $("price").addEventListener("input", updateTotal);
+    $("title").addEventListener("input", () => $("f-title").classList.remove("invalid"));
+    $("phone").addEventListener("input", () => $("f-phone").classList.remove("invalid"));
+    $("photos").addEventListener("change", (e) => {
+      const f = e.target.files && e.target.files[0];
+      // In a desktop browser without a camera this opens a file picker.
+      photos.push({ url: f ? URL.createObjectURL(f) : "", at: "Today " + now() });
+      renderPhotos();
+    });
+    $("photos").addEventListener("click", (e) => {
+      const rm = e.target.closest("[data-rm]");
+      if (rm) { photos.splice(Number(rm.dataset.rm), 1); renderPhotos(); }
+    });
+
+    function collect(status) {
+      const phone = $("phone").value.trim();
+      return {
+        title: $("title").value.trim() || "Untitled order", category: cat || "Laundry", status,
+        customer: { name: $("name").value.trim(), phone: phone ? "+60 " + phone.replace(/^\+?60\s?/, "") : "", app: false },
+        qty: num($("qty").value) || 1, unit, price: num($("price").value), photos: photos.map((p) => p.at),
+      };
+    }
+    function valid() {
+      let ok = true;
+      const bad = [];
+      if (!$("title").value.trim()) { $("f-title").classList.add("invalid"); bad.push($("f-title")); ok = false; }
+      if (!cat) { $("f-cat").classList.add("invalid"); bad.push($("f-cat")); ok = false; }
+      const ph = $("phone").value.trim();
+      if (ph && !PM.phoneRe.test(ph)) { $("f-phone").classList.add("invalid"); bad.push($("f-phone")); ok = false; }
+      if (bad.length) { bad[0].scrollIntoView({ behavior: "smooth", block: "center" }); PM.shake(bad[0]); }
+      return ok;
+    }
+
+    $("go").addEventListener("click", () => {
+      if (!valid()) return;
+      const fields = collect("created");
+      const o = V.create(fields);
+      if ($("paid").checked) { o.paid = V.total(o); o.log.unshift({ kind: "payment", text: `Paid ${PM.data.money(o.paid)} at drop-off`, at: "Just now" }); V.save(); }
+      const first = o.customer.name.split(" ")[0] || "The customer";
+      $("done").innerHTML = `
+        <span class="badge-icon ring" style="margin: 0 auto"><svg class="i" data-icon="checkcircle"></svg></span>
+        <h3 style="margin-top: 14px">Order ${o.id} created</h3>
+        <p class="lead small" style="margin-top: 2px">${V.esc(o.title)} · ${PM.data.money(V.total(o))}</p>
+        <div class="qr">${PM.data.qr(o.id)}</div>
+        <div class="code">${V.code(o)}</div>
+        <div class="alert ${o.customer.phone ? "success" : "info"}"><svg class="i" data-icon="${o.customer.phone ? "message" : "qr"}"></svg>
+          <span>${o.customer.phone ? `${V.esc(first)} got an SMS with the tracking link at ${V.esc(o.customer.phone)}.` : "No phone number, so nobody was notified. Print the receipt; the customer scans this QR to follow the order."}</span></div>
+        <div class="row2">
+          <button class="btn secondary" type="button" id="share"><svg class="i" data-icon="share"></svg>Share link</button>
+          <button class="btn secondary" type="button" id="print"><svg class="i" data-icon="receipt"></svg>Print</button>
+        </div>
+        <button class="btn primary" type="button" id="view" style="margin-top: 10px">View order</button>
+        <button class="btn ghost" type="button" id="another">Create another</button>`;
+      PM.hydrateIcons($("done"));
+      document.body.classList.add("open");
+      $("share").onclick = () => PM.toast("Tracking link copied");
+      $("print").onclick = () => PM.toast("Sent to the receipt printer");
+      $("view").onclick = () => { PM.store.set("vorder", o.id); PM.go("VORD-05"); };
+      $("another").onclick = () => location.reload();
+    });
+
+    $("draft").addEventListener("click", () => {
+      if (!$("title").value.trim()) { $("f-title").classList.add("invalid"); PM.shake($("f-title")); return; }
+      V.create(collect("draft"));
+      PM.toast("Saved as draft. The customer isn't notified");
+      PM.store.set("vfilter", "draft");
+      setTimeout(() => PM.go("VORD-01"), 700);
+    });
+    $("back").addEventListener("click", () => PM.go("VORD-01"));
+    document.querySelector(".sheet-bg").addEventListener("click", () => document.body.classList.remove("open"));
+
+    renderUnits();
+    renderPhotos();
+    updateTotal();
+  </script>
+</body>
+</html>

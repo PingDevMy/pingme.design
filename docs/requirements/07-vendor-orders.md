@@ -23,7 +23,7 @@ Order: id, number, shop id, title, category, customer name, customer phone, cust
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `VORD-01` Order List · 🟠 Reference only
+### `VORD-01` Order List · 🔵 In design
 
 Every order the vendor is handling, filtered by status, with one-tap actions.
 
@@ -42,9 +42,11 @@ Every order the vendor is handling, filtered by status, with one-tap actions.
 
 - [ ] The next-step button moves the order forward one step and updates the card in place
 
+> Start Work, Mark Ready and Complete move the order one step and update the card in place. Notify opens the Notify Customer sheet. Search is behind the magnifier; changes carry over to the dashboard and order details.
+
 Reference: [1](../../design%20reference/vendor/Screenshot%202026-10-13%20134456.png)
 
-### `VORD-02` Update Status Sheet · 🟠 Reference only
+### `VORD-02` Update Status Sheet · 🔵 In design
 
 Bottom sheet to set any status and attach a note the customer will see.
 
@@ -56,9 +58,11 @@ Bottom sheet to set any status and attach a note the customer will see.
 
 - Customer gets the new status and the note
 
+> Opens over the current order. The same sheet is used from Order Details (Update Status).
+
 Reference: [1](../../design%20reference/vendor/Screenshot%202026-10-13%20134505.png)
 
-### `VORD-03` Notify Customer Sheet · ⚪ Not started
+### `VORD-03` Notify Customer Sheet · 🔵 In design
 
 Send a free-text or template message to the customer without changing status.
 
@@ -74,7 +78,9 @@ Send a free-text or template message to the customer without changing status.
 
 - [ ] Sent messages appear in the order's activity log
 
-### `VORD-04` Create New Order · 🟠 Reference only
+> Opens over the current order. Pick a quick reply or type; the channel line says Push or SMS. Sent messages land in the activity log. The same sheet is used from the order list and details.
+
+### `VORD-04` Create New Order · 🔵 In design
 
 Vendor logs a new job, captures proof photos and generates the order QR.
 
@@ -94,9 +100,11 @@ Vendor logs a new job, captures proof photos and generates the order QR.
 - [ ] Generating creates a unique order number and QR code
 - [ ] Drafts do not notify the customer
 
+> Title and category are required; customer details are optional (the customer can claim by QR). Add photo opens the camera or a file picker. Generate QR shows the new code; Save as Draft notifies nobody.
+
 Reference: [1](../../design%20reference/vendor/Screenshot%202026-10-13%20134432.png)
 
-### `VORD-05` Order Details · 🟠 Reference only
+### `VORD-05` Order Details · 🔵 In design
 
 Everything about one order: customer, payment, pickup QR, proof photo and activity.
 
@@ -110,9 +118,11 @@ Everything about one order: customer, payment, pickup QR, proof photo and activi
 
 - [ ] Mark as Picked Up is only available when status is Ready
 
+> Mark as Picked Up is enabled only when the order is Ready. Try the sample orders from the list: Wash & press (Ready), Silk suit (In Progress), Baju Melayu (Draft).
+
 Reference: [1](../../design%20reference/vendor/Screenshot%202026-10-13%20134450.png)
 
-### `VORD-06` Scan Pickup QR · ⚪ Not started
+### `VORD-06` Scan Pickup QR · 🔵 In design
 
 Vendor scans the customer's QR at the counter to confirm handover.
 
@@ -126,5 +136,7 @@ Vendor scans the customer's QR at the counter to confirm handover.
 **Acceptance:**
 
 - [ ] Scanning a QR from another shop shows an error
+
+> Tap the viewfinder to scan the first Ready order's pass. Enter pickup code accepts e.g. PINGME-1198-X99; the link at the bottom shows the other-shop error.
 
 <!-- screens:end -->

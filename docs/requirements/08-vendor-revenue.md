@@ -19,7 +19,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `VREV-01` Revenue Analytics · 🟠 Reference only
+### `VREV-01` Revenue Analytics · 🔵 In design
 
 How much the shop earned and from which orders.
 
@@ -34,13 +34,17 @@ How much the shop earned and from which orders.
 
 - [ ] Report downloads as CSV for the selected range
 
+> Range chips change every figure. Hover or tap a bar for its value; Show as table lists the same numbers. Download Report saves a CSV of the selected range.
+
 Reference: [1](../../design%20reference/vendor/Screenshot%202026-10-13%20134521.png)
 
-### `VREV-02` Transactions · ⚪ Not started
+### `VREV-02` Transactions · 🔵 In design
 
 Full list of payments with search and filters.
 
 - Filter by status and date
 - Tap opens the related order
+
+> Filter by status and date or search. Tap a payment to open its order.
 
 <!-- screens:end -->

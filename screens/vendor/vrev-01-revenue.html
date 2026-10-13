@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Revenue Analytics · PingMe for Vendors</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .head { display: flex; align-items: center; gap: 12px; padding: 14px var(--gutter) 0; }
+    .head h1 { flex: 1; min-width: 0; margin: 0; font-size: 26px; letter-spacing: -0.025em; }
+    .ranges { margin-top: 14px; }
+    .dl { margin-top: 12px; height: 48px; font-size: 15px; }
+
+    .total { margin-top: 14px; position: relative; overflow: hidden; }
+    .total::after { content: ""; position: absolute; right: -40px; top: -50px; width: 150px; height: 150px; border-radius: 50%; background: var(--brand-50); }
+    .total > * { position: relative; z-index: 1; }
+    .total .lbl { font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-3); }
+    .total .amt { margin-top: 4px; font-size: 34px; line-height: 1.1; font-weight: 800; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+    .total .cmp { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+    .delta { display: inline-flex; align-items: center; gap: 3px; height: 24px; padding: 0 8px; border-radius: 999px; font-size: 12.5px; font-weight: 700; background: var(--success-50); color: #047857; }
+    .delta.down { background: var(--danger-50); color: #b91c1c; }
+    .delta svg.i { width: 13px; height: 13px; }
+
+    .chart-card h2 { margin: 0; font-size: 16px; }
+    .chart-card .row { justify-content: space-between; }
+    .plot { position: relative; margin-top: 14px; padding-left: 40px; }
+    .grid-y { position: absolute; inset: 0 0 0 40px; display: flex; flex-direction: column; justify-content: space-between; pointer-events: none; }
+    .grid-y div { position: relative; border-top: 1px dashed var(--line); }
+    .grid-y div:last-child { border-top: 1px solid var(--line); }
+    .grid-y span { position: absolute; right: calc(100% + 6px); top: -8px; font-size: 10.5px; color: var(--ink-3); white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .cols { position: relative; display: flex; align-items: flex-end; gap: 2px; height: 150px; }
+    .cols button { flex: 1 1 0; min-width: 0; height: 100%; border: 0; padding: 0; background: none; display: flex; align-items: flex-end; cursor: pointer; }
+    .cols button span { display: block; width: 100%; border-radius: 4px 4px 0 0; background: var(--brand); opacity: 0.8; transition: opacity 0.12s; }
+    .cols button.last span { opacity: 1; }
+    .cols:hover button span { opacity: 0.45; }
+    .cols button:hover span, .cols button[aria-pressed="true"] span { opacity: 1; background: var(--brand-700); }
+    .xlabels { position: relative; height: 18px; margin: 6px 0 0 40px; font-size: 10.5px; color: var(--ink-3); }
+    .xlabels span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+    .ctip { position: absolute; top: -6px; transform: translate(-50%, -100%); padding: 6px 10px; border-radius: 10px; background: var(--ink); color: #fff; font-size: 12px; line-height: 1.3; white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 0.12s; z-index: 3; }
+    .ctip b { display: block; font-size: 13.5px; }
+    .ctip.show { opacity: 1; }
+    .table-toggle { margin-top: 10px; font-size: 12.5px; }
+    .dtable { width: 100%; margin-top: 8px; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+    .dtable th, .dtable td { padding: 6px 4px; border-bottom: 1px solid var(--line-2); text-align: left; }
+    .dtable td:last-child, .dtable th:last-child { text-align: right; }
+    .dtable[hidden] { display: none; }
+
+    .tiles { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; margin-top: 12px; }
+    .tiles .card { margin: 0; padding: 14px; }
+    .tiles .tile { width: 34px; height: 34px; border-radius: 10px; }
+    .tiles .tile svg.i { width: 17px; height: 17px; }
+    .tiles .lbl { display: block; margin-top: 10px; font-size: 12.5px; color: var(--ink-2); font-weight: 500; }
+    .tiles b { display: block; font-size: 19px; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+    .tiles small { display: block; font-size: 11.5px; color: var(--ink-3); }
+
+    .tx { display: flex; align-items: center; gap: 12px; }
+    .tx .grow { flex: 1; min-width: 0; }
+    .tx b { display: block; font-size: 15px; }
+    .tx .right { text-align: right; flex: none; }
+    .tx .amt { display: block; font-weight: 700; font-variant-numeric: tabular-nums; margin-bottom: 4px; }
+    .tx .amt.neg { color: #b91c1c; }
+    .txs .list .item { min-height: 64px; }
+    .txs .item .grow b, .txs .item .grow small { display: block; }
+    @media (max-width: 360px) {
+      .total .amt { font-size: 28px; }
+      .tiles b { font-size: 17px; }
+    }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page tabbed">
+    <header class="head">
+      <h1>Revenue</h1>
+      <button class="icon-btn" type="button" aria-label="All transactions" data-go="VREV-02"><svg class="i" data-icon="receipt"></svg></button>
+    </header>
+
+    <main class="content">
+      <div class="chips scroll ranges" id="ranges" role="group" aria-label="Date range"></div>
+      <button class="btn primary dl" type="button" id="dl"><svg class="i" data-icon="download"></svg>Download Report</button>
+
+      <section class="card total rise">
+        <div class="lbl" id="t-lbl">Total revenue</div>
+        <div class="amt" id="t-amt"></div>
+        <div class="cmp" id="t-cmp"></div>
+      </section>
+
+      <section class="card chart-card rise" style="margin-top: 12px">
+        <div class="row"><h2 id="c-title">Daily revenue</h2><span class="meta" id="c-span"></span></div>
+        <div class="plot">
+          <div class="grid-y" id="grid"></div>
+          <div class="cols" id="cols" role="group" aria-label="Revenue per period"></div>
+          <div class="ctip" id="ctip" role="status"></div>
+        </div>
+        <div class="xlabels" id="xl" aria-hidden="true"></div>
+        <button class="text-btn table-toggle" type="button" id="tt" aria-expanded="false">Show as table</button>
+        <table class="dtable" id="dtable" hidden></table>
+      </section>
+
+      <div class="tiles" id="tiles"></div>
+
+      <section class="section txs">
+        <div class="section-head"><h2>Recent transactions</h2><a href="#" data-go="VREV-02">See all</a></div>
+        <div class="list" id="txs"></div>
+      </section>
+    </main>
+
+    <nav class="tabbar five" aria-label="Main">
+      <a href="#" data-go="VHOME-01"><svg class="i" data-icon="home"></svg>Home</a>
+      <a href="#" data-go="VORD-01"><svg class="i" data-icon="receipt"></svg>Orders</a>
+      <a href="#" class="scan" aria-label="Create new order" data-go="VORD-04"><svg class="i" data-icon="plus"></svg></a>
+      <a href="#" aria-current="page"><svg class="i" data-icon="chart"></svg>Revenue</a>
+      <a href="#" data-go="VSHOP-01"><svg class="i" data-icon="store"></svg>Shop</a>
+    </nav>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    const rm = (n) => "RM " + n.toLocaleString("en-MY", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const rm0 = (n) => "RM " + Math.round(n).toLocaleString("en-MY");
+
+    // Sample series, seeded so every visit shows the same numbers.
+    let seed = 7;
+    const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
+    const hours = Array.from({ length: 13 }, (_, i) => i + 9);
+    const today = hours.map((h) => [h === 12 ? "12p" : h > 12 ? h - 12 + "p" : h + "a", h > 15 ? 0 : Math.round(10 + rnd() * 60)]);
+    const days = Array.from({ length: 30 }, (_, i) => {
+      const d = new Date(2026, 9, 13 - 29 + i);
+      const wkend = d.getDay() === 0 || d.getDay() === 6;
+      return [d.toLocaleDateString("en-MY", { day: "numeric", month: "short" }), Math.round((wkend ? 230 : 120) + rnd() * 160)];
+    });
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct"].map((m, i) => [m, i === 9 ? 4285.5 : Math.round(2400 + i * 160 + rnd() * 700)]);
+
+    const ranges = {
+      today: { label: "Today", title: "Hourly revenue", span: "Tue, 13 Oct", series: today, delta: 8.4, vs: "yesterday", every: 3, txDays: 0, unit: "hour" },
+      d7: { label: "7D", title: "Daily revenue", span: "7 – 13 Oct", series: days.slice(-7), delta: 12.1, vs: "previous 7 days", every: 1, txDays: 6, unit: "day" },
+      d30: { label: "30D", title: "Daily revenue", span: "14 Sep – 13 Oct", series: days, delta: 14.2, vs: "previous 30 days", every: 7, txDays: 29, unit: "day" },
+      all: { label: "All Time", title: "Monthly revenue", span: "Jan – Oct 2026", series: months, delta: null, vs: "", every: 1, txDays: 999, unit: "month" },
+    };
+    let range = "d30";
+
+    function figures(r) {
+      const total = r.series.reduce((a, d) => a + d[1], 0);
+      const orders = Math.max(1, Math.round(total / 38.6));
+      const fees = total * 0.032;
+      return { total, orders, avg: total / orders, fees, net: total - fees, prev: r.delta == null ? null : total / (1 + r.delta / 100) };
+    }
+
+    function render() {
+      const r = ranges[range];
+      const f = figures(r);
+      $("ranges").innerHTML = Object.entries(ranges).map(([k, x]) => `<button type="button" class="chip" data-r="${k}" aria-pressed="${k === range}">${x.label}</button>`).join("");
+      $("t-lbl").textContent = `Total revenue · ${r.label === "All Time" ? "all time" : r.label === "Today" ? "today" : "last " + r.label.replace("D", " days")}`;
+      $("t-amt").textContent = rm(f.total);
+      $("t-cmp").innerHTML = f.prev == null
+        ? `Since you joined PingMe in January`
+        : `<span class="delta"><svg class="i" data-icon="arrow" style="transform: rotate(-45deg)"></svg>${r.delta}%</span>vs ${rm0(f.prev)} ${r.vs}`;
+      $("c-title").textContent = r.title;
+      $("c-span").textContent = r.span;
+
+      // Chart: one series, so the title names it and there's no legend.
+      const max = Math.max(...r.series.map((d) => d[1]));
+      const top = Math.ceil(max / (max > 1000 ? 1000 : 100)) * (max > 1000 ? 1000 : 100);
+      $("grid").innerHTML = [top, top / 2, 0].map((v) => `<div><span>${v >= 1000 ? v / 1000 + "k" : v}</span></div>`).join("");
+      $("cols").innerHTML = r.series.map(([l, v], i) => `<button type="button" class="${i === r.series.length - 1 ? "last" : ""}" data-i="${i}" aria-label="${l}: ${rm(v)}" aria-pressed="false"><span style="height:${v ? Math.max(2, (v / top) * 100) : 0}%"></span></button>`).join("");
+      const n = r.series.length;
+      $("xl").innerHTML = r.series.map(([l], i) => (i % r.every === 0 || i === n - 1) && !(i !== n - 1 && n - 1 - i < r.every / 2 && r.every > 1) ? `<span style="left:${((i + 0.5) / n) * 100}%">${l}</span>` : "").join("");
+      $("dtable").innerHTML = `<thead><tr><th>${r.unit[0].toUpperCase() + r.unit.slice(1)}</th><th>Revenue</th></tr></thead><tbody>${r.series.map(([l, v]) => `<tr><td>${l}</td><td>${rm(v)}</td></tr>`).join("")}</tbody>`;
+
+      $("tiles").innerHTML = [
+        ["Net earnings", rm(f.net), "After fees", "receipt", ""],
+        ["Total orders", f.orders.toLocaleString("en-MY"), r.label === "Today" ? "Paid today" : "Paid in range", "package", "sky"],
+        ["Avg. order value", rm(f.avg), "Per paid order", "chart", "violet"],
+        ["Fees & taxes", rm(f.fees), "Card & e-wallet 3.2%", "tag", "rose"],
+      ].map(([l, v, s, icon, tone]) => `<div class="card"><span class="tile ${tone}"><svg class="i" data-icon="${icon}"></svg></span><span class="lbl">${l}</span><b>${v}</b><small>${s}</small></div>`).join("");
+
+      const tx = V.transactions.filter((t) => t.day <= r.txDays).slice(0, 4);
+      $("txs").innerHTML = tx.length ? tx.map((t) => `
+        <a class="item" href="#" data-order="${t.order}">
+          ${V.catTile(t.cat, "sm")}
+          <span class="grow"><b class="ellipsis" style="font-size: 15px">${V.esc(t.what)}</b><small class="ellipsis">${V.esc(t.who)} · ${t.at}</small></span>
+          <span class="right" style="text-align: right; flex: none"><span class="mono" style="display: block; font-weight: 700; ${t.amount < 0 ? "color: #b91c1c" : ""}">${t.amount < 0 ? "−" : "+"}${rm(Math.abs(t.amount))}</span><span class="pill ${V.txStatus[t.status][1]} plain" style="height: 20px; font-size: 11px; margin-top: 3px">${V.txStatus[t.status][0]}</span></span>
+        </a>`).join("") : `<div class="item"><span class="grow muted">No payments yet today.</span></div>`;
+      PM.hydrateIcons(document.querySelector(".content"));
+    }
+
+    // Tooltip on hover, tap and keyboard focus.
+    const tip = $("ctip");
+    function show(btn) {
+      const r = ranges[range];
+      const [l, v] = r.series[btn.dataset.i];
+      document.querySelectorAll("#cols button").forEach((b) => b.setAttribute("aria-pressed", String(b === btn)));
+      tip.innerHTML = `${l}<b>${rm(v)}</b>`;
+      const box = $("cols").getBoundingClientRect(), b = btn.getBoundingClientRect();
+      const plot = document.querySelector(".plot").getBoundingClientRect();
+      const half = tip.offsetWidth / 2;
+      const x = Math.min(Math.max(b.left - plot.left + b.width / 2, half), plot.width - half);
+      tip.style.left = x + "px";
+      tip.style.top = Math.max(0, b.top - box.top + b.height * (1 - parseFloat(btn.firstChild.style.height) / 100)) + "px";
+      tip.classList.add("show");
+    }
+    function hide() { tip.classList.remove("show"); document.querySelectorAll("#cols button").forEach((b) => b.setAttribute("aria-pressed", "false")); }
+    $("cols").addEventListener("mouseover", (e) => { const b = e.target.closest("button"); b && show(b); });
+    $("cols").addEventListener("mouseleave", hide);
+    $("cols").addEventListener("click", (e) => { const b = e.target.closest("button"); b && show(b); });
+    $("cols").addEventListener("focusin", (e) => show(e.target.closest("button")));
+    $("cols").addEventListener("focusout", hide);
+
+    $("tt").addEventListener("click", () => {
+      const t = $("dtable");
+      t.hidden = !t.hidden;
+      $("tt").setAttribute("aria-expanded", String(!t.hidden));
+      $("tt").textContent = t.hidden ? "Show as table" : "Hide table";
+    });
+    $("ranges").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-r]");
+      if (!b) return;
+      range = b.dataset.r;
+      hide();
+      render();
+    });
+    $("txs").addEventListener("click", (e) => {
+      const a = e.target.closest("[data-order]");
+      if (!a) return;
+      e.preventDefault();
+      V.openTx(a.dataset.order);
+    });
+
+    // VREV-R5: the report is a CSV of the selected range.
+    $("dl").addEventListener("click", () => {
+      const r = ranges[range];
+      const f = figures(r);
+      const rows = [
+        ["PingMe revenue report", V.shop.name], ["Range", r.span], [],
+        ["Total revenue", f.total.toFixed(2)], ["Net earnings", f.net.toFixed(2)], ["Total orders", f.orders], ["Average order value", f.avg.toFixed(2)], ["Fees & taxes", f.fees.toFixed(2)], [],
+        [r.unit, "revenue_rm"], ...r.series.map(([l, v]) => [l, v.toFixed(2)]), [],
+        ["transaction", "order", "customer", "service", "method", "status", "date", "amount_rm"],
+        ...V.transactions.filter((t) => t.day <= r.txDays).map((t) => [t.id, t.order, t.who, t.what, t.method, V.txStatus[t.status][0], t.at, t.amount.toFixed(2)]),
+      ];
+      const csv = rows.map((row) => row.map((c) => /[",\n]/.test(String(c)) ? `"${String(c).replace(/"/g, '""')}"` : c).join(",")).join("\n");
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" }));
+      a.download = `pingme-revenue-${range}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      PM.toast(`Report downloaded: ${r.label}`);
+    });
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Staff &amp; Technicians · PingMe for Vendors</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .intro { display: flex; gap: 12px; align-items: center; }
+    .intro .grow { flex: 1; min-width: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.45; }
+    .member .grow b { display: block; font-size: 15px; }
+    .member .role { flex: none; }
+    .member .avatar.pending { background: var(--line); color: var(--ink-2); }
+    .member .tech { display: flex; align-items: center; gap: 4px; }
+    .member .tech svg.i { width: 13px; height: 13px; }
+    .pill.admin { background: #f5f3ff; color: #6d28d9; }
+    .pill.tech { background: #eff6ff; color: #1d4ed8; }
+    .roles { display: grid; gap: 8px; margin-top: 8px; }
+    .sheet .field:first-of-type { margin-top: 14px; }
+    .sheet section[hidden] { display: none; }
+    .sheet .btn.danger { background: var(--danger); color: #fff; box-shadow: none; }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="VSHOP-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Staff &amp; Technicians</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <section class="card intro rise">
+        <span class="tile"><svg class="i" data-icon="user"></svg></span>
+        <span class="grow">Staff can create orders and update statuses. Technicians see only the on-site jobs assigned to them.</span>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Team</h2><span class="meta" id="count"></span></div>
+        <div class="list" id="team"></div>
+      </section>
+    </main>
+
+    <div class="foot"><button class="btn primary" type="button" id="invite"><svg class="i" data-icon="plus"></svg>Invite by phone</button></div>
+  </div>
+
+  <div class="sheet-bg" id="bg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-label="Team member">
+    <div class="grab"></div>
+    <section id="s-invite">
+      <h3>Invite a team member</h3>
+      <p class="lead small">They get an SMS with a link to join your shop on PingMe.</p>
+      <form id="form" novalidate>
+        <div class="field" id="f-name">
+          <label class="label" for="i-name">Name</label>
+          <div class="control" style="margin-top: 6px"><svg class="i" data-icon="user"></svg><input id="i-name" autocomplete="off" /></div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter their name.</div>
+        </div>
+        <div class="field" id="f-phone">
+          <label class="label" for="i-phone">Phone number</label>
+          <div class="control" style="margin-top: 6px"><span class="prefix">🇲🇾 +60</span><input id="i-phone" type="tel" inputmode="tel" placeholder="12-345 6789" /></div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter a valid phone number.</div>
+        </div>
+        <div class="field">
+          <span class="label">Role</span>
+          <div class="roles choices" id="roles" role="radiogroup" aria-label="Role"></div>
+        </div>
+        <div class="actions"><button class="btn primary" type="submit">Send invite</button><button class="btn ghost" type="button" data-close>Cancel</button></div>
+      </form>
+    </section>
+    <section id="s-member" hidden>
+      <h3 id="m-name"></h3>
+      <p class="lead small" id="m-sub"></p>
+      <div class="roles choices" id="m-roles" role="radiogroup" aria-label="Role"></div>
+      <div class="actions">
+        <button class="btn primary" type="button" id="m-save">Save role</button>
+        <button class="btn secondary" type="button" id="m-remove" style="color: var(--danger)"><svg class="i" data-icon="trash"></svg>Remove from shop</button>
+      </div>
+    </section>
+    <section id="s-remove" hidden>
+      <h3>Remove <span id="r-name"></span>?</h3>
+      <p class="lead small">They lose access to your orders straight away. Their past status updates stay in each order's activity log.</p>
+      <div class="actions"><button class="btn danger" type="button" id="r-go">Remove</button><button class="btn ghost" type="button" data-close>Cancel</button></div>
+    </section>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const $ = (id) => document.getElementById(id);
+    const roles = {
+      admin: ["Admin", "Everything, including revenue and shop settings", "admin"],
+      staff: ["Staff", "Create orders, update statuses, message customers", ""],
+      technician: ["Technician", "Update on-site jobs assigned to them", "tech"],
+    };
+    const team = [
+      { name: "Alex Tan", phone: "+60 12-345 4291", role: "owner", you: true },
+      { name: "Siti Hajar", phone: "+60 17-220 9184", role: "staff" },
+      { name: "Raj Kumar", phone: "+60 16-411 7302", role: "technician", jobs: 2 },
+      { name: "Wei Jie", phone: "+60 11-1834 6620", role: "staff", pending: true },
+    ];
+    let sel = null;
+
+    const roleOpts = (cur, name) => Object.entries(roles).map(([k, [l, d]]) => `
+      <label class="choice"><input type="radio" name="${name}" value="${k}"${k === cur ? " checked" : ""} /><span class="grow"><b>${l}</b><small>${d}</small></span></label>`).join("");
+
+    function render() {
+      $("count").textContent = `${team.length} people`;
+      $("team").innerHTML = team.map((m, i) => {
+        const r = m.role === "owner" ? ["Owner", "", "progress"] : roles[m.role];
+        return `<${m.you ? "div" : "button type=\"button\""} class="item member" data-i="${i}">
+          <span class="avatar sm${m.pending ? " pending" : ""}">${V.initials(m.name)}</span>
+          <span class="grow"><b class="ellipsis">${V.esc(m.name)}${m.you ? " (you)" : ""}</b>
+            <small class="ellipsis${m.jobs ? " tech" : ""}">${m.pending ? "Invite sent · waiting to join" : m.jobs ? `<svg class="i" data-icon="wrench"></svg>${m.jobs} on-site jobs` : V.esc(m.phone)}</small></span>
+          <span class="pill plain role ${r[2]}">${r[0]}</span>
+          ${m.you ? "" : '<svg class="i" data-icon="chevron"></svg>'}
+        </${m.you ? "div" : "button"}>`;
+      }).join("");
+      PM.hydrateIcons($("team"));
+    }
+
+    const panes = ["s-invite", "s-member", "s-remove"];
+    function open(id) { panes.forEach((p) => ($(p).hidden = p !== id)); document.body.classList.add("open"); }
+    function close() { document.body.classList.remove("open"); }
+    $("bg").addEventListener("click", close);
+    document.querySelectorAll("[data-close]").forEach((b) => b.addEventListener("click", close));
+
+    $("invite").addEventListener("click", () => {
+      $("form").reset();
+      ["f-name", "f-phone"].forEach((f) => $(f).classList.remove("invalid"));
+      $("roles").innerHTML = roleOpts("staff", "ir");
+      open("s-invite");
+    });
+    $("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = $("i-name").value.trim(), phone = $("i-phone").value.trim();
+      $("f-name").classList.toggle("invalid", !name);
+      $("f-phone").classList.toggle("invalid", !PM.phoneRe.test(phone));
+      if (!name || !PM.phoneRe.test(phone)) return PM.shake(document.querySelector(".sheet .invalid"));
+      team.push({ name, phone: "+60 " + phone, role: document.querySelector("input[name=ir]:checked").value, pending: true });
+      close();
+      render();
+      PM.toast(`Invite sent to ${name.split(" ")[0]}`);
+    });
+
+    $("team").addEventListener("click", (e) => {
+      const b = e.target.closest("button[data-i]");
+      if (!b) return;
+      sel = team[b.dataset.i];
+      $("m-name").textContent = sel.name;
+      $("m-sub").textContent = sel.pending ? `Invited at ${sel.phone}. They haven't joined yet.` : sel.phone;
+      $("m-roles").innerHTML = roleOpts(sel.role, "mr");
+      $("m-remove").innerHTML = `<svg class="i" data-icon="trash"></svg>${sel.pending ? "Cancel invite" : "Remove from shop"}`;
+      PM.hydrateIcons($("m-remove"));
+      open("s-member");
+    });
+    $("m-save").addEventListener("click", () => {
+      sel.role = document.querySelector("input[name=mr]:checked").value;
+      if (sel.role !== "technician") delete sel.jobs;
+      close();
+      render();
+      PM.toast(`${sel.name.split(" ")[0]} is now ${roles[sel.role][0]}`);
+    });
+    $("m-remove").addEventListener("click", () => {
+      if (sel.pending) { team.splice(team.indexOf(sel), 1); close(); render(); return PM.toast("Invite cancelled"); }
+      $("r-name").textContent = sel.name.split(" ")[0];
+      open("s-remove");
+    });
+    $("r-go").addEventListener("click", () => {
+      team.splice(team.indexOf(sel), 1);
+      close();
+      render();
+      PM.toast(`${sel.name.split(" ")[0]} removed`);
+    });
+
+    render();
+  </script>
+</body>
+</html>
