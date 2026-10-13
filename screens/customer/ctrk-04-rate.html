@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Rate &amp; Review · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .who { text-align: center; padding-top: 6px; }
+    .who .tile { margin: 0 auto 14px; }
+    .who .h2 { font-size: 22px; }
+    .who p { margin: 6px 0 0; font-size: 13.5px; color: var(--ink-2); }
+    .rating { display: flex; justify-content: center; gap: 6px; margin: 24px 0 6px; }
+    .rating button { width: 52px; height: 52px; border: 0; background: none; padding: 0; display: grid; place-items: center; color: var(--line); transition: transform 0.15s, color 0.15s; }
+    .rating button svg.i { width: 42px; height: 42px; fill: currentColor; stroke: none; }
+    .rating button.on { color: #f59e0b; }
+    .rating button:active { transform: scale(0.9); }
+    .rating button.pop { animation: pop 0.3s; }
+    @keyframes pop { 50% { transform: scale(1.25); } }
+    .rating-label { text-align: center; height: 22px; font-weight: 600; color: var(--ink-2); }
+    .ask { margin: 26px 0 10px; font-size: 15px; font-weight: 600; }
+    .counter { text-align: right; font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+    .photos { display: flex; gap: 10px; flex-wrap: wrap; }
+    .ph { position: relative; width: 76px; height: 76px; border-radius: 16px; overflow: hidden; flex: none; }
+    .ph.add { display: grid; place-items: center; align-content: center; gap: 2px; border: 1.5px dashed var(--line); background: var(--canvas); color: var(--ink-2); font-size: 11.5px; font-weight: 600; }
+    .ph.add svg.i { width: 22px; height: 22px; }
+    .ph.img { background: linear-gradient(135deg, #a5f3fc, #0e8fa3); }
+    .ph.img:nth-child(2) { background: linear-gradient(135deg, #fde68a, #f97316); }
+    .ph.img:nth-child(3) { background: linear-gradient(135deg, #ddd6fe, #7c3aed); }
+    .ph .x { position: absolute; top: 4px; right: 4px; width: 22px; height: 22px; border-radius: 50%; border: 0; display: grid; place-items: center; background: rgba(15, 23, 42, 0.6); color: #fff; padding: 0; }
+    .ph .x svg.i { width: 12px; height: 12px; stroke-width: 3; }
+    .policy { display: flex; align-items: center; gap: 8px; margin-top: 18px; font-size: 12.5px; color: var(--ink-3); }
+    .policy svg.i { width: 16px; height: 16px; }
+    .thanks { min-height: 100vh; min-height: 100dvh; display: none; flex-direction: column; justify-content: center; text-align: center; padding: 24px var(--gutter) calc(var(--safe-bottom) + 24px); }
+    .done .thanks { display: flex; }
+    .done .page { display: none; }
+    .thanks .badge-icon { margin: 0 auto 20px; background: #fffbeb; color: #f59e0b; }
+    .thanks .badge-icon svg.i { fill: currentColor; stroke: none; }
+    .thanks .badge-icon.ring { box-shadow: 0 0 0 10px rgba(245, 158, 11, 0.08); }
+    .thanks p { color: var(--ink-2); margin: 8px auto 28px; max-width: 290px; }
+    .thanks .btn + .btn { margin-top: 10px; }
+    @media (max-width: 340px) { .rating button { width: 44px; height: 44px; } .rating button svg.i { width: 36px; height: 36px; } }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="appbar">
+      <button class="icon-btn" type="button" aria-label="Close" id="close"><svg class="i" data-icon="close"></svg></button>
+      <div class="title" id="title">Rate your order</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <div class="who rise">
+        <span class="tile lg" id="tile"></span>
+        <h1 class="h2" id="ask">How was PingClean Express?</h1>
+        <p id="sub"></p>
+      </div>
+
+      <div class="rating" role="radiogroup" aria-label="Rating" id="rating"></div>
+      <div class="rating-label" id="rating-label" aria-live="polite">Tap a star to rate</div>
+
+      <div class="ask">What stood out?</div>
+      <div class="chips" id="tags"></div>
+
+      <div class="field">
+        <div class="field-head"><label class="label" for="text">Tell others more <span class="opt">(optional)</span></label></div>
+        <div class="control area"><textarea id="text" maxlength="500" placeholder="What went well, or what could be better?"></textarea></div>
+        <div class="counter"><span id="count">0</span>/500</div>
+      </div>
+
+      <div class="ask" style="margin-top: 12px">Add photos <span class="muted small" style="font-weight: 500">(optional, up to 3)</span></div>
+      <div class="photos" id="photos"></div>
+
+      <div class="policy"><svg class="i" data-icon="info"></svg><span>Your review is public on the shop's page. You can edit it for 7 days.</span></div>
+    </main>
+
+    <footer class="foot">
+      <button class="btn primary" id="submit" type="button" disabled>Submit review</button>
+    </footer>
+  </div>
+
+  <section class="thanks" aria-live="polite">
+    <span class="badge-icon ring"><svg class="i" data-icon="star"></svg></span>
+    <h1 class="h2" id="t-title">Thanks for the review!</h1>
+    <p id="t-text">It's now on the shop's page and helps other customers choose.</p>
+    <button class="btn primary" type="button" data-go="SHOP-01">See it on the shop page</button>
+    <button class="btn secondary" type="button" data-go="CHOME-01">Back to Home</button>
+  </section>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    let o = D.current();
+    if (!o || o.status !== "completed") o = D.order("ORD-0712");
+    const s = D.shops[o.shop];
+    // A review already left can still be edited (7 days in the real app).
+    const editing = !!o.rated;
+    let stars = editing ? o.rated : 0;
+    const words = ["", "Terrible", "Not great", "Okay", "Good", "Excellent!"];
+    const tags = ["On time", "Friendly staff", "Great quality", "Good value", "Clear updates", "Clean & tidy"];
+    let photos = editing ? 1 : 0;
+
+    $("tile").className = `tile lg ${s.tone}`;
+    $("tile").innerHTML = `<svg class="i" data-icon="${s.icon}"></svg>`;
+    $("ask").textContent = `How was ${s.name}?`;
+    $("sub").textContent = `${o.service} · ${o.id} · ${o.updated}`;
+    $("title").textContent = editing ? "Edit your review" : "Rate your order";
+    $("submit").textContent = editing ? "Update review" : "Submit review";
+    $("close").addEventListener("click", () => PM.go("CTRK-03"));
+
+    $("rating").innerHTML = [1, 2, 3, 4, 5].map((n) => `<button type="button" role="radio" aria-checked="false" aria-label="${n} star${n > 1 ? "s" : ""}" data-n="${n}"><svg class="i" data-icon="star"></svg></button>`).join("");
+    $("tags").innerHTML = tags.map((t, i) => `<button class="chip" type="button" aria-pressed="${editing && i < 2}">${t}</button>`).join("");
+
+    function paint() {
+      $("rating").querySelectorAll("button").forEach((b) => {
+        const n = +b.dataset.n;
+        b.classList.toggle("on", n <= stars);
+        b.setAttribute("aria-checked", String(n === stars));
+      });
+      $("rating-label").textContent = stars ? words[stars] : "Tap a star to rate";
+      $("submit").disabled = !stars;
+    }
+    $("rating").addEventListener("click", (e) => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      stars = +b.dataset.n;
+      b.classList.remove("pop"); void b.offsetWidth; b.classList.add("pop");
+      paint();
+    });
+    $("tags").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      c && c.setAttribute("aria-pressed", String(c.getAttribute("aria-pressed") !== "true"));
+    });
+    if (editing) $("text").value = "Always quick and the clothes come back perfectly folded.";
+    const count = () => ($("count").textContent = $("text").value.length);
+    $("text").addEventListener("input", count);
+    count();
+
+    function renderPhotos() {
+      $("photos").innerHTML =
+        Array.from({ length: photos }, (_, i) => `<span class="ph img"><button class="x" type="button" aria-label="Remove photo ${i + 1}" data-rm><svg class="i" data-icon="close"></svg></button></span>`).join("") +
+        (photos < 3 ? `<button class="ph add" type="button" id="add-photo"><svg class="i" data-icon="camera"></svg>Add</button>` : "");
+      PM.hydrateIcons($("photos"));
+    }
+    $("photos").addEventListener("click", (e) => {
+      if (e.target.closest("[data-rm]")) photos--;
+      else if (e.target.closest("#add-photo")) photos++;
+      else return;
+      renderPhotos();
+    });
+
+    $("submit").addEventListener("click", () => {
+      const btn = $("submit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Posting';
+      setTimeout(() => {
+        o.rated = stars;
+        if (editing) $("t-title").textContent = "Review updated";
+        document.body.classList.add("done");
+        window.scrollTo(0, 0);
+      }, 800);
+    });
+
+    PM.hydrateIcons();
+    renderPhotos();
+    paint();
+  </script>
+</body>
+</html>

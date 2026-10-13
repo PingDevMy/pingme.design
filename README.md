@@ -7,7 +7,7 @@ Design workspace for **PingMe**, a mobile app where vendors keep their clients p
 | Path | What it is |
 |---|---|
 | `index.html` + `app/` | Prototype site (replaces Figma): modules and screens on the left, phone preview in the centre, screen description on the right. |
-| `screens/` | Redesigned app screens as HTML (`screens/auth/` for Onboarding & Auth), sharing the UI kit in `screens/kit.css` and `screens/kit.js`. |
+| `screens/` | Redesigned app screens as HTML: `screens/auth/` (Onboarding & Auth), `screens/customer/` (Customer Home, Order Tracking, Shop Profile) and `screens/shared/` (Notifications, Account). They share the UI kit in `screens/kit.css` and `screens/kit.js`; app screens also load `screens/app.css` (tab bar, cards, lists, sheets) and the sample orders in `screens/data.js`. |
 | `app/screens.js` | Screen registry. The one place to update a screen's status, description and reference images. |
 | `docs/requirements/` | Requirements: [overview](docs/requirements/00-overview.md), one doc per module, and the [screen tracker](docs/requirements/README.md). |
 | `design reference/` | Reference sketches the redesign starts from. |

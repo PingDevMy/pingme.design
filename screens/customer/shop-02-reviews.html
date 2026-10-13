@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>All Reviews · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .sum { display: flex; align-items: center; gap: 14px; }
+    .sum b { font-size: 34px; letter-spacing: -0.03em; line-height: 1; }
+    .sum .grow { flex: 1; min-width: 0; }
+    .sum .meta { display: block; margin-top: 4px; }
+    .tools { position: sticky; top: 56px; z-index: 4; margin: 12px calc(-1 * var(--gutter)) 0; padding: 6px var(--gutter) 10px; background: var(--canvas); }
+    .chips { flex-wrap: nowrap; overflow-x: auto; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex: none; }
+    .chip .star { width: 13px; height: 13px; fill: #f59e0b; stroke: none; }
+    .sort { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 10px; font-size: 13px; color: var(--ink-2); }
+    .sort select { border: 0; background: none; font-weight: 600; color: var(--ink); padding: 4px 0; cursor: pointer; }
+
+    .review .row { align-items: flex-start; }
+    .review .who b { display: block; font-size: 14.5px; }
+    .review p { margin: 10px 0 0; font-size: 14px; line-height: 1.55; }
+    .review .pics { display: flex; gap: 8px; margin-top: 10px; }
+    .review .pics span { width: 64px; height: 64px; border-radius: 12px; background: linear-gradient(135deg, #a5f3fc, #0e8fa3); }
+    .review .pics span:nth-child(2) { background: linear-gradient(135deg, #fde68a, #f97316); }
+    .review .foot-row { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-top: 10px; font-size: 12.5px; color: var(--ink-3); }
+    .review .foot-row .acts { display: flex; gap: 6px; }
+    .helpful, .reply-btn { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 12.5px; font-weight: 600; color: var(--ink-2); white-space: nowrap; }
+    .helpful svg.i, .reply-btn svg.i { width: 14px; height: 14px; }
+    .helpful[aria-pressed="true"] { border-color: var(--brand); color: var(--brand-700); background: var(--brand-50); }
+    .reply-btn { border-color: var(--brand); color: var(--brand-700); }
+    .reply { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--canvas); font-size: 13px; color: var(--ink-2); }
+    .reply b { color: var(--ink); font-size: 12px; display: block; }
+    .composer { margin-top: 10px; }
+    .composer .control textarea { min-height: 70px; }
+    .composer .row { justify-content: flex-end; margin-top: 8px; gap: 8px; }
+    .composer .btn { width: auto; height: 38px; padding: 0 14px; font-size: 14px; }
+    .composer .note { font-size: 12px; color: var(--ink-3); margin-right: auto; }
+    body:not(.is-owner) .owner { display: none; }
+    .proto { display: block; margin: 20px auto 0; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="SHOP-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title" id="title">Reviews</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <div class="card sum">
+        <b id="avg"></b>
+        <div class="grow"><b class="ellipsis" id="shop" style="display:block;font-size:15px;letter-spacing:0;line-height:1.3"></b><span id="avg-stars"></span><span class="meta" id="total"></span></div>
+      </div>
+
+      <div class="tools">
+        <div class="chips" role="group" aria-label="Filter by rating" id="chips"></div>
+        <div class="sort"><span id="showing"></span>
+          <label>Sort <select id="sort"><option value="recent">Most recent</option><option value="helpful">Most helpful</option><option value="low">Lowest first</option></select></label>
+        </div>
+      </div>
+
+      <div id="list"></div>
+      <button class="text-btn proto" type="button" id="proto">Prototype: view as the shop owner</button>
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    const cur = D.current();
+    const s = D.shops[(cur && cur.shop) || "pingclean"];
+    let filter = "all";
+
+    const grad = ["#f472b6,#db2777", "#60a5fa,#2563eb", "#fbbf24,#d97706", "#34d399,#059669", "#a78bfa,#7c3aed", "#f87171,#dc2626"];
+    const all = [
+      { n: "Sarah Jenkins", r: 5, t: "Absolutely the best service in town. My silk dresses were handled with so much care. Highly recommend!", at: "2 days ago", d: 2, h: 12, pics: 2 },
+      { n: "Michael Chen", r: 4, t: "Fast turnaround time. The tracking feature on PingMe makes it so easy to know when to pick up.", at: "1 week ago", d: 7, h: 8, reply: "Thanks Michael! See you next week." },
+      { n: "Nurul Aina", r: 5, t: "Got pinged the moment my baju was ready. No more calling to ask!", at: "1 week ago", d: 8, h: 6 },
+      { n: "Elena Rodriguez", r: 5, t: "Friendly staff and clean shop. The QR code pickup system is seamless.", at: "3 weeks ago", d: 21, h: 3, pics: 1 },
+      { n: "Daniel Wong", r: 3, t: "Good cleaning but it was ready a day later than the estimate.", at: "1 month ago", d: 31, h: 4 },
+      { n: "Priya Nair", r: 2, t: "One shirt came back with a missing button. They fixed it, but it took a second trip.", at: "1 month ago", d: 36, h: 9, reply: "So sorry Priya, we've added a final button check before packing." },
+      { n: "Hafiz Rahman", r: 5, t: "Consistent every week. Folding is perfect.", at: "2 months ago", d: 60, h: 2 },
+      { n: "Grace Lim", r: 1, t: "Waited 20 minutes at the counter even with the pickup QR.", at: "3 months ago", d: 95, h: 5 },
+    ].map((v, i) => ({ ...v, id: i, i: v.n.split(" ").map((w) => w[0]).join(""), c: grad[i % grad.length] }));
+
+    
+    $("avg").textContent = s.rating.toFixed(1);
+    $("avg-stars").innerHTML = D.stars(s.rating);
+    $("shop").textContent = s.name;
+    $("total").textContent = `${s.reviews.toLocaleString()} verified reviews`;
+
+    const star = '<svg class="i star" data-icon="star"></svg>';
+    const filters = [["all", "All"], ["5", `5 ${star}`], ["4", `4 ${star}`], ["3", `3 ${star}`], ["2", `2 ${star}`], ["1", `1 ${star}`], ["photos", '<svg class="i" data-icon="image"></svg>With photos']];
+    $("chips").innerHTML = filters.map(([k, l]) => `<button class="chip" type="button" data-f="${k}" aria-pressed="${k === "all"}">${l}</button>`).join("");
+
+    function card(v) {
+      return `
+        <article class="card review" data-id="${v.id}">
+          <div class="row">
+            <span class="avatar sm" style="background:linear-gradient(145deg,${v.c})">${v.i}</span>
+            <div class="grow who"><b class="ellipsis">${v.n}</b><span class="meta">${v.at}</span></div>
+            ${D.stars(v.r)}
+          </div>
+          <p>${v.t}</p>
+          ${v.pics ? `<div class="pics">${"<span></span>".repeat(v.pics)}</div>` : ""}
+          ${v.reply ? `<div class="reply"><b>Reply from ${s.name}</b>${v.reply}</div>` : ""}
+          <div class="foot-row">
+            <span></span>
+            <span class="acts">
+              ${v.reply ? "" : `<button class="reply-btn owner" type="button" data-reply><svg class="i" data-icon="message"></svg>Reply</button>`}
+              <button class="helpful" type="button" aria-pressed="${!!v.mine}" data-help><svg class="i" data-icon="thumb"></svg>${v.h + (v.mine ? 1 : 0)}</button>
+            </span>
+          </div>
+        </article>`;
+    }
+
+    function render() {
+      let items = all.filter((v) => filter === "all" || (filter === "photos" ? v.pics : v.r === +filter));
+      const sort = $("sort").value;
+      items = items.slice().sort((a, b) => (sort === "helpful" ? b.h - a.h : sort === "low" ? a.r - b.r : a.d - b.d));
+      $("showing").textContent = `${items.length} shown`;
+      $("list").innerHTML = items.length ? items.map(card).join("") : `<div class="empty"><span class="badge-icon ring"><svg class="i" data-icon="star"></svg></span><h3>No reviews here yet</h3><p>Try another filter.</p></div>`;
+      PM.hydrateIcons($("list"));
+    }
+
+    $("chips").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (!c) return;
+      filter = c.dataset.f;
+      $("chips").querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+      render();
+    });
+    $("sort").addEventListener("change", render);
+
+    $("list").addEventListener("click", (e) => {
+      const art = e.target.closest(".review");
+      if (!art) return;
+      const v = all[+art.dataset.id];
+      if (e.target.closest("[data-help]")) { v.mine = !v.mine; return render(); }
+      if (e.target.closest("[data-reply]")) {
+        if (art.querySelector(".composer")) return;
+        art.insertAdjacentHTML("beforeend", `
+          <form class="composer">
+            <div class="control area"><textarea placeholder="Reply publicly to ${v.n.split(" ")[0]}…" maxlength="400"></textarea></div>
+            <div class="row"><span class="note">Replies are public. Reviews can't be deleted.</span><button class="btn secondary" type="button" data-cancel>Cancel</button><button class="btn primary" type="submit">Post</button></div>
+          </form>`);
+        art.querySelector("textarea").focus();
+        return;
+      }
+      if (e.target.closest("[data-cancel]")) art.querySelector(".composer").remove();
+    });
+    $("list").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const art = e.target.closest(".review");
+      const text = e.target.querySelector("textarea").value.trim();
+      if (!text) return PM.shake(e.target);
+      all[+art.dataset.id].reply = text;
+      render();
+      PM.toast("Reply posted");
+    });
+
+    $("proto").addEventListener("click", (e) => {
+      const on = document.body.classList.toggle("is-owner");
+      e.currentTarget.textContent = on ? "Prototype: view as a customer" : "Prototype: view as the shop owner";
+    });
+
+    PM.hydrateIcons();
+    render();
+  </script>
+</body>
+</html>

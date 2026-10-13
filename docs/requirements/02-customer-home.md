@@ -19,7 +19,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `CHOME-01` Home · 🟠 Reference only
+### `CHOME-01` Home · 🔵 In design
 
 Customer landing screen: a greeting, how many orders are active, and each order's progress.
 
@@ -39,9 +39,11 @@ Customer landing screen: a greeting, how many orders are active, and each order'
 - [ ] Empty state explains that orders appear when a vendor adds your phone number
 - [ ] Pull to refresh
 
+> Tap a card or Track Your Order Now to open tracking. A few seconds after opening, The Tailor Studio starts an order to show a live update. Pull down to refresh; the link under the list previews the empty state.
+
 Reference: [1](../../design%20reference/Customer/Screenshot%202026-10-13%20134146.png)
 
-### `CHOME-02` Scan Order QR · ⚪ Not started
+### `CHOME-02` Scan Order QR · 🔵 In design
 
 Customer scans the QR on a vendor's receipt to claim an order into their app.
 
@@ -52,5 +54,7 @@ Customer scans the QR on a vendor's receipt to claim an order into their app.
 **Acceptance:**
 
 - [ ] An order can only be claimed by one customer account
+
+> Tap the viewfinder to simulate a scan. Under Enter order code, any code like PINGME-1204-X99 works; a code ending in TAKEN shows the already-claimed error.
 
 <!-- screens:end -->

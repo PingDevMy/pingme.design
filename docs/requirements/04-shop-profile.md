@@ -15,7 +15,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `SHOP-01` Shop Profile · 🟠 Reference only
+### `SHOP-01` Shop Profile · 🔵 In design
 
 Public page for a vendor: who they are, where they are, and what customers say.
 
@@ -29,13 +29,17 @@ Public page for a vendor: who they are, where they are, and what customers say.
 
 - [ ] Customer sees the same page without the owner controls
 
+> Shows the shop of the picked order. Open / Closed follows the real time of day against opening hours. The link at the bottom shows the owner view.
+
 Reference: [1](../../design%20reference/Customer/Screenshot%202026-10-13%20134211.png)
 
-### `SHOP-02` All Reviews · ⚪ Not started
+### `SHOP-02` All Reviews · 🔵 In design
 
 Full list of reviews with filters by star rating.
 
 - Filter chips: All, 5, 4, 3, 2, 1, With photos
 - Vendor can reply publicly to a review (owner view)
+
+> The link at the bottom shows the owner view, where unanswered reviews get a public Reply.
 
 <!-- screens:end -->

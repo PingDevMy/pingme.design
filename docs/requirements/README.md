@@ -4,7 +4,7 @@
 
 Start with the [product overview](00-overview.md). Open `index.html` to browse the screens.
 
-**8 of 33 screens done** · ⚪ Not started: 15 · 🟠 Reference only: 10 · 🔵 In design: 0 · 🟢 Done: 8
+**8 of 33 screens done** · ⚪ Not started: 6 · 🟠 Reference only: 6 · 🔵 In design: 13 · 🟢 Done: 8
 
 ## Get started
 
@@ -27,25 +27,25 @@ Start with the [product overview](00-overview.md). Open `index.html` to browse t
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `CHOME-01` | Home | 🟠 Reference only | 1 image |
-| `CHOME-02` | Scan Order QR | ⚪ Not started | – |
+| `CHOME-01` | Home | 🔵 In design | 1 image |
+| `CHOME-02` | Scan Order QR | 🔵 In design | – |
 
 ### [Order Tracking](03-customer-order-tracking.md) · 0/5
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `CTRK-01` | Order Tracking (drop-off) | 🟠 Reference only | 1 image |
-| `CTRK-02` | Service Status (on-site) | 🟠 Reference only | 1 image |
-| `CTRK-03` | Order History | ⚪ Not started | – |
-| `CTRK-04` | Rate & Review | ⚪ Not started | – |
-| `CTRK-05` | Public Tracking Link (web) | ⚪ Not started | – |
+| `CTRK-01` | Order Tracking (drop-off) | 🔵 In design | 1 image |
+| `CTRK-02` | Service Status (on-site) | 🔵 In design | 1 image |
+| `CTRK-03` | Order History | 🔵 In design | – |
+| `CTRK-04` | Rate & Review | 🔵 In design | – |
+| `CTRK-05` | Public Tracking Link (web) | 🔵 In design | – |
 
 ### [Shop Profile](04-shop-profile.md) · 0/2
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `SHOP-01` | Shop Profile | 🟠 Reference only | 1 image |
-| `SHOP-02` | All Reviews | ⚪ Not started | – |
+| `SHOP-01` | Shop Profile | 🔵 In design | 1 image |
+| `SHOP-02` | All Reviews | 🔵 In design | – |
 
 ## Vendor app
 
@@ -87,13 +87,13 @@ Start with the [product overview](00-overview.md). Open `index.html` to browse t
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `NOTI-01` | Notification Inbox | ⚪ Not started | – |
-| `NOTI-02` | Notification Preferences | ⚪ Not started | – |
+| `NOTI-01` | Notification Inbox | 🔵 In design | – |
+| `NOTI-02` | Notification Preferences | 🔵 In design | – |
 
 ### [Account](10-account.md) · 0/2
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `ACCT-01` | Profile | ⚪ Not started | – |
-| `ACCT-02` | Help & Support | ⚪ Not started | – |
+| `ACCT-01` | Profile | 🔵 In design | – |
+| `ACCT-02` | Help & Support | 🔵 In design | – |
 

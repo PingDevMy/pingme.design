@@ -22,7 +22,7 @@
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `CTRK-01` Order Tracking (drop-off) · 🟠 Reference only
+### `CTRK-01` Order Tracking (drop-off) · 🔵 In design
 
 Live status of a drop-off order such as laundry or tailoring.
 
@@ -41,9 +41,11 @@ Live status of a drop-off order such as laundry or tailoring.
 
 - [ ] Timeline matches the vendor's status history exactly
 
+> Shows the order picked on Home. The link at the bottom simulates the shop's next update: In Progress, then Ready (pickup QR), then Completed (rating prompt).
+
 Reference: [1](../../design%20reference/Customer/Screenshot%202026-10-13%20134157.png)
 
-### `CTRK-02` Service Status (on-site) · 🟠 Reference only
+### `CTRK-02` Service Status (on-site) · 🔵 In design
 
 Live status of an on-site service, such as an HVAC repair, with the assigned technician.
 
@@ -63,9 +65,11 @@ Live status of an on-site service, such as an HVAC repair, with the assigned tec
 
 - [ ] Cancel is only allowed before In Progress
 
+> The countdown ticks live. Manage is locked while the technician is working; the link at the bottom shows the visit before work starts, where reschedule and cancel are allowed.
+
 Reference: [1](../../design%20reference/Customer/Screenshot%202026-10-13%20134224.png)
 
-### `CTRK-03` Order History · ⚪ Not started
+### `CTRK-03` Order History · 🔵 In design
 
 All past orders, searchable, with re-order and rating.
 
@@ -73,7 +77,9 @@ All past orders, searchable, with re-order and rating.
 - Search by vendor or order number
 - Rate the vendor on completed orders that are not yet rated
 
-### `CTRK-04` Rate & Review · ⚪ Not started
+> Search by shop or order number. Rate opens Rate & Review for that order; tapping a row opens its tracking page.
+
+### `CTRK-04` Rate & Review · 🔵 In design
 
 Customer rates a completed order and leaves feedback for the vendor.
 
@@ -84,7 +90,9 @@ Customer rates a completed order and leaves feedback for the vendor.
 
 - [ ] One review per order; editable for 7 days
 
-### `CTRK-05` Public Tracking Link (web) · ⚪ Not started
+> Opens for the picked completed order (PingClean Express by default). An order already rated opens in edit mode.
+
+### `CTRK-05` Public Tracking Link (web) · 🔵 In design
 
 Web page the SMS link opens, so customers without the app can still follow an order.
 
@@ -94,5 +102,7 @@ Web page the SMS link opens, so customers without the app can still follow an or
 **Acceptance:**
 
 - [ ] Link is unguessable and stops working 30 days after completion
+
+> Web page, shown with mobile browser chrome. The link at the bottom shows the expired-link state.
 
 <!-- screens:end -->
