@@ -46,7 +46,7 @@ window.PINGME = {
         {
           id: "AUTH-01",
           name: "Splash",
-          status: "design",
+          status: "done",
           summary: "Brand splash shown while the app boots and restores the session.",
           points: [
             "PingMe logo with a short intro animation on first open",
@@ -64,7 +64,7 @@ window.PINGME = {
         {
           id: "AUTH-02",
           name: "Onboarding",
-          status: "design",
+          status: "done",
           summary: "Four swipeable intro slides that explain PingMe to customers and vendors.",
           points: [
             "Slides: Book with Confidence, Grow Your Business, Discover Local Services, Connect with Ease",
@@ -81,7 +81,7 @@ window.PINGME = {
         {
           id: "AUTH-03",
           name: "Role Selection",
-          status: "design",
+          status: "done",
           summary: "New users choose whether they are a Customer or a Vendor before signing up.",
           points: [
             "Two cards: I am a Customer, I am a Vendor, each with a one-line explanation",
@@ -97,7 +97,7 @@ window.PINGME = {
         {
           id: "AUTH-04",
           name: "Sign In",
-          status: "design",
+          status: "done",
           summary: "Returning users sign in with email or phone, choosing Customer or Vendor mode.",
           points: [
             "Role toggle: Customer (track and follow my orders) or Vendor (manage shop and orders)",
@@ -124,7 +124,7 @@ window.PINGME = {
         {
           id: "AUTH-05",
           name: "Customer Sign Up",
-          status: "design",
+          status: "done",
           summary: "Customer creates an account with name, email, phone and password.",
           points: [
             "Full name, email, phone number, password, confirm password",
@@ -142,7 +142,7 @@ window.PINGME = {
         {
           id: "AUTH-06",
           name: "Vendor Sign Up",
-          status: "design",
+          status: "done",
           summary: "Vendor creates an account and a basic shop profile in one flow.",
           points: [
             "Owner name, email, phone, password",
@@ -158,7 +158,7 @@ window.PINGME = {
         {
           id: "AUTH-07",
           name: "Forgot Password",
-          status: "design",
+          status: "done",
           summary: "User requests a password reset link by email.",
           points: [
             "Email address field, Send Reset Link button",
@@ -173,7 +173,7 @@ window.PINGME = {
         {
           id: "AUTH-08",
           name: "Security Code",
-          status: "design",
+          status: "done",
           summary: "Six-digit code sent by SMS to verify a phone number or a sign-in.",
           points: [
             "Masked phone number with 'Wrong number? Edit'",

@@ -27,7 +27,7 @@ User: id, full name, email, phone (verified flag), password hash, roles [custome
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `AUTH-01` Splash · 🔵 In design
+### `AUTH-01` Splash · 🟢 Done
 
 Brand splash shown while the app boots and restores the session.
 
@@ -42,7 +42,7 @@ Brand splash shown while the app boots and restores the session.
 
 > Tap the splash to continue. The intro plays on the first open of a browser session; later opens show the static logo (Replay intro restarts it).
 
-### `AUTH-02` Onboarding · 🔵 In design
+### `AUTH-02` Onboarding · 🟢 Done
 
 Four swipeable intro slides that explain PingMe to customers and vendors.
 
@@ -57,7 +57,7 @@ Four swipeable intro slides that explain PingMe to customers and vendors.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135118.png)
 
-### `AUTH-03` Role Selection · 🔵 In design
+### `AUTH-03` Role Selection · 🟢 Done
 
 New users choose whether they are a Customer or a Vendor before signing up.
 
@@ -71,7 +71,7 @@ New users choose whether they are a Customer or a Vendor before signing up.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135051.png)
 
-### `AUTH-04` Sign In · 🔵 In design
+### `AUTH-04` Sign In · 🟢 Done
 
 Returning users sign in with email or phone, choosing Customer or Vendor mode.
 
@@ -90,7 +90,7 @@ Returning users sign in with email or phone, choosing Customer or Vendor mode.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135010.png) · [2](../../design%20reference/authentication/Screenshot%202026-10-13%20135028.png) · [3](../../design%20reference/authentication/Screenshot%202026-10-13%20135046.png) · [4](../../design%20reference/Customer/Screenshot%202026-10-13%20134125.png) · [5](../../design%20reference/Customer/Screenshot%202026-10-06%20152222.png) · [6](../../design%20reference/Customer/Screenshot%202026-10-06%20152155.png)
 
-### `AUTH-05` Customer Sign Up · 🔵 In design
+### `AUTH-05` Customer Sign Up · 🟢 Done
 
 Customer creates an account with name, email, phone and password.
 
@@ -106,7 +106,7 @@ Customer creates an account with name, email, phone and password.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135038.png)
 
-### `AUTH-06` Vendor Sign Up · 🔵 In design
+### `AUTH-06` Vendor Sign Up · 🟢 Done
 
 Vendor creates an account and a basic shop profile in one flow.
 
@@ -118,7 +118,7 @@ Vendor creates an account and a basic shop profile in one flow.
 
 - [ ] Vendor can create orders right after sign-up; profile can be finished later
 
-### `AUTH-07` Forgot Password · 🔵 In design
+### `AUTH-07` Forgot Password · 🟢 Done
 
 User requests a password reset link by email.
 
@@ -131,7 +131,7 @@ User requests a password reset link by email.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135100.png)
 
-### `AUTH-08` Security Code · 🔵 In design
+### `AUTH-08` Security Code · 🟢 Done
 
 Six-digit code sent by SMS to verify a phone number or a sign-in.
 
