@@ -73,6 +73,7 @@ Reference: [1](../../design%20reference/Customer/Screenshot%202026-10-13%2013422
 
 All past orders, searchable, with re-order and rating.
 
+- The Orders tab in Customer mode (no back button; the tab bar stays)
 - List grouped by month with vendor, service, amount and final status
 - Search by vendor or order number
 - Rate the vendor on completed orders that are not yet rated

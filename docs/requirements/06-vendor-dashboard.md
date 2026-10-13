@@ -29,7 +29,7 @@ Vendor landing screen: revenue this month, workload, and the latest orders.
 - Recent orders: customer, order number, service, items, status pill, amount, Manage
 - Raised + button in the tab bar to Create New Order
 - Rating and sales over the last 7 days (from the ServiceHub sketch)
-- Bottom nav: Home, Orders, + (new order), Revenue, Shop
+- Bottom tab bar (same layout as Customer mode): Home, Orders, New (raised centre), Revenue, Shop
 
 **Acceptance:**
 

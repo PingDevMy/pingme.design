@@ -40,6 +40,7 @@
 
 Every ping a user has received, newest first, with unread markers.
 
+- Customer mode: the Inbox tab. Vendor mode: opened from the bell on the dashboard, with a back button
 - Grouped Today / Earlier, unread dot, mark all as read
 - Tapping opens the related order
 - Customer mode: status changes and shop messages. Vendor mode: customer replies, claimed orders, payments, new reviews

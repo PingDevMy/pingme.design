@@ -88,7 +88,7 @@ window.PINGME = {
       id: "customer",
       mode: "customer",
       label: "Customer mode",
-      hint: "Tabs: Home, Scan, Profile",
+      hint: "Tabs: Home, Orders, Scan, Inbox, Profile",
       kids: [
         {
           id: "CHOME-01", via: "Tab",
@@ -101,11 +101,11 @@ window.PINGME = {
               ],
             },
             { id: "CTRK-02", via: "On-site service" },
-            { id: "CTRK-03", via: "See all history" },
-            { id: "NOTI-01", via: "Bell" },
           ],
         },
+        { id: "CTRK-03", via: "Tab", kids: [{ id: "CTRK-04", via: "Rate" }] },
         { id: "CHOME-02", via: "Tab", kids: [{ to: "CTRK-01", via: "Order claimed" }] },
+        { id: "NOTI-01", via: "Tab" },
         {
           id: "ACCT-01", via: "Tab",
           kids: [
@@ -121,7 +121,7 @@ window.PINGME = {
       id: "vendor",
       mode: "vendor",
       label: "Vendor mode",
-      hint: "Tabs: Home, Orders, +, Revenue, Shop",
+      hint: "Tabs: Home, Orders, New, Revenue, Shop",
       kids: [
         { id: "VHOME-01", via: "Tab", kids: [{ id: "NOTI-01", via: "Bell" }] },
         {
@@ -137,7 +137,7 @@ window.PINGME = {
             { id: "VORD-06", via: "Scan" },
           ],
         },
-        { id: "VORD-04", via: "+ tab" },
+        { id: "VORD-04", via: "Tab" },
         { id: "VREV-01", via: "Tab", kids: [{ id: "VREV-02", via: "See all" }] },
         {
           id: "VSHOP-01", via: "Tab",
@@ -344,7 +344,7 @@ window.PINGME = {
             "Track Your Order Now (opens the most recent active order)",
             "Your Order list with Pending / Completed tabs",
             "Each order card: vendor, service, status pill, step X of Y, % complete, order number, date, Details",
-            "Bottom nav: Home, Scan (centre), Profile",
+            "Bottom tab bar (same layout as Vendor mode): Home, Orders, Scan (raised centre), Inbox, Profile",
           ],
           notify: [
             "Card updates live when the vendor changes status",
@@ -436,6 +436,7 @@ window.PINGME = {
           status: "design",
           summary: "All past orders, searchable, with re-order and rating.",
           points: [
+            "The Orders tab in Customer mode (no back button; the tab bar stays)",
             "List grouped by month with vendor, service, amount and final status",
             "Search by vendor or order number",
             "Rate the vendor on completed orders that are not yet rated",
@@ -533,6 +534,7 @@ window.PINGME = {
           status: "design",
           summary: "Every ping a user has received, newest first, with unread markers.",
           points: [
+            "Customer mode: the Inbox tab. Vendor mode: opened from the bell on the dashboard, with a back button",
             "Grouped Today / Earlier, unread dot, mark all as read",
             "Tapping opens the related order",
             "Customer mode: status changes and shop messages. Vendor mode: customer replies, claimed orders, payments, new reviews",
@@ -577,7 +579,7 @@ window.PINGME = {
             "Recent orders: customer, order number, service, items, status pill, amount, Manage",
             "Raised + button in the tab bar to Create New Order",
             "Rating and sales over the last 7 days (from the ServiceHub sketch)",
-            "Bottom nav: Home, Orders, + (new order), Revenue, Shop",
+            "Bottom tab bar (same layout as Customer mode): Home, Orders, New (raised centre), Revenue, Shop",
           ],
           criteria: [
             "Counters tap through to Order Management with the matching filter",

@@ -33,7 +33,7 @@
   </style>
 </head>
 <body class="canvas">
-  <div class="page">
+  <div class="page tabbed">
     <header class="appbar sticky">
       <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
       <div class="title">Notifications</div>
@@ -49,6 +49,7 @@
       <div class="bar"><span id="unread"></span><button class="text-btn" type="button" id="all-read">Mark all as read</button></div>
       <div id="list"></div>
     </main>
+    <nav class="tabbar" data-tabbar="inbox|"></nav>
   </div>
 
   <script src="../kit.js"></script>
@@ -60,7 +61,9 @@
     // kind: order (status change) or msg (vendor message). via: push or sms.
     // The inbox is shared by both modes; each mode shows its own pings.
     const vendor = PM.mode() === "vendor";
-    $("back").addEventListener("click", () => PM.go(vendor ? "VHOME-01" : "CHOME-01"));
+    // Customer mode: a tab, so no back button. Vendor mode: opened from the bell on the dashboard.
+    if (vendor) $("back").addEventListener("click", () => PM.go("VHOME-01"));
+    else $("back").replaceWith(Object.assign(document.createElement("span"), { className: "spacer" }));
     const customerItems = [
       { id: 1, day: "Today", kind: "order", order: "ORD-1204", icon: "checkcircle", tone: "green", t: "Ready for pickup", b: "Sunshine Dry Cleaners: your 2 suits are ready. Show your pickup QR at the counter.", at: "9:02 AM", via: "push", unread: true },
       { id: 2, day: "Today", kind: "order", order: "SVC-88201", icon: "pin", tone: "sky", t: "Technician arrived", b: "Marcus from AquaPure Services has arrived at your location.", at: "10:47 AM", via: "push", unread: true },
