@@ -4,22 +4,22 @@
 
 Start with the [product overview](00-overview.md). Open `index.html` to browse the screens.
 
-**0 of 33 screens done** · ⚪ Not started: 6 · 🟠 Reference only: 6 · 🔵 In design: 21 · 🟢 Done: 0
+**8 of 33 screens done** · ⚪ Not started: 6 · 🟠 Reference only: 6 · 🔵 In design: 13 · 🟢 Done: 8
 
 ## Get started
 
-### [Onboarding & Auth](01-onboarding-auth.md) · 0/8
+### [Onboarding & Auth](01-onboarding-auth.md) · 8/8
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `AUTH-01` | Splash | 🔵 In design | – |
-| `AUTH-02` | Onboarding | 🔵 In design | 1 image |
-| `AUTH-03` | Role Selection | 🔵 In design | 1 image |
-| `AUTH-04` | Sign In | 🔵 In design | 6 images |
-| `AUTH-05` | Customer Sign Up | 🔵 In design | 1 image |
-| `AUTH-06` | Vendor Sign Up | 🔵 In design | – |
-| `AUTH-07` | Forgot Password | 🔵 In design | 1 image |
-| `AUTH-08` | Security Code | 🔵 In design | 1 image |
+| `AUTH-01` | Splash | 🟢 Done | – |
+| `AUTH-02` | Onboarding | 🟢 Done | 1 image |
+| `AUTH-03` | Role Selection | 🟢 Done | 1 image |
+| `AUTH-04` | Sign In | 🟢 Done | 6 images |
+| `AUTH-05` | Customer Sign Up | 🟢 Done | 1 image |
+| `AUTH-06` | Vendor Sign Up | 🟢 Done | – |
+| `AUTH-07` | Forgot Password | 🟢 Done | 1 image |
+| `AUTH-08` | Security Code | 🟢 Done | 1 image |
 
 ## Customer app
 
