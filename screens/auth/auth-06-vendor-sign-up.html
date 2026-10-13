@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Vendor Sign Up · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <style>
+    .role-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 999px; background: var(--brand-50); color: var(--brand-700); font-size: 12.5px; font-weight: 600; }
+    .role-chip svg.i { width: 16px; height: 16px; }
+    .step { display: none; }
+    .step.on { display: block; animation: rise 0.35s ease-out both; }
+    .section { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; }
+    .section-head h2 { margin: 0; font-size: 16px; }
+    .later { font-size: 12px; font-weight: 600; color: var(--ink-3); background: var(--canvas); border-radius: 999px; padding: 2px 9px; }
+    .chips { margin-top: 8px; }
+    .logo-up { display: flex; gap: 14px; align-items: center; margin-top: 12px; }
+    .logo-box {
+      width: 72px; height: 72px; border-radius: 20px; border: 1.5px dashed var(--ink-3); background: var(--canvas);
+      display: grid; place-items: center; color: var(--ink-3); flex: none; overflow: hidden; font-size: 26px; font-weight: 700;
+    }
+    .logo-box.set { border: 0; background: linear-gradient(145deg, #13a4ba, var(--brand-700)); color: #fff; }
+    .logo-up p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); }
+    .logo-up .btn { height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 11px; }
+    .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 8px; }
+    .days .chip { justify-content: center; padding: 7px 0; font-size: 13px; }
+    .hours { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; margin-top: 12px; }
+    .hours .control { height: 48px; }
+    .hours span { color: var(--ink-3); font-size: 13px; }
+    .summary { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r); background: var(--canvas); margin-top: 18px; }
+    .summary .avatar { width: 40px; height: 40px; border-radius: 12px; background: var(--brand-50); color: var(--brand-700); display: grid; place-items: center; }
+    .summary b { display: block; font-size: 14px; }
+    .summary small { color: var(--ink-2); font-size: 12.5px; }
+    .summary a { margin-left: auto; font-size: 13px; }
+    .terms { margin-top: 20px; }
+    .switch { margin-top: 12px; text-align: center; font-size: 14px; color: var(--ink-2); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
+      <div class="steps" style="width: 140px" id="steps" aria-label="Sign-up progress"><span class="on"></span><span class="on"></span><span></span><span></span></div>
+      <span style="width: 40px"></span>
+    </header>
+
+    <main class="content">
+      <form id="form" novalidate>
+        <!-- Step 1: owner -->
+        <section class="step on" id="step-1" aria-labelledby="t1">
+          <span class="role-chip"><svg class="i" data-icon="store"></svg>Vendor account · 1 of 2</span>
+          <h1 class="h1" id="t1" style="margin-top: 12px">Tell us about you</h1>
+          <p class="lead">Your clients will see your shop, not these details.</p>
+
+          <div class="field" data-rule="name">
+            <label class="label" for="name">Owner name</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="user"></svg><input id="name" autocomplete="name" placeholder="Hafiz Ismail" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter your name.</div>
+          </div>
+          <div class="field" data-rule="email">
+            <label class="label" for="email">Email</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="mail"></svg><input id="email" type="email" inputmode="email" autocomplete="email" placeholder="owner@yourshop.com" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>That email doesn't look right.</div>
+          </div>
+          <div class="field" data-rule="phone">
+            <label class="label" for="phone">Mobile number</label>
+            <div class="control" style="margin-top: 6px"><span class="prefix">🇲🇾 +60</span><input id="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="12-345 6789" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="hint">We'll send a 6-digit code to verify it.</div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter a Malaysian mobile number, e.g. 12-345 6789.</div>
+          </div>
+          <div class="field" data-rule="password">
+            <label class="label" for="pw">Password</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="lock"></svg><input id="pw" type="password" autocomplete="new-password" placeholder="8+ characters, with a number" /><button class="peek" type="button" data-peek aria-label="Show password"><svg class="i" data-icon="eye"></svg></button></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Use at least 8 characters, including a number.</div>
+          </div>
+        </section>
+
+        <!-- Step 2: shop -->
+        <section class="step" id="step-2" aria-labelledby="t2">
+          <span class="role-chip"><svg class="i" data-icon="store"></svg>Vendor account · 2 of 2</span>
+          <h1 class="h1" id="t2" style="margin-top: 12px">Set up your shop</h1>
+          <p class="lead">Just the basics so you can start taking orders. Finish the rest in Shop Settings.</p>
+
+          <div class="field" data-rule="shop">
+            <label class="label" for="shop">Shop name</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="store"></svg><input id="shop" autocomplete="organization" placeholder="Bright Laundry" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter your shop name.</div>
+          </div>
+
+          <div class="field" data-rule="category">
+            <span class="label" id="cat-label">Service category</span>
+            <div class="chips" id="cats" role="radiogroup" aria-labelledby="cat-label">
+              <button type="button" class="chip" data-v="Laundry" aria-pressed="false"><svg class="i" data-icon="shirt"></svg>Laundry</button>
+              <button type="button" class="chip" data-v="Tailoring" aria-pressed="false"><svg class="i" data-icon="scissors"></svg>Tailoring</button>
+              <button type="button" class="chip" data-v="Repair" aria-pressed="false"><svg class="i" data-icon="wrench"></svg>Repair</button>
+              <button type="button" class="chip" data-v="Cleaning" aria-pressed="false"><svg class="i" data-icon="sparkle"></svg>Cleaning</button>
+              <button type="button" class="chip" data-v="HVAC" aria-pressed="false"><svg class="i" data-icon="snow"></svg>HVAC</button>
+              <button type="button" class="chip" data-v="Other" aria-pressed="false"><svg class="i" data-icon="dots"></svg>Other</button>
+            </div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Pick the closest match.</div>
+          </div>
+
+          <div class="field" data-rule="address">
+            <label class="label" for="address">Shop address</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="pin"></svg><input id="address" autocomplete="street-address" placeholder="12, Jalan SS 2/24, Petaling Jaya" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter where clients drop off or where you're based.</div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2>Opening hours</h2><span class="later">Optional</span></div>
+            <div class="days" id="days" role="group" aria-label="Open days">
+              <button type="button" class="chip" aria-pressed="true">M</button><button type="button" class="chip" aria-pressed="true">T</button>
+              <button type="button" class="chip" aria-pressed="true">W</button><button type="button" class="chip" aria-pressed="true">T</button>
+              <button type="button" class="chip" aria-pressed="true">F</button><button type="button" class="chip" aria-pressed="true">S</button>
+              <button type="button" class="chip" aria-pressed="false">S</button>
+            </div>
+            <div class="hours">
+              <div class="control"><input type="time" value="09:00" aria-label="Opens at" /></div>
+              <span>to</span>
+              <div class="control"><input type="time" value="19:00" aria-label="Closes at" /></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2>Shop logo</h2><span class="later">Optional · add later</span></div>
+            <div class="logo-up">
+              <div class="logo-box" id="logo-box"><svg class="i" data-icon="image"></svg></div>
+              <div>
+                <button type="button" class="btn secondary" id="logo-btn"><svg class="i" data-icon="upload"></svg>Upload logo</button>
+                <p>Square image, at least 400 × 400.</p>
+              </div>
+            </div>
+          </div>
+
+          <label class="check terms">
+            <input type="checkbox" id="terms" />
+            <span>I agree to PingMe's <a href="#">Terms of Service</a>, <a href="#">Vendor Terms</a> and <a href="#">Privacy Policy</a>.</span>
+          </label>
+        </section>
+      </form>
+    </main>
+
+    <footer class="foot">
+      <button class="btn primary" id="submit" type="button" disabled>Continue <svg class="i" data-icon="arrow"></svg></button>
+      <div class="switch">Already have an account? <a href="#" data-go="AUTH-04">Sign in</a></div>
+    </footer>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let step = 1;
+    let category = null;
+    const touched = new Set();
+    const rules = {
+      name: () => $("name").value.trim().length >= 2,
+      email: () => PM.emailRe.test($("email").value.trim()),
+      phone: () => /^1\d[\s-]?\d{3,4}[\s-]?\d{4}$/.test($("phone").value.trim()),
+      password: () => $("pw").value.length >= 8 && /\d/.test($("pw").value),
+      shop: () => $("shop").value.trim().length >= 2,
+      category: () => !!category,
+      address: () => $("address").value.trim().length >= 6,
+    };
+
+    function validate() {
+      const fields = [...$("step-" + step).querySelectorAll("[data-rule]")];
+      let all = true;
+      for (const f of fields) {
+        const ok = rules[f.dataset.rule]();
+        all = all && ok;
+        f.classList.toggle("valid", ok);
+        f.classList.toggle("invalid", !ok && touched.has(f.dataset.rule));
+      }
+      if (step === 2) all = all && $("terms").checked;
+      $("submit").disabled = !all;
+    }
+
+    function goStep(n) {
+      step = n;
+      document.querySelectorAll(".step").forEach((s) => s.classList.toggle("on", s.id === "step-" + n));
+      [...$("steps").children].forEach((b, i) => b.classList.toggle("on", i <= n));
+      $("submit").innerHTML = n === 1 ? 'Continue <svg class="i" data-icon="arrow"></svg>' : 'Create my shop <svg class="i" data-icon="arrow"></svg>';
+      PM.hydrateIcons($("submit"));
+      window.scrollTo({ top: 0 });
+      validate();
+    }
+
+    document.querySelectorAll("[data-rule] input").forEach((input) => {
+      const rule = input.closest("[data-rule]").dataset.rule;
+      input.addEventListener("blur", () => { if (input.value) touched.add(rule); validate(); });
+      input.addEventListener("input", () => { if (input.closest(".invalid")) touched.add(rule); validate(); });
+    });
+    $("cats").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (!c) return;
+      category = c.dataset.v;
+      $("cats").querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+      validate();
+    });
+    $("days").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (c) c.setAttribute("aria-pressed", String(c.getAttribute("aria-pressed") !== "true"));
+    });
+    $("logo-btn").addEventListener("click", () => {
+      const box = $("logo-box");
+      const name = $("shop").value.trim() || "Shop";
+      box.classList.add("set");
+      box.textContent = name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+      $("logo-btn").lastChild.textContent = "Change logo";
+    });
+    $("terms").addEventListener("change", validate);
+
+    $("back").addEventListener("click", () => (step === 2 ? goStep(1) : PM.go("AUTH-03")));
+    $("submit").addEventListener("click", () => {
+      if (step === 1) return goStep(2);
+      const btn = $("submit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Creating your shop';
+      PM.store.set("role", "vendor");
+      PM.store.set("phone", "+60 " + $("phone").value.trim());
+      PM.store.set("verifyFor", "vendor");
+      setTimeout(() => PM.go("AUTH-08"), 800);
+    });
+    goStep(1);
+  </script>
+</body>
+</html>
