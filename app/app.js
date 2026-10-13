@@ -74,6 +74,7 @@
     body.scrollTop = 0;
     if (s.html) {
       body.innerHTML = `<iframe src="${encPath(s.html)}" title="${esc(s.name)}"></iframe>`;
+      fitScreen();
     } else if (s.refs.length) {
       const ref = s.refs[state.refIndex] || s.refs[0];
       body.innerHTML = `<img src="${encPath(ref)}" alt="Reference sketch for ${esc(s.name)}" />`;
@@ -99,6 +100,25 @@
     $("prev").disabled = i === 0;
     $("next").disabled = i === screens.length - 1;
   }
+
+  // HTML screens are laid out at the real device width (402 pt) and scaled to
+  // the drawn frame, so a smaller frame shrinks the screen instead of reflowing it.
+  // On phone widths the screen is the device itself, so it fills it unscaled.
+  const DEVICE_W = 402;
+  const phoneView = window.matchMedia("(max-width: 760px)");
+  function fitScreen() {
+    const body = $("screen-body");
+    const frame = body.querySelector("iframe");
+    body.classList.toggle("has-frame", !!frame);
+    if (!frame) return;
+    if (phoneView.matches) {
+      frame.style.cssText = "";
+      return;
+    }
+    const k = body.clientWidth / DEVICE_W;
+    frame.style.cssText = `width:${DEVICE_W}px;height:${body.clientHeight / k}px;transform:scale(${k});transform-origin:0 0`;
+  }
+  new ResizeObserver(fitScreen).observe($("screen-body"));
 
   function list(title, items, cls = "") {
     if (!items || !items.length) return "";

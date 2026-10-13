@@ -12,13 +12,15 @@
     .top .brand { display: flex; align-items: center; gap: 8px; font-weight: 700; letter-spacing: -0.02em; }
     .top .text-btn[hidden] { display: block; visibility: hidden; }
 
-    .track { flex: 1; display: flex; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; min-height: 0; }
+    .track { flex: 1; display: flex; overflow-x: auto; overflow-y: hidden; scroll-snap-type: x mandatory; scrollbar-width: none; min-height: 0; }
     .track::-webkit-scrollbar { display: none; }
-    .slide { flex: 0 0 100%; scroll-snap-align: center; display: flex; flex-direction: column; padding: 0 var(--gutter); min-height: 0; }
+    .slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: center; display: flex; flex-direction: column; padding: 0 var(--gutter); min-height: 0; }
     .art {
-      flex: 1; min-height: 300px; max-height: 470px; border-radius: 32px; position: relative; overflow: hidden;
-      display: grid; place-items: center; background: var(--tint);
+      flex: 1 1 0; min-height: 0; max-height: 470px; border-radius: 32px; position: relative; overflow: hidden;
+      display: grid; grid-template: minmax(0, 1fr) / minmax(0, 1fr); place-items: center; background: var(--tint);
     }
+    /* Illustrations are drawn on a fixed 342 x 420 stage and scaled to fit the art box. */
+    .fit { position: relative; width: 342px; height: 420px; display: grid; place-items: center; transform: scale(var(--s, 1)); flex: none; }
     .art::before { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 50% at 50% 45%, rgba(255, 255, 255, 0.85), transparent 70%); }
     .copy { padding: 26px 4px 0; text-align: center; flex: none; }
     .copy .eyebrow { color: var(--brand-700); }
@@ -99,6 +101,17 @@
     .notif p { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); line-height: 1.4; }
     .sms { width: 236px; padding: 10px 14px; border-radius: 18px 18px 18px 6px; background: #e9e9eb; font-size: 13px; line-height: 1.4; color: var(--ink); }
     .sms u { color: #2563eb; text-decoration: none; }
+    @media (max-height: 700px) {
+      .copy { padding-top: 16px; }
+      .copy .h1 { font-size: 24px; margin-top: 4px; }
+      .copy p { font-size: 14px; margin-top: 6px; }
+      .controls { padding-top: 14px; }
+      .dots { margin-bottom: 14px; }
+    }
+    @media (max-height: 600px) {
+      .copy .eyebrow { display: none; }
+      .art { border-radius: 24px; }
+    }
     .sms-label { font-size: 11px; color: var(--ink-3); font-weight: 600; margin: 0 0 4px 6px; }
   </style>
 </head>
@@ -224,6 +237,23 @@
     const skip = document.getElementById("skip");
     const signin = document.getElementById("signin");
     let index = 0;
+
+    // Move each illustration onto a fixed-size stage (backgrounds stay full-bleed) and scale it to fit.
+    const arts = [...document.querySelectorAll(".art")];
+    for (const art of arts) {
+      const fit = document.createElement("div");
+      fit.className = "fit";
+      [...art.children].filter((c) => !c.matches(".map, .road")).forEach((c) => fit.appendChild(c));
+      art.appendChild(fit);
+    }
+    function fitArt() {
+      for (const art of arts) {
+        const s = Math.min(1, art.clientWidth / 342, art.clientHeight / 420);
+        art.style.setProperty("--s", s.toFixed(3));
+      }
+    }
+    new ResizeObserver(fitArt).observe(track);
+    fitArt();
 
     dots.innerHTML = slides.map((_, i) => `<button type="button" role="tab" aria-label="Slide ${i + 1}"></button>`).join("");
     const show = (i) => track.scrollTo({ left: i * track.clientWidth, behavior: "smooth" });
