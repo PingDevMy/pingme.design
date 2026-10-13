@@ -4,7 +4,7 @@
 
 Start with the [product overview](00-overview.md). Open `index.html` to browse the screens.
 
-**0 of 33 screens done** · ⚪ Not started: 17 · 🟠 Reference only: 16 · 🔵 In design: 0 · 🟢 Done: 0
+**0 of 33 screens done** · ⚪ Not started: 15 · 🟠 Reference only: 10 · 🔵 In design: 8 · 🟢 Done: 0
 
 ## Get started
 
@@ -12,14 +12,14 @@ Start with the [product overview](00-overview.md). Open `index.html` to browse t
 
 | ID | Screen | Status | Reference |
 |---|---|---|---|
-| `AUTH-01` | Splash | ⚪ Not started | – |
-| `AUTH-02` | Onboarding | 🟠 Reference only | 1 image |
-| `AUTH-03` | Role Selection | 🟠 Reference only | 1 image |
-| `AUTH-04` | Sign In | 🟠 Reference only | 6 images |
-| `AUTH-05` | Customer Sign Up | 🟠 Reference only | 1 image |
-| `AUTH-06` | Vendor Sign Up | ⚪ Not started | – |
-| `AUTH-07` | Forgot Password | 🟠 Reference only | 1 image |
-| `AUTH-08` | Security Code | 🟠 Reference only | 1 image |
+| `AUTH-01` | Splash | 🔵 In design | – |
+| `AUTH-02` | Onboarding | 🔵 In design | 1 image |
+| `AUTH-03` | Role Selection | 🔵 In design | 1 image |
+| `AUTH-04` | Sign In | 🔵 In design | 6 images |
+| `AUTH-05` | Customer Sign Up | 🔵 In design | 1 image |
+| `AUTH-06` | Vendor Sign Up | 🔵 In design | – |
+| `AUTH-07` | Forgot Password | 🔵 In design | 1 image |
+| `AUTH-08` | Security Code | 🔵 In design | 1 image |
 
 ## Customer app
 

@@ -27,7 +27,7 @@ User: id, full name, email, phone (verified flag), password hash, roles [custome
 <!-- screens:start -->
 <!-- Generated from app/screens.js by scripts/build-tracker.mjs -->
 
-### `AUTH-01` Splash · ⚪ Not started
+### `AUTH-01` Splash · 🔵 In design
 
 Brand splash shown while the app boots and restores the session.
 
@@ -40,7 +40,9 @@ Brand splash shown while the app boots and restores the session.
 - [ ] Splash never shows longer than 2 s on a warm start
 - [ ] Animation plays once per install; later launches show a static logo
 
-### `AUTH-02` Onboarding · 🟠 Reference only
+> Tap the splash to continue. The intro plays on the first open of a browser session; later opens show the static logo (Replay intro restarts it).
+
+### `AUTH-02` Onboarding · 🔵 In design
 
 Four swipeable intro slides that explain PingMe to customers and vendors.
 
@@ -55,7 +57,7 @@ Four swipeable intro slides that explain PingMe to customers and vendors.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135118.png)
 
-### `AUTH-03` Role Selection · 🟠 Reference only
+### `AUTH-03` Role Selection · 🔵 In design
 
 New users choose whether they are a Customer or a Vendor before signing up.
 
@@ -69,7 +71,7 @@ New users choose whether they are a Customer or a Vendor before signing up.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135051.png)
 
-### `AUTH-04` Sign In · 🟠 Reference only
+### `AUTH-04` Sign In · 🔵 In design
 
 Returning users sign in with email or phone, choosing Customer or Vendor mode.
 
@@ -84,9 +86,11 @@ Returning users sign in with email or phone, choosing Customer or Vendor mode.
 - [ ] Wrong credentials show an inline error without clearing the email field
 - [ ] An account holding both roles lands on the role picked in the toggle
 
+> Prototype: any email or phone signs in; the password "wrong" shows the failed sign-in state. Social pair shown as Google + Apple until the open question is settled.
+
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135010.png) · [2](../../design%20reference/authentication/Screenshot%202026-10-13%20135028.png) · [3](../../design%20reference/authentication/Screenshot%202026-10-13%20135046.png) · [4](../../design%20reference/Customer/Screenshot%202026-10-13%20134125.png) · [5](../../design%20reference/Customer/Screenshot%202026-10-06%20152222.png) · [6](../../design%20reference/Customer/Screenshot%202026-10-06%20152155.png)
 
-### `AUTH-05` Customer Sign Up · 🟠 Reference only
+### `AUTH-05` Customer Sign Up · 🔵 In design
 
 Customer creates an account with name, email, phone and password.
 
@@ -102,7 +106,7 @@ Customer creates an account with name, email, phone and password.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135038.png)
 
-### `AUTH-06` Vendor Sign Up · ⚪ Not started
+### `AUTH-06` Vendor Sign Up · 🔵 In design
 
 Vendor creates an account and a basic shop profile in one flow.
 
@@ -114,7 +118,7 @@ Vendor creates an account and a basic shop profile in one flow.
 
 - [ ] Vendor can create orders right after sign-up; profile can be finished later
 
-### `AUTH-07` Forgot Password · 🟠 Reference only
+### `AUTH-07` Forgot Password · 🔵 In design
 
 User requests a password reset link by email.
 
@@ -127,7 +131,7 @@ User requests a password reset link by email.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135100.png)
 
-### `AUTH-08` Security Code · 🟠 Reference only
+### `AUTH-08` Security Code · 🔵 In design
 
 Six-digit code sent by SMS to verify a phone number or a sign-in.
 
@@ -140,6 +144,8 @@ Six-digit code sent by SMS to verify a phone number or a sign-in.
 
 - [ ] Resend is locked until the countdown ends
 - [ ] Code expires after 10 minutes; five wrong tries locks for 15 minutes
+
+> Prototype: 000000 is treated as a wrong code (five tries, then locked); any other six digits verify and show the success state.
 
 Reference: [1](../../design%20reference/authentication/Screenshot%202026-10-13%20135106.png)
 

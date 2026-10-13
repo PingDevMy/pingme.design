@@ -46,7 +46,7 @@ window.PINGME = {
         {
           id: "AUTH-01",
           name: "Splash",
-          status: "todo",
+          status: "design",
           summary: "Brand splash shown while the app boots and restores the session.",
           points: [
             "PingMe logo with a short intro animation on first open",
@@ -58,11 +58,13 @@ window.PINGME = {
             "Animation plays once per install; later launches show a static logo",
           ],
           refs: [],
+          html: "screens/auth/auth-01-splash.html",
+          note: "Tap the splash to continue. The intro plays on the first open of a browser session; later opens show the static logo (Replay intro restarts it).",
         },
         {
           id: "AUTH-02",
           name: "Onboarding",
-          status: "reference",
+          status: "design",
           summary: "Four swipeable intro slides that explain PingMe to customers and vendors.",
           points: [
             "Slides: Book with Confidence, Grow Your Business, Discover Local Services, Connect with Ease",
@@ -74,11 +76,12 @@ window.PINGME = {
             "Shown only until the user finishes or skips it once",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135118.png"],
+          html: "screens/auth/auth-02-onboarding.html",
         },
         {
           id: "AUTH-03",
           name: "Role Selection",
-          status: "reference",
+          status: "design",
           summary: "New users choose whether they are a Customer or a Vendor before signing up.",
           points: [
             "Two cards: I am a Customer, I am a Vendor, each with a one-line explanation",
@@ -89,11 +92,12 @@ window.PINGME = {
             "Selected role carries into Sign Up and decides which sign-up form opens",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135051.png"],
+          html: "screens/auth/auth-03-role.html",
         },
         {
           id: "AUTH-04",
           name: "Sign In",
-          status: "reference",
+          status: "design",
           summary: "Returning users sign in with email or phone, choosing Customer or Vendor mode.",
           points: [
             "Role toggle: Customer (track and follow my orders) or Vendor (manage shop and orders)",
@@ -114,11 +118,13 @@ window.PINGME = {
             "design reference/Customer/Screenshot 2026-10-06 152222.png",
             "design reference/Customer/Screenshot 2026-10-06 152155.png",
           ],
+          html: "screens/auth/auth-04-sign-in.html",
+          note: "Prototype: any email or phone signs in; the password \"wrong\" shows the failed sign-in state. Social pair shown as Google + Apple until the open question is settled.",
         },
         {
           id: "AUTH-05",
           name: "Customer Sign Up",
-          status: "reference",
+          status: "design",
           summary: "Customer creates an account with name, email, phone and password.",
           points: [
             "Full name, email, phone number, password, confirm password",
@@ -131,11 +137,12 @@ window.PINGME = {
             "Phone number links any orders a vendor already created for that number",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135038.png"],
+          html: "screens/auth/auth-05-customer-sign-up.html",
         },
         {
           id: "AUTH-06",
           name: "Vendor Sign Up",
-          status: "todo",
+          status: "design",
           summary: "Vendor creates an account and a basic shop profile in one flow.",
           points: [
             "Owner name, email, phone, password",
@@ -146,11 +153,12 @@ window.PINGME = {
             "Vendor can create orders right after sign-up; profile can be finished later",
           ],
           refs: [],
+          html: "screens/auth/auth-06-vendor-sign-up.html",
         },
         {
           id: "AUTH-07",
           name: "Forgot Password",
-          status: "reference",
+          status: "design",
           summary: "User requests a password reset link by email.",
           points: [
             "Email address field, Send Reset Link button",
@@ -160,11 +168,12 @@ window.PINGME = {
             "Always shows the same confirmation whether or not the email exists",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135100.png"],
+          html: "screens/auth/auth-07-forgot-password.html",
         },
         {
           id: "AUTH-08",
           name: "Security Code",
-          status: "reference",
+          status: "design",
           summary: "Six-digit code sent by SMS to verify a phone number or a sign-in.",
           points: [
             "Masked phone number with 'Wrong number? Edit'",
@@ -177,6 +186,8 @@ window.PINGME = {
             "Code expires after 10 minutes; five wrong tries locks for 15 minutes",
           ],
           refs: ["design reference/authentication/Screenshot 2026-10-13 135106.png"],
+          html: "screens/auth/auth-08-security-code.html",
+          note: "Prototype: 000000 is treated as a wrong code (five tries, then locked); any other six digits verify and show the success state.",
         },
       ],
     },

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Sign In · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <style>
+    .hero { display: flex; align-items: center; gap: 14px; margin: 6px 0 24px; }
+    .hero .h1 { font-size: 26px; }
+    .hero .lead { margin: 2px 0 0; font-size: 14px; }
+    #form-error { margin-top: 16px; display: none; }
+    #form-error.show { display: flex; }
+    .forgot { font-size: 13px; }
+    .submit { margin-top: 22px; }
+    .switch { margin: 22px 0 18px; text-align: center; font-size: 14px; color: var(--ink-2); }
+    .meta { text-align: center; font-size: 11px; font-weight: 600; letter-spacing: 0.08em; color: var(--ink-3); margin-bottom: 6px; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <main class="content" style="padding-top: 20px">
+      <div class="hero rise">
+        <span class="mark"><svg class="i" data-icon="bolt"></svg></span>
+        <div>
+          <h1 class="h1">Welcome back</h1>
+          <p class="lead">Sign in to pick up where you left off.</p>
+        </div>
+      </div>
+
+      <div class="label" id="role-label" style="margin-bottom: 8px">Sign in as</div>
+      <div class="segmented" role="group" aria-labelledby="role-label">
+        <button type="button" data-role="customer" aria-pressed="true">
+          <span class="seg-icon"><svg class="i" data-icon="user"></svg></span>
+          <span><strong>Customer</strong><small>Track my orders</small></span>
+        </button>
+        <button type="button" data-role="vendor" aria-pressed="false">
+          <span class="seg-icon"><svg class="i" data-icon="store"></svg></span>
+          <span><strong>Vendor</strong><small>Manage my shop</small></span>
+        </button>
+      </div>
+
+      <form id="form" novalidate>
+        <div class="alert danger" id="form-error" role="alert">
+          <svg class="i" data-icon="alert"></svg>
+          <span>That email or phone and password don't match. Try again or <a href="#" data-go="AUTH-07">reset your password</a>.</span>
+        </div>
+
+        <div class="field" id="f-id">
+          <div class="field-head"><label class="label" for="id">Email or phone</label></div>
+          <div class="control">
+            <svg class="i" data-icon="mail" id="id-icon"></svg>
+            <input id="id" name="id" type="text" inputmode="email" autocomplete="username" placeholder="you@email.com or 012-345 6789" />
+          </div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter a valid email or phone number.</div>
+        </div>
+
+        <div class="field" id="f-pw">
+          <div class="field-head">
+            <label class="label" for="pw">Password</label>
+            <a class="forgot" href="#" data-go="AUTH-07">Forgot?</a>
+          </div>
+          <div class="control">
+            <svg class="i" data-icon="lock"></svg>
+            <input id="pw" name="pw" type="password" autocomplete="current-password" placeholder="Your password" />
+            <button class="peek" type="button" data-peek aria-label="Show password"><svg class="i" data-icon="eye"></svg></button>
+          </div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter your password.</div>
+        </div>
+
+        <button class="btn primary submit" id="submit" type="submit"></button>
+      </form>
+
+      <div class="divider">or continue with</div>
+      <div class="social">
+        <button class="btn secondary" type="button" data-brand="google">Google</button>
+        <button class="btn secondary" type="button" data-brand="apple">Apple</button>
+      </div>
+
+      <div class="switch">New to PingMe? <a href="#" data-go="AUTH-03">Create an account</a></div>
+    </main>
+
+    <footer class="foot flat" style="padding-top: 0">
+      <div class="meta">PINGME V2.4.0</div>
+      <div class="legal"><a href="#">Privacy Policy</a><span aria-hidden="true">·</span><a href="#">Terms of Service</a></div>
+    </footer>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script>
+    const segs = document.querySelectorAll(".segmented button");
+    const submit = document.getElementById("submit");
+    const form = document.getElementById("form");
+    const id = document.getElementById("id");
+    const pw = document.getElementById("pw");
+    const formError = document.getElementById("form-error");
+    let role = PM.store.get("role") === "vendor" ? "vendor" : "customer";
+
+    function setRole(r) {
+      role = r;
+      segs.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.role === r)));
+      submit.innerHTML = `Sign In to ${r === "vendor" ? "Vendor" : "Customer"} <svg class="i" data-icon="arrow"></svg>`;
+      PM.hydrateIcons(submit);
+    }
+    segs.forEach((b) => b.addEventListener("click", () => setRole(b.dataset.role)));
+    setRole(role);
+
+    // Swap the field icon to match what's being typed.
+    id.addEventListener("input", () => {
+      const icon = document.getElementById("id-icon");
+      const isPhone = /^[+\d][\d\s-]*$/.test(id.value.trim()) && id.value.trim().length > 0;
+      if (icon.dataset.icon !== (isPhone ? "phone" : "mail")) {
+        icon.dataset.icon = isPhone ? "phone" : "mail";
+        PM.hydrateIcons(icon.parentElement);
+      }
+      document.getElementById("f-id").classList.remove("invalid");
+    });
+    pw.addEventListener("input", () => document.getElementById("f-pw").classList.remove("invalid"));
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      formError.classList.remove("show");
+      const v = id.value.trim();
+      const idOk = PM.emailRe.test(v) || PM.phoneRe.test(v);
+      const pwOk = pw.value.length > 0;
+      document.getElementById("f-id").classList.toggle("invalid", !idOk);
+      document.getElementById("f-pw").classList.toggle("invalid", !pwOk);
+      if (!idOk || !pwOk) return PM.shake(form);
+
+      submit.disabled = true;
+      submit.innerHTML = '<span class="spinner"></span>Signing in';
+      setTimeout(() => {
+        // Prototype: the password "wrong" shows the failed sign-in state.
+        if (pw.value === "wrong") {
+          setRole(role);
+          submit.disabled = false;
+          pw.value = "";
+          formError.classList.add("show");
+          PM.shake(formError);
+          pw.focus();
+          return;
+        }
+        PM.store.set("role", role);
+        PM.go(role === "vendor" ? "VHOME-01" : "CHOME-01");
+      }, 900);
+    });
+  </script>
+</body>
+</html>
