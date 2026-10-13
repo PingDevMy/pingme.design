@@ -118,23 +118,26 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* Stage / phone */
 .stage { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; min-height: 0; }
+/* iPhone 18 Pro: 402 x 874 pt viewport (2622 x 1206 px @3x). Shown at 1:1 when the window is tall enough. */
 .phone {
-  --w: 380px;
-  width: var(--w); aspect-ratio: 390 / 844; max-height: calc(100vh - 140px);
-  padding: 12px; border-radius: 56px; background: #0b0f17;
+  --bezel: 12px;
+  --w: min(426px, calc((100vh - 170px) * 402 / 874 + 2 * var(--bezel)));
+  width: var(--w); height: calc(var(--w) * 898 / 426); /* screen + 12px bezel each side */
+  flex: none;
+  padding: var(--bezel); border-radius: 64px; background: #0b0f17;
   box-shadow: 0 0 0 2px #2a2f3a, 0 30px 60px rgba(15, 23, 42, 0.25);
   position: relative;
 }
 .phone-screen {
-  width: 100%; height: 100%; border-radius: 44px; overflow: hidden; background: #fff;
+  width: 100%; height: 100%; border-radius: 52px; overflow: hidden; background: #fff;
   display: flex; flex-direction: column; position: relative;
 }
 .statusbar {
-  flex: none; height: 50px; padding: 14px 28px 0;
+  flex: none; height: 54px; padding: 18px 32px 0;
   display: flex; align-items: flex-start; justify-content: space-between;
   font-weight: 600; font-size: 15px; position: relative; z-index: 2; background: #fff;
 }
-.island { position: absolute; left: 50%; top: 11px; width: 118px; height: 34px; border-radius: 20px; background: #0b0f17; transform: translateX(-50%); }
+.island { position: absolute; left: 50%; top: 11px; width: 126px; height: 37px; border-radius: 20px; background: #0b0f17; transform: translateX(-50%); }
 .sb-icons { display: flex; gap: 6px; align-items: center; }
 .sb-icons svg { stroke: none; fill: currentColor; height: 12px; width: auto; }
 .screen-body { flex: 1; overflow-y: auto; overflow-x: hidden; scrollbar-width: thin; }
@@ -156,6 +159,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .icon-btn:hover:not(:disabled) { border-color: var(--accent); color: var(--accent-ink); }
 .icon-btn:disabled { opacity: 0.4; cursor: default; }
+.device-label { font-size: 12px; color: var(--ink-3); margin-top: -8px; }
 .refs { display: flex; gap: 6px; align-items: center; min-height: 38px; font-size: 13px; color: var(--ink-2); }
 .ref-btn { border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 4px 11px; font-size: 12px; }
 .ref-btn[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent-ink); }
@@ -201,15 +205,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .layout { grid-template-columns: 280px minmax(0, 1fr); grid-template-rows: auto auto; height: auto; min-height: 100vh; }
   .nav { grid-row: span 2; max-height: calc(100vh - 56px); position: sticky; top: 28px; }
   .stage { padding: 8px 0; }
-  .phone { max-height: none; }
+  .phone { --w: min(426px, calc(100vw - 340px)); }
 }
 /* Phone widths: the device is the phone, so show only the app screen, full-bleed. */
 @media (max-width: 760px) {
   html, body { height: 100%; overflow: hidden; background: #fff; }
   .layout { display: block; height: 100dvh; padding: 0; }
-  .nav, .info, .stage-controls, .statusbar, .home-indicator { display: none; }
+  .nav, .info, .stage-controls, .device-label, .statusbar, .home-indicator { display: none; }
   .stage { height: 100%; display: block; padding: 0; }
-  .phone { width: 100%; height: 100%; max-height: none; aspect-ratio: auto; padding: 0; border-radius: 0; background: #fff; box-shadow: none; }
+  .phone { width: 100%; height: 100%; padding: 0; border-radius: 0; background: #fff; box-shadow: none; }
   .phone-screen { border-radius: 0; }
   .screen-body { padding-bottom: env(safe-area-inset-bottom); }
 }
