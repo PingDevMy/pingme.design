@@ -16,17 +16,17 @@
   const stops = [];
   const byKey = {};
   let uid = 0;
-  function index(node, sec) {
+  function index(node, sec, parents = [sec.id]) {
     node.uid = "n" + uid++;
     if (node.id) {
       node.key = sec.mode && shared(node.id) ? `${node.id}@${sec.mode}` : node.id;
       node.mode = sec.mode;
       if (!byKey[node.key]) {
-        byKey[node.key] = { key: node.key, id: node.id, mode: sec.mode, sec };
+        byKey[node.key] = { key: node.key, id: node.id, mode: sec.mode, sec, parents };
         stops.push(byKey[node.key]);
       }
     }
-    (node.kids || []).forEach((k) => index(k, sec));
+    (node.kids || []).forEach((k) => index(k, sec, [...parents, node.uid]));
   }
   for (const sec of data.flow) sec.kids.forEach((n) => index(n, sec));
 
@@ -82,44 +82,57 @@
     return [...ids];
   }
 
+  // Each screen is one row: caret (if it has children), status dot, name, ID.
+  // How you get there ("Tab", "Bell", "Sheet") is the row's tooltip.
   function nodeHtml(n, sec) {
     if (n.to) {
       const t = byId[n.to];
       const key = Object.values(byKey).find((x) => x.id === n.to && (!shared(n.to) || x.mode === sec.mode))?.key || n.to;
-      return `<li class="jump"><div class="node-row"><a class="node" href="#${key}" data-key="${key}" title="Goes to ${esc(t.name)} (${t.id})">
-        <span class="via">${esc(n.via)}</span><span class="nm">${jumpIcon}${esc(n.label || t.name)}</span></a><span class="tw" aria-hidden="true"></span></div></li>`;
+      return `<li class="jump"><a class="row" href="#${key}" data-key="${key}" title="${esc(n.via)}: goes to ${esc(t.name)} (${t.id})">
+        <span class="tw"></span>${jumpIcon}<span class="nm">${esc(n.label || t.name)}</span></a></li>`;
     }
     const s = byId[n.id];
     const kids = n.kids || [];
     const open = !state.closed.has(n.uid);
     const dim = state.filter !== "all" && s.status !== state.filter;
     const cur = state.current === n.key;
-    return `<li class="${kids.length ? "has-kids" : ""}${open ? "" : " closed"}">
-      <div class="node-row">
-        <a class="node${dim ? " dim" : ""}${shared(n.id) ? " shared" : ""}" href="#${n.key}" data-key="${n.key}"${cur ? ' aria-current="page"' : ""}>
-          ${n.via ? `<span class="via">${esc(n.via)}</span>` : ""}
-          <span class="line"><span class="nm">${esc(s.name)}</span><span class="nid">${s.id}</span><span class="sdot ${s.status}" title="${esc(data.statuses[s.status].label)}"></span></span>
-        </a>
-        ${kids.length ? `<button class="tw" data-uid="${n.uid}" aria-expanded="${open}" aria-label="${open ? "Collapse" : "Expand"} ${esc(s.name)}">${caret}<span>${kids.length}</span></button>` : `<span class="tw" aria-hidden="true"></span>`}
-      </div>
+    const tip = `${n.via ? n.via + " · " : ""}${data.statuses[s.status].label}${shared(n.id) ? " · shared by both modes" : ""}`;
+    return `<li class="${open ? "" : "closed"}">
+      <a class="row${dim ? " dim" : ""}" href="#${n.key}" data-key="${n.key}" title="${esc(tip)}"${cur ? ' aria-current="page"' : ""}>
+        ${kids.length ? `<span class="tw" data-uid="${n.uid}" role="button" aria-expanded="${open}" aria-label="${open ? "Collapse" : "Expand"} ${esc(s.name)}">${caret}</span>` : `<span class="tw"></span>`}
+        <span class="sdot ${s.status}"></span>
+        <span class="nm">${esc(s.name)}${shared(n.id) ? '<i class="both" title="Shared by both modes"></i>' : ""}</span>
+        <span class="nid">${s.id}</span>
+      </a>
       ${kids.length ? `<ul class="ft">${kids.map((k) => nodeHtml(k, sec)).join("")}</ul>` : ""}
     </li>`;
   }
 
+  // Screens with children. Collapse all folds these but keeps sections open, so
+  // each section shows its top-level screens (the tabs) as an overview.
+  const folders = [];
+  for (const sec of data.flow) {
+    const walk = (n) => { if (n.kids && n.kids.length && n.id) folders.push(n.uid); (n.kids || []).forEach(walk); };
+    sec.kids.forEach(walk);
+  }
+
   function renderTree() {
-    $("nav-tree").innerHTML = data.flow.map((sec) => {
+    const allOpen = state.closed.size === 0;
+    $("nav-tree").innerHTML = `<div class="tree-tools">
+        <button type="button" data-all="open"${allOpen ? " disabled" : ""}>Expand all</button>
+        <button type="button" data-all="close">Collapse all</button>
+      </div>` + data.flow.map((sec) => {
       const ids = secIds(sec);
       const done = ids.filter((id) => byId[id].status === "done").length;
       const open = !state.closed.has(sec.id);
       return `<section class="flow-sec${open ? "" : " closed"}" data-sec="${sec.id}">
-        <button class="sec-head" data-uid="${sec.id}" aria-expanded="${open}">
-          <span class="sec-ic ${sec.id}"><svg viewBox="0 0 24 24" aria-hidden="true">${secIcon[sec.id] || ""}</svg></span>
-          <span class="sec-t"><b>${esc(sec.label)}</b><small>${esc(sec.hint || "")}</small></span>
-          <span class="count">${done}/${ids.length}</span>${caret}
+        <button class="sec-head" data-uid="${sec.id}" aria-expanded="${open}" title="${esc(sec.hint || "")}">
+          ${caret}<span class="sec-ic ${sec.id}"><svg viewBox="0 0 24 24" aria-hidden="true">${secIcon[sec.id] || ""}</svg></span>
+          <b>${esc(sec.label)}</b><span class="count">${done}/${ids.length}</span>
         </button>
         <ul class="ft root">${sec.kids.map((n) => nodeHtml(n, sec)).join("")}</ul>
       </section>`;
-    }).join("") + `<p class="legend"><span>${jumpIcon} goes to another branch</span><span><i></i> shared by both modes</span></p>`;
+    }).join("") + `<p class="legend"><span>${jumpIcon} goes to another branch</span><span><i class="both"></i> shared by both modes</span></p>`;
   }
 
   // Resolve a hash ("ID" or "ID@mode") to a stop. A bare ID for a shared screen
@@ -217,6 +230,8 @@
     const s = byId[stop.id];
     if (state.current !== stop.key) state.refIndex = 0;
     state.current = stop.key;
+    // Unfold the branch the screen sits in, so the current row is always visible.
+    stop.parents.forEach((p) => state.closed.delete(p));
     // Shared screens read the mode from the session, so set it before the frame loads.
     if (stop.mode) appMode.set(stop.mode);
     if (push && location.hash.slice(1) !== stop.key) history.replaceState(null, "", "#" + stop.key);
@@ -235,17 +250,24 @@
 
   // Events
   $("nav-tree").addEventListener("click", (e) => {
-    const link = e.target.closest("a[data-key]");
-    if (link) {
-      e.preventDefault();
-      select(link.dataset.key);
+    const all = e.target.closest("[data-all]");
+    if (all) {
+      state.closed = all.dataset.all === "open" ? new Set() : new Set(folders);
+      renderTree();
       return;
     }
     const tw = e.target.closest("[data-uid]");
     if (tw) {
+      e.preventDefault();
       const id = tw.dataset.uid;
       state.closed.has(id) ? state.closed.delete(id) : state.closed.add(id);
       renderTree();
+      return;
+    }
+    const link = e.target.closest("a[data-key]");
+    if (link) {
+      e.preventDefault();
+      select(link.dataset.key);
     }
   });
   $("filters").addEventListener("click", (e) => {
