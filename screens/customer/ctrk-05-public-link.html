@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Track your order · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    /* Mobile browser chrome: this screen is a web page opened from the SMS link. */
+    .urlbar { position: sticky; top: 0; z-index: 6; padding: 6px 12px 8px; background: #f1f5f9; border-bottom: 1px solid var(--line); }
+    .urlbar .u { display: flex; align-items: center; justify-content: center; gap: 6px; height: 36px; border-radius: 12px; background: #fff; font-size: 14px; color: var(--ink-2); min-width: 0; }
+    .urlbar .u span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .urlbar svg.i { width: 13px; height: 13px; color: var(--ink-3); }
+
+    .install { display: flex; align-items: center; gap: 12px; padding: 12px var(--gutter); background: var(--ink); color: #fff; }
+    .install .grow { flex: 1; min-width: 0; font-size: 13px; line-height: 1.35; color: rgba(255, 255, 255, 0.75); }
+    .install b { display: block; color: #fff; font-size: 14px; }
+    .install .btn { width: auto; height: 36px; padding: 0 14px; font-size: 13.5px; flex: none; border-radius: 10px; box-shadow: none; }
+    .install .x { background: none; border: 0; color: rgba(255, 255, 255, 0.6); padding: 4px; margin-left: -4px; display: grid; }
+
+    .site { display: flex; align-items: center; justify-content: space-between; padding: 16px var(--gutter) 4px; }
+    .site .brand { display: flex; align-items: center; gap: 8px; font-weight: 800; letter-spacing: -0.02em; font-size: 17px; }
+    .site .secure { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; color: var(--ink-3); }
+    .site .secure svg.i { width: 14px; height: 14px; color: var(--success); }
+
+    .wrap { padding: 12px var(--gutter) calc(var(--safe-bottom) + 24px); }
+    .status h1 { margin: 10px 0 2px; font-size: 24px; letter-spacing: -0.02em; line-height: 1.2; }
+    .status .top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .status .id { font-size: 12.5px; color: var(--ink-3); font-weight: 600; }
+    .status p { margin: 0 0 16px; font-size: 14px; color: var(--ink-2); }
+
+    .timeline { list-style: none; margin: 0; padding: 0; }
+    .timeline li { position: relative; display: grid; grid-template-columns: 24px minmax(0, 1fr) auto; gap: 12px; padding-bottom: 18px; }
+    .timeline li:last-child { padding-bottom: 0; }
+    .timeline li::before { content: ""; position: absolute; left: 11px; top: 24px; bottom: 0; width: 2px; background: var(--line); }
+    .timeline li:last-child::before { display: none; }
+    .timeline li.done::before { background: var(--brand); }
+    .timeline .dot { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; border: 2px solid var(--line); background: #fff; color: #fff; }
+    .timeline .dot svg.i { width: 13px; height: 13px; stroke-width: 3; }
+    .timeline li.done .dot { background: var(--brand); border-color: var(--brand); }
+    .timeline li.now .dot { border-color: var(--brand); box-shadow: 0 0 0 4px var(--brand-50); }
+    .timeline li.now .dot::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
+    .timeline b { font-size: 14.5px; font-weight: 600; }
+    .timeline li.todo b { color: var(--ink-3); font-weight: 500; }
+    .timeline time { font-size: 12px; color: var(--ink-3); white-space: nowrap; padding-top: 2px; }
+
+    .shop .grow b { display: block; }
+    .shop .acts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; margin-top: 14px; }
+    .shop .acts .btn { height: 46px; font-size: 14.5px; }
+
+    .why { margin-top: 18px; padding: 18px; border-radius: var(--r-lg); background: linear-gradient(150deg, var(--brand-50), #fff); border: 1px solid var(--brand-100); }
+    .why h2 { margin: 0 0 10px; font-size: 16px; }
+    .why ul { margin: 0 0 16px; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .why li { display: flex; gap: 8px; align-items: flex-start; font-size: 13.5px; color: var(--ink-2); }
+    .why li svg.i { width: 16px; height: 16px; color: var(--brand); margin-top: 2px; stroke-width: 2.5; }
+    .stores { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 10px; }
+    .stores a { display: flex; align-items: center; justify-content: center; gap: 8px; height: 46px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 13.5px; font-weight: 600; text-decoration: none; }
+    .stores a svg { width: 18px; height: 18px; }
+    .fine { margin-top: 22px; text-align: center; font-size: 12px; color: var(--ink-3); }
+    .fine a { color: var(--ink-2); font-weight: 500; }
+
+    .expired { display: none; text-align: center; padding: 48px 8px 12px; }
+    .expired .badge-icon { margin: 0 auto 18px; background: #f1f5f9; color: var(--ink-2); }
+    .expired p { color: var(--ink-2); font-size: 14px; max-width: 300px; margin: 8px auto 22px; }
+    .is-expired .expired { display: block; }
+    .is-expired .live-only { display: none; }
+    .proto { display: block; margin: 16px auto 0; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+  </style>
+</head>
+<body>
+  <div class="urlbar"><div class="u"><svg class="i" data-icon="lock"></svg><span>pingme.my/t/k8Qz4wP1x</span></div></div>
+
+  <div class="install live-only" id="install">
+    <button class="x" type="button" aria-label="Dismiss" id="dismiss"><svg class="i" data-icon="close"></svg></button>
+    <span class="mark sm"><svg class="i" data-icon="bolt"></svg></span>
+    <div class="grow"><b>Get PingMe</b>Live pings instead of SMS, for every shop</div>
+    <a class="btn primary" href="#">Install</a>
+  </div>
+
+  <div class="site">
+    <span class="brand"><span class="mark sm"><svg class="i" data-icon="bolt"></svg></span>PingMe</span>
+    <span class="secure"><svg class="i" data-icon="shield"></svg>Private link</span>
+  </div>
+
+  <main class="wrap">
+    <div class="live-only">
+      <section class="card status rise">
+        <div class="top"><span class="pill progress live">In Progress</span><span class="id">ORD-0921</span></div>
+        <h1>Processing your order</h1>
+        <p>Wash &amp; Press · 6 kg · ready around <b>5:00 PM today</b></p>
+        <ol class="timeline">
+          <li class="done"><span class="dot"><svg class="i" data-icon="check"></svg></span><b>Order Created</b><time>10:30 AM</time></li>
+          <li class="now"><span class="dot"></span><b>Processing Service</b><time>10:45 AM</time></li>
+          <li class="todo"><span class="dot"></span><b>Ready for Pickup</b><time></time></li>
+          <li class="todo"><span class="dot"></span><b>Order Completed</b><time></time></li>
+        </ol>
+        <div class="alert info" style="margin-top: 16px"><svg class="i" data-icon="message"></svg><span>“Your clothes are being cleaned and pressed. We'll text you as soon as they're ready.”</span></div>
+      </section>
+
+      <section class="card shop" style="margin-top: 12px">
+        <div class="row">
+          <span class="tile"><svg class="i" data-icon="shirt"></svg></span>
+          <div class="grow"><b class="ellipsis">Luxe Laundry Hub</b><span class="meta">12 Jalan SS2/24, Petaling Jaya</span></div>
+        </div>
+        <div class="acts">
+          <a class="btn secondary" href="tel:+60378651204"><svg class="i" data-icon="call"></svg>Call</a>
+          <a class="btn secondary" href="https://maps.google.com/?q=12%20Jalan%20SS2%2F24%2C%20Petaling%20Jaya" target="_blank" rel="noopener"><svg class="i" data-icon="navigate"></svg>Directions</a>
+        </div>
+      </section>
+
+      <section class="why">
+        <h2>Follow every order in one app</h2>
+        <ul>
+          <li><svg class="i" data-icon="check"></svg>Push pings the moment your order moves</li>
+          <li><svg class="i" data-icon="check"></svg>Pickup QR, receipts and history for all your shops</li>
+          <li><svg class="i" data-icon="check"></svg>Sign up with this number and this order is already there</li>
+        </ul>
+        <div class="stores">
+          <a href="#" data-brand="apple">App Store</a>
+          <a href="#"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#34A853" d="M3.6 2.2 13.4 12l-9.8 9.8c-.4-.2-.6-.6-.6-1.1V3.3c0-.5.2-.9.6-1.1Z"/><path fill="#FBBC05" d="m16.8 8.6-3.4 3.4 3.4 3.4 3.8-2.2c.9-.5.9-1.9 0-2.4l-3.8-2.2Z"/><path fill="#4285F4" d="M3.6 2.2c.3-.2.8-.2 1.2 0l12 6.4-3.4 3.4L3.6 2.2Z"/><path fill="#EA4335" d="m13.4 12 3.4 3.4-12 6.4c-.4.2-.9.2-1.2 0L13.4 12Z"/></svg>Google Play</a>
+        </div>
+      </section>
+    </div>
+
+    <section class="expired" aria-live="polite">
+      <span class="badge-icon ring"><svg class="i" data-icon="clock"></svg></span>
+      <h1 class="h2">This link has expired</h1>
+      <p>Tracking links stop working 30 days after an order is completed. Your order history is always in the PingMe app.</p>
+      <a class="btn primary" href="#">Get the PingMe app</a>
+    </section>
+
+    <div class="fine">Sent by Luxe Laundry Hub via PingMe · <a href="#">Privacy</a> · <a href="#">Report this message</a></div>
+    <button class="text-btn proto" type="button" id="proto">Prototype: show an expired link</button>
+  </main>
+
+  <script src="../kit.js"></script>
+  <script>
+    document.getElementById("dismiss").addEventListener("click", () => document.getElementById("install").remove());
+    document.getElementById("proto").addEventListener("click", (e) => {
+      const on = document.body.classList.toggle("is-expired");
+      e.currentTarget.textContent = on ? "Prototype: show a live link" : "Prototype: show an expired link";
+    });
+  </script>
+</body>
+</html>

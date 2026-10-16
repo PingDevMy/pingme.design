@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Choose Mode · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <style>
+    .roles { display: grid; gap: 14px; margin-top: 28px; }
+    .role {
+      position: relative; text-align: left; width: 100%; padding: 18px; border-radius: var(--r-lg);
+      border: 1.5px solid var(--line); background: var(--surface); display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: start;
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .role:hover { border-color: var(--ink-3); }
+    .role[aria-checked="true"] { border-color: var(--brand); background: linear-gradient(180deg, #fff, var(--brand-50)); box-shadow: 0 0 0 4px var(--brand-50); }
+    .role .ic { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: var(--canvas); color: var(--ink-2); transition: background 0.15s, color 0.15s; }
+    .role[aria-checked="true"] .ic { background: var(--brand); color: #fff; }
+    .role .ic svg.i { width: 24px; height: 24px; }
+    .role .rt { display: block; font-weight: 700; margin: 2px 0 2px; font-size: 17px; letter-spacing: -0.01em; }
+    .role .rd { display: block; margin: 0; font-size: 13.5px; color: var(--ink-2); line-height: 1.45; }
+    .role .rl { margin: 10px 0 0; padding: 0; list-style: none; display: grid; gap: 4px; }
+    .role .ri { display: flex; gap: 6px; align-items: center; font-size: 12.5px; color: var(--ink-2); }
+    .role .ri svg.i { width: 14px; height: 14px; color: var(--brand); stroke-width: 2.5; }
+    .radio { width: 22px; height: 22px; border-radius: 50%; border: 1.5px solid var(--ink-3); display: grid; place-items: center; margin-top: 2px; }
+    .role[aria-checked="true"] .radio { border-color: var(--brand); background: var(--brand); }
+    .role[aria-checked="true"] .radio::after { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #fff; }
+    .both { margin-top: 18px; }
+    .foot .alt { margin-top: 14px; text-align: center; font-size: 14px; color: var(--ink-2); }
+    /* Help sheet */
+    .sheet-bg { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10; }
+    .sheet { position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 24px 24px 0 0; padding: 10px var(--gutter) calc(var(--safe-bottom) + 12px); transform: translateY(100%); transition: transform 0.28s cubic-bezier(0.2, 0.7, 0.2, 1); z-index: 11; }
+    .sheet .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 16px; }
+    .sheet h3 { margin: 0 0 12px; font-size: 18px; }
+    .sheet dl { margin: 0 0 20px; display: grid; gap: 12px; }
+    .sheet dt { font-weight: 600; font-size: 14px; }
+    .sheet dd { margin: 2px 0 0; font-size: 13.5px; color: var(--ink-2); }
+    .open .sheet-bg { opacity: 1; pointer-events: auto; }
+    .open .sheet { transform: none; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <span style="width: 40px"></span>
+      <div class="steps" style="width: 120px" aria-label="Step 3 of 3"><span class="on"></span><span class="on"></span><span class="on"></span></div>
+      <button class="icon-btn plain" type="button" aria-label="Help choosing" id="help"><svg class="i" data-icon="help"></svg></button>
+    </header>
+
+    <main class="content">
+      <div class="rise">
+        <div class="eyebrow">Almost there</div>
+        <h1 class="h1" style="margin-top: 8px">Where do you want to start?</h1>
+        <p class="lead">Your account works for both. Pick where to land now and switch any time from Profile.</p>
+      </div>
+
+      <div class="roles" role="radiogroup" aria-label="Start in">
+        <button class="role rise" type="button" role="radio" aria-checked="false" data-role="customer" style="animation-delay: 0.05s">
+          <span class="ic"><svg class="i" data-icon="user"></svg></span>
+          <span>
+            <span class="rt">Track my orders</span>
+            <span class="rd">Follow orders from the shops I use and get pinged when they move.</span>
+            <span class="rl">
+              <span class="ri"><svg class="i" data-icon="check"></svg>Live order status with photos</span>
+              <span class="ri"><svg class="i" data-icon="check"></svg>Pickup QR and receipts</span>
+            </span>
+          </span>
+          <span class="radio" aria-hidden="true"></span>
+        </button>
+        <button class="role rise" type="button" role="radio" aria-checked="false" data-role="vendor" style="animation-delay: 0.1s">
+          <span class="ic"><svg class="i" data-icon="store"></svg></span>
+          <span>
+            <span class="rt">Run my shop</span>
+            <span class="rd">Log each job and keep my clients posted automatically. Takes one short form.</span>
+            <span class="rl">
+              <span class="ri"><svg class="i" data-icon="check"></svg>Orders, QR tags and status updates</span>
+              <span class="ri"><svg class="i" data-icon="check"></svg>Push and SMS pings to clients</span>
+            </span>
+          </span>
+          <span class="radio" aria-hidden="true"></span>
+        </button>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <button class="btn primary" id="continue" type="button" disabled>Continue</button>
+      <div class="alt">Not sure? Start with your orders. <a href="#" id="later">Set up a shop later</a></div>
+    </footer>
+  </div>
+
+  <div class="sheet-bg" id="sheet-bg"></div>
+  <section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title">
+    <div class="grab"></div>
+    <h3 id="sheet-title">Which one should I pick?</h3>
+    <dl>
+      <div><dt>Track my orders</dt><dd>You drop things off or book a service, and want to know when it's done. Shops reach you by your phone number.</dd></div>
+      <div><dt>Run my shop</dt><dd>You run a laundry, tailor, repair shop or on-site service and want to update clients without calls. You'll add your shop's name, category and address next.</dd></div>
+      <div><dt>Both?</dt><dd>It's one app and one account. Shop owners still get their own orders from other shops. Switch between the two from Profile.</dd></div>
+    </dl>
+    <button class="btn secondary" type="button" id="close-sheet">Got it</button>
+  </section>
+
+  <script src="../kit.js"></script>
+  <script>
+    const cards = document.querySelectorAll(".role");
+    const cta = document.getElementById("continue");
+    let role = null;
+
+    function pick(r) {
+      role = r;
+      cards.forEach((c) => c.setAttribute("aria-checked", String(c.dataset.role === r)));
+      cta.disabled = false;
+      cta.innerHTML = `${r === "vendor" ? "Set up my shop" : "See my orders"} <svg class="i" data-icon="arrow"></svg>`;
+      PM.hydrateIcons(cta);
+    }
+    cards.forEach((c) => c.addEventListener("click", () => pick(c.dataset.role)));
+    // Customer mode needs nothing more; Vendor mode first needs a shop.
+    cta.addEventListener("click", () => {
+      if (role === "vendor") { PM.store.set("shopFrom", "AUTH-06"); return PM.go("AUTH-07"); }
+      PM.store.set("role", "customer");
+      PM.go("CHOME-01");
+    });
+    document.getElementById("later").addEventListener("click", (e) => { e.preventDefault(); PM.store.set("role", "customer"); PM.go("CHOME-01"); });
+
+    const toggle = (on) => document.body.classList.toggle("open", on);
+    document.getElementById("help").addEventListener("click", () => toggle(true));
+    document.getElementById("close-sheet").addEventListener("click", () => toggle(false));
+    document.getElementById("sheet-bg").addEventListener("click", () => toggle(false));
+  </script>
+</body>
+</html>

@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Shop · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .head { display: flex; align-items: center; gap: 10px; padding: 14px var(--gutter) 0; }
+    .head h1 { flex: 1; min-width: 0; margin: 0; font-size: 26px; letter-spacing: -0.025em; }
+    .save { width: auto; height: 40px; padding: 0 16px; font-size: 14.5px; }
+
+    .brand { position: relative; margin-top: 14px; border-radius: var(--r-lg); overflow: hidden; background: var(--surface); border: 1px solid var(--line-2); box-shadow: var(--shadow-sm); }
+    .cover { position: relative; height: 112px; background: linear-gradient(135deg, #13a4ba, var(--brand-700) 60%, #0f3d47); }
+    .cover::after { content: ""; position: absolute; inset: 0; background: radial-gradient(60% 90% at 85% 10%, rgba(127, 240, 198, 0.35), transparent 70%); }
+    .cover .chg { position: absolute; right: 10px; top: 10px; z-index: 1; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border: 0; border-radius: 999px; background: rgba(15, 23, 42, 0.45); color: #fff; font-size: 12.5px; font-weight: 600; backdrop-filter: blur(6px); }
+    .cover .chg svg.i { width: 15px; height: 15px; }
+    .logo-row { display: flex; align-items: flex-start; gap: 12px; padding: 0 16px 14px; margin-top: -34px; position: relative; z-index: 1; }
+    .logo { position: relative; width: 72px; height: 72px; border-radius: 22px; display: grid; place-items: center; background: #fff; color: var(--brand-700); box-shadow: 0 0 0 4px #fff, var(--shadow); flex: none; }
+    .logo svg.i { width: 34px; height: 34px; }
+    .logo button { position: absolute; right: -6px; bottom: -6px; width: 28px; height: 28px; border-radius: 50%; border: 0; padding: 0; display: grid; place-items: center; background: var(--ink); color: #fff; box-shadow: 0 0 0 3px #fff; }
+    .logo button svg.i { width: 14px; height: 14px; }
+    .logo-row .grow { flex: 1; min-width: 0; padding-top: 42px; }
+    .logo-row b { display: block; font-size: 16px; }
+    .logo-row .meta { display: flex; align-items: center; gap: 4px; }
+    .logo-row .meta svg.i { width: 13px; height: 13px; fill: #f59e0b; stroke: none; }
+    .preview-link { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; flex: none; padding-top: 52px; }
+    .preview-link svg.i { width: 15px; height: 15px; }
+
+    .card .field:first-child { margin-top: 0; }
+    .map { position: relative; height: 110px; margin-top: 10px; border-radius: var(--r); overflow: hidden; background: #e8f1f3; }
+    .map svg.bg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .map .pin { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -100%); color: var(--brand-700); }
+    .map .pin svg.i { width: 34px; height: 34px; fill: #fff; stroke-width: 2.2; }
+    .map button { position: absolute; right: 8px; bottom: 8px; height: 30px; padding: 0 10px; border-radius: 999px; border: 0; background: #fff; box-shadow: var(--shadow-sm); font-size: 12.5px; font-weight: 600; color: var(--brand-700); }
+
+    .hours .day { display: grid; grid-template-columns: 44px minmax(0, 1fr) auto; align-items: center; gap: 10px; min-height: 52px; padding: 6px 14px; }
+    .hours .day b { font-size: 14px; }
+    .hours .times { display: flex; align-items: center; gap: 4px; min-width: 0; font-size: 13px; color: var(--ink-3); }
+    .hours .times input { min-width: 0; width: 100%; max-width: 104px; height: 34px; border: 1px solid var(--line); border-radius: 9px; padding: 0 6px; font-size: 13px; background: var(--surface); color: var(--ink); }
+    .hours .times input { text-align: center; padding: 0 4px; font-variant-numeric: tabular-nums; }
+    .hours .times input::-webkit-calendar-picker-indicator { display: none; }
+    .hours .closed { font-size: 13.5px; color: var(--ink-3); }
+    .copy { display: block; width: fit-content; margin: 8px 0 0 auto; font-size: 13px; }
+
+    .svc { display: grid; grid-template-columns: minmax(0, 1fr) 96px 32px; align-items: center; gap: 8px; padding: 8px 10px 8px 14px; }
+    .svc input { min-width: 0; width: 100%; height: 38px; border: 1px solid transparent; border-radius: 9px; padding: 0 8px; font-size: 14.5px; background: transparent; }
+    .svc input:focus { border-color: var(--brand); outline: 0; background: #fff; }
+    .svc .price { display: flex; align-items: center; border: 1px solid var(--line); border-radius: 9px; padding-left: 8px; font-size: 13px; color: var(--ink-3); }
+    .svc .price input { border: 0; padding-left: 4px; text-align: right; font-weight: 600; color: var(--ink); }
+    .svc .rm { width: 32px; height: 32px; border: 0; border-radius: 9px; background: none; color: var(--ink-3); display: grid; place-items: center; }
+    .svc .rm:hover { color: var(--danger); background: var(--danger-50); }
+    .svc .rm svg.i { width: 17px; height: 17px; }
+    .add-svc { color: var(--brand-700); font-weight: 600; }
+    @media (max-width: 360px) {
+      .svc { grid-template-columns: minmax(0, 1fr) 84px 28px; padding-left: 8px; }
+      .hours .day { grid-template-columns: 38px minmax(0, 1fr) auto; gap: 6px; padding: 6px 10px; }
+      .preview-link span { display: none; }
+    }
+  </style>
+</head>
+<body class="canvas" data-mode="vendor">
+  <div class="page tabbed">
+    <header class="head">
+      <h1>Shop</h1>
+      <button class="btn primary save" type="button" id="save" disabled>Save</button>
+    </header>
+
+    <main class="content">
+      <section class="brand rise">
+        <div class="cover"><button class="chg" type="button" data-photo="cover"><svg class="i" data-icon="camera"></svg>Cover</button></div>
+        <div class="logo-row">
+          <span class="logo"><svg class="i" data-icon="shirt"></svg><button type="button" aria-label="Change logo" data-photo="logo"><svg class="i" data-icon="camera"></svg></button></span>
+          <div class="grow"><b class="ellipsis" id="name-view"></b><span class="meta"><svg class="i" data-icon="star"></svg><span id="rating"></span></span></div>
+          <a href="#" class="preview-link" data-go="SHOP-01"><svg class="i" data-icon="eye"></svg><span>Preview</span></a>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>About</h2></div>
+        <div class="card">
+          <div class="field" id="f-name">
+            <label class="label" for="name">Shop name</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="store"></svg><input id="name" maxlength="40" /></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Your shop needs a name.</div>
+          </div>
+          <div class="field">
+            <span class="label">Category</span>
+            <div class="chips" id="cats" style="margin-top: 8px"></div>
+          </div>
+          <div class="field">
+            <div class="field-head"><label class="label" for="desc">Description</label><span class="meta" id="desc-n"></span></div>
+            <div class="control area"><textarea id="desc" maxlength="200"></textarea></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Location</h2></div>
+        <div class="card">
+          <div class="field">
+            <label class="label" for="addr">Address</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="pin"></svg><input id="addr" /></div>
+          </div>
+          <div class="map" aria-label="Map preview">
+            <svg class="bg" viewBox="0 0 320 110" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <path d="M0 70 C80 60 120 90 200 72 S300 40 320 52" stroke="#fff" stroke-width="10" fill="none"/>
+              <path d="M140 0 L170 110 M40 0 L70 110 M250 0 L230 110" stroke="#fff" stroke-width="6" fill="none"/>
+              <rect x="190" y="12" width="40" height="28" rx="4" fill="#d3e8cf"/><rect x="80" y="80" width="46" height="24" rx="4" fill="#d3e8cf"/>
+            </svg>
+            <span class="pin"><svg class="i" data-icon="pin"></svg></span>
+            <button type="button" id="pin">Adjust pin</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Opening hours</h2></div>
+        <div class="list hours" id="hours"></div>
+        <a href="#" class="copy" id="copy">Copy Monday to all weekdays</a>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Services &amp; default prices</h2></div>
+        <div class="list" id="svcs"></div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Settings</h2></div>
+        <div class="list">
+          <a class="item" href="#" data-go="VSHOP-02"><span class="ii"><svg class="i" data-icon="message"></svg></span><span class="grow">Customer messaging<small>Auto-messages, quick replies, SMS fallback</small></span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#" data-go="VSHOP-03"><span class="ii"><svg class="i" data-icon="user"></svg></span><span class="grow">Staff &amp; technicians<small>3 people</small></span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#" data-go="NOTI-02"><span class="ii"><svg class="i" data-icon="bell"></svg></span><span class="grow">Notification preferences</span><svg class="i" data-icon="chevron"></svg></a>
+          <a class="item" href="#" data-go="ACCT-01"><span class="ii"><svg class="i" data-icon="swap"></svg></span><span class="grow">Account &amp; switch to Customer</span><svg class="i" data-icon="chevron"></svg></a>
+        </div>
+      </section>
+    </main>
+
+    <nav class="tabbar" data-tabbar="shop"></nav>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const $ = (id) => document.getElementById(id);
+    const shop = V.shop;
+    let dirty = false;
+    const cats = ["Laundry", "Dry cleaning", "Tailoring", "Shoe & bag repair", "Phone repair", "HVAC"];
+    let picked = new Set(["Laundry", "Dry cleaning", "Tailoring", "Shoe & bag repair"]);
+    const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+    const hours = days.map((d, i) => ({ d, open: i < 6, from: i === 5 ? "10:00" : "09:00", to: i === 5 ? "18:00" : "21:00" }));
+    const services = [["Wash & press (per kg)", 7], ["Dry clean (per piece)", 12], ["Duvet / comforter", 35], ["Trouser hemming", 12], ["Suit alteration", 45], ["Heel repair (pair)", 25]];
+
+    $("name").value = shop.name;
+    $("addr").value = shop.address;
+    $("desc").value = "Family-run laundry in SS2 since 2014. Same-day wash & press, careful dry cleaning, alterations and shoe repair. We ping you the moment it's ready.";
+    $("rating").textContent = `${shop.rating} · ${shop.reviews} reviews`;
+
+    function mark() { dirty = true; $("save").disabled = false; }
+    function sync() {
+      $("name-view").textContent = $("name").value.trim() || "Your shop";
+      $("desc-n").textContent = `${$("desc").value.length}/200`;
+    }
+
+    function renderCats() {
+      $("cats").innerHTML = cats.map((c) => `<button type="button" class="chip" data-c="${c}" aria-pressed="${picked.has(c)}">${c}</button>`).join("");
+    }
+    function renderHours() {
+      $("hours").innerHTML = hours.map((h, i) => `
+        <div class="day">
+          <b>${h.d}</b>
+          ${h.open ? `<span class="times"><input type="time" value="${h.from}" data-h="${i}" data-k="from" aria-label="${h.d} opens" />–<input type="time" value="${h.to}" data-h="${i}" data-k="to" aria-label="${h.d} closes" /></span>` : `<span class="closed">Closed</span>`}
+          <label class="switch"><input type="checkbox" data-open="${i}"${h.open ? " checked" : ""} aria-label="Open on ${h.d}" /><span></span></label>
+        </div>`).join("");
+    }
+    function renderSvcs() {
+      $("svcs").innerHTML = services.map(([n, p], i) => `
+        <div class="svc">
+          <input value="${V.esc(n)}" data-s="${i}" data-k="0" aria-label="Service name" />
+          <label class="price">RM<input inputmode="decimal" value="${p.toFixed(2)}" data-s="${i}" data-k="1" aria-label="Default price for ${V.esc(n)}" /></label>
+          <button class="rm" type="button" aria-label="Remove ${V.esc(n)}" data-rm="${i}"><svg class="i" data-icon="trash"></svg></button>
+        </div>`).join("") + `<button class="item add-svc" type="button" id="add-svc"><span class="ii" style="background: var(--brand-50); color: var(--brand-700)"><svg class="i" data-icon="plus"></svg></span>Add a service</button>`;
+      PM.hydrateIcons($("svcs"));
+    }
+
+    ["name", "desc", "addr"].forEach((id) => $(id).addEventListener("input", () => { mark(); sync(); $("f-name").classList.remove("invalid"); }));
+    $("cats").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-c]");
+      if (!b) return;
+      const c = b.dataset.c;
+      if (picked.has(c) && picked.size === 1) return PM.toast("Keep at least one category");
+      picked.has(c) ? picked.delete(c) : picked.add(c);
+      mark();
+      renderCats();
+    });
+    $("hours").addEventListener("change", (e) => {
+      const t = e.target;
+      if (t.dataset.open) { hours[t.dataset.open].open = t.checked; renderHours(); }
+      else if (t.dataset.h) hours[t.dataset.h][t.dataset.k] = t.value;
+      mark();
+    });
+    $("copy").addEventListener("click", (e) => {
+      e.preventDefault();
+      for (let i = 1; i < 5; i++) Object.assign(hours[i], { open: hours[0].open, from: hours[0].from, to: hours[0].to });
+      renderHours();
+      mark();
+      PM.toast("Monday's hours copied to Tue – Fri");
+    });
+    $("svcs").addEventListener("input", (e) => {
+      const t = e.target;
+      if (t.dataset.s == null) return;
+      services[t.dataset.s][t.dataset.k] = t.dataset.k === "1" ? parseFloat(t.value) || 0 : t.value;
+      mark();
+    });
+    $("svcs").addEventListener("click", (e) => {
+      const rm = e.target.closest("[data-rm]");
+      if (rm) { services.splice(Number(rm.dataset.rm), 1); renderSvcs(); mark(); return; }
+      if (e.target.closest("#add-svc")) {
+        services.push(["", 0]);
+        renderSvcs();
+        mark();
+        $("svcs").querySelector(`[data-s="${services.length - 1}"][data-k="0"]`).focus();
+      }
+    });
+    document.querySelectorAll("[data-photo]").forEach((b) => b.addEventListener("click", () => { mark(); PM.toast(b.dataset.photo === "logo" ? "Choose a square logo, at least 400 px" : "Choose a wide cover photo"); }));
+    $("pin").addEventListener("click", () => PM.toast("Drag the map to move the pin"));
+
+    $("save").addEventListener("click", () => {
+      if (!$("name").value.trim()) { $("f-name").classList.add("invalid"); $("f-name").scrollIntoView({ behavior: "smooth", block: "center" }); return PM.shake($("f-name")); }
+      dirty = false;
+      $("save").disabled = true;
+      PM.toast("Saved. Customers see it on your profile now");
+    });
+
+    sync();
+    renderCats();
+    renderHours();
+    renderSvcs();
+    PM.hydrateIcons();
+  </script>
+</body>
+</html>

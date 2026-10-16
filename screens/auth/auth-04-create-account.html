@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Create Account · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <style>
+    .meter { display: flex; gap: 4px; margin-top: 8px; }
+    .meter span { flex: 1; height: 4px; border-radius: 4px; background: var(--line); transition: background 0.2s; }
+    .meter-label { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+    .terms { margin-top: 20px; }
+    .alert.info { margin-top: 20px; }
+    .switch { margin-top: 12px; text-align: center; font-size: 14px; color: var(--ink-2); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="AUTH-02"><svg class="i" data-icon="back"></svg></button>
+      <div class="steps" style="width: 120px" aria-label="Step 1 of 3"><span class="on"></span><span></span><span></span></div>
+      <span style="width: 40px"></span>
+    </header>
+
+    <main class="content">
+      <div class="rise">
+        <div class="eyebrow">Get started</div>
+        <h1 class="h1" style="margin-top: 8px">Create your account</h1>
+        <p class="lead">One account follows your orders and, if you run a shop, manages it too. We'll verify your phone next.</p>
+      </div>
+
+      <div class="social" style="margin-top: 22px">
+        <button class="btn secondary" type="button" data-brand="google">Google</button>
+        <button class="btn secondary" type="button" data-brand="apple">Apple</button>
+      </div>
+      <div class="divider" style="margin-top: 20px; margin-bottom: 0">or with email</div>
+
+      <form id="form" novalidate>
+        <div class="field" data-rule="name">
+          <label class="label" for="name">Full name</label>
+          <div class="control" style="margin-top: 6px">
+            <svg class="i" data-icon="user"></svg>
+            <input id="name" autocomplete="name" placeholder="Nur Aisyah Rahman" />
+            <svg class="i ok" data-icon="check"></svg>
+          </div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter your name as shops and clients should see it.</div>
+        </div>
+
+        <div class="field" data-rule="email">
+          <label class="label" for="email">Email</label>
+          <div class="control" style="margin-top: 6px">
+            <svg class="i" data-icon="mail"></svg>
+            <input id="email" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com" />
+            <svg class="i ok" data-icon="check"></svg>
+          </div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>That email doesn't look right.</div>
+        </div>
+
+        <div class="field" data-rule="phone">
+          <label class="label" for="phone">Phone number</label>
+          <div class="control" style="margin-top: 6px">
+            <span class="prefix">🇲🇾 +60</span>
+            <input id="phone" type="tel" inputmode="tel" autocomplete="tel-national" placeholder="12-345 6789" />
+            <svg class="i ok" data-icon="check"></svg>
+          </div>
+          <div class="hint">Orders a shop already made for this number will show up in your account.</div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Enter a Malaysian mobile number, e.g. 12-345 6789.</div>
+        </div>
+
+        <div class="field" data-rule="password">
+          <label class="label" for="pw">Password</label>
+          <div class="control" style="margin-top: 6px">
+            <svg class="i" data-icon="lock"></svg>
+            <input id="pw" type="password" autocomplete="new-password" placeholder="At least 8 characters" />
+            <button class="peek" type="button" data-peek aria-label="Show password"><svg class="i" data-icon="eye"></svg></button>
+          </div>
+          <div class="meter" aria-hidden="true"><span></span><span></span><span></span><span></span></div>
+          <div class="meter-label" id="meter-label">Use 8+ characters with a number.</div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Use at least 8 characters, including a number.</div>
+        </div>
+
+        <div class="field" data-rule="confirm">
+          <label class="label" for="pw2">Confirm password</label>
+          <div class="control" style="margin-top: 6px">
+            <svg class="i" data-icon="lock"></svg>
+            <input id="pw2" type="password" autocomplete="new-password" placeholder="Type it again" />
+            <svg class="i ok" data-icon="check"></svg>
+          </div>
+          <div class="error"><svg class="i" data-icon="alert"></svg>Passwords don't match.</div>
+        </div>
+
+        <label class="check terms">
+          <input type="checkbox" id="terms" />
+          <span>I agree to PingMe's <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</span>
+        </label>
+      </form>
+    </main>
+
+    <footer class="foot">
+      <button class="btn primary" id="submit" type="submit" form="form" disabled>Create Account</button>
+      <div class="switch">Already have an account? <a href="#" data-go="AUTH-03">Sign in</a></div>
+    </footer>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const strength = (v) => [v.length >= 8, /\d/.test(v), /[A-Z]/.test(v) && /[a-z]/.test(v), /[^A-Za-z0-9]/.test(v) || v.length >= 12].filter(Boolean).length;
+    const rules = {
+      name: () => $("name").value.trim().length >= 2,
+      email: () => PM.emailRe.test($("email").value.trim()),
+      phone: () => /^1\d[\s-]?\d{3,4}[\s-]?\d{4}$/.test($("phone").value.trim()),
+      password: () => $("pw").value.length >= 8 && /\d/.test($("pw").value),
+      confirm: () => $("pw2").value.length > 0 && $("pw2").value === $("pw").value,
+    };
+    const fields = [...document.querySelectorAll("[data-rule]")];
+    const touched = new Set();
+
+    function paintMeter() {
+      const s = $("pw").value ? strength($("pw").value) : 0;
+      const colors = ["#ef4444", "#f59e0b", "#0e8fa3", "#059669"];
+      document.querySelectorAll(".meter span").forEach((b, i) => (b.style.background = i < s ? colors[s - 1] : ""));
+      $("meter-label").textContent = !$("pw").value ? "Use 8+ characters with a number." : ["Weak", "Weak", "Okay", "Good", "Strong"][s] + " password";
+    }
+
+    function validate() {
+      let all = true;
+      for (const f of fields) {
+        const ok = rules[f.dataset.rule]();
+        all = all && ok;
+        f.classList.toggle("valid", ok);
+        f.classList.toggle("invalid", !ok && touched.has(f.dataset.rule));
+      }
+      // Create Account stays disabled until every field is valid and terms are ticked.
+      $("submit").disabled = !(all && $("terms").checked);
+    }
+
+    fields.forEach((f) => {
+      const input = f.querySelector("input");
+      input.addEventListener("blur", () => { if (input.value) touched.add(f.dataset.rule); validate(); });
+      input.addEventListener("input", () => { if (f.classList.contains("invalid")) touched.add(f.dataset.rule); paintMeter(); validate(); });
+    });
+    $("terms").addEventListener("change", validate);
+
+    $("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const btn = $("submit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Creating account';
+      // A new account starts without a shop; the mode is chosen after verifying.
+      PM.store.set("role", "customer");
+      PM.store.set("hasShop", "0");
+      PM.store.set("phone", "+60 " + $("phone").value.trim());
+      PM.store.set("verifyFor", "signup");
+      setTimeout(() => PM.go("AUTH-05"), 800);
+    });
+  </script>
+</body>
+</html>

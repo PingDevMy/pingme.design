@@ -1,0 +1,145 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Order History · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .tools { position: sticky; top: 56px; z-index: 4; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter) 12px; background: var(--canvas); }
+    .chips { flex-wrap: nowrap; overflow-x: auto; margin: 12px calc(-1 * var(--gutter)) 0; padding: 0 var(--gutter); scrollbar-width: none; }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip { flex: none; }
+    .summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 4px; }
+    .summary .card { padding: 14px; }
+    .summary small { display: block; font-size: 12px; font-weight: 600; color: var(--ink-3); }
+    .summary b { font-size: 20px; letter-spacing: -0.02em; }
+    .month { margin: 22px 0 10px; font-size: 13px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-2); display: flex; justify-content: space-between; gap: 8px; }
+    .month span { color: var(--ink-3); font-weight: 600; letter-spacing: 0; text-transform: none; }
+    .rows { background: var(--surface); border: 1px solid var(--line-2); border-radius: var(--r-lg); overflow: hidden; }
+    .h-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; width: 100%; background: none; border: 0; text-align: left; color: inherit; font-weight: inherit; }
+    .h-row + .h-row { border-top: 1px solid var(--line-2); }
+    .h-row:hover { background: var(--canvas); }
+    .h-row .grow { flex: 1; min-width: 0; }
+    .h-row b { display: block; font-size: 15px; }
+    .h-row .side { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+    .h-row .amt { font-weight: 700; font-size: 14px; font-variant-numeric: tabular-nums; }
+    .h-row .amt.void { color: var(--ink-3); text-decoration: line-through; font-weight: 600; }
+    .rate-btn { display: inline-flex; align-items: center; gap: 4px; height: 26px; padding: 0 10px; border-radius: 999px; border: 0; background: #fffbeb; color: #b45309; font-size: 12px; font-weight: 700; }
+    .rate-btn svg.i { width: 13px; height: 13px; fill: currentColor; stroke: none; }
+    .rated { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; color: var(--ink-3); }
+    .rated .stars svg.i { width: 12px; height: 12px; }
+    mark { background: #fef9c3; color: inherit; border-radius: 3px; }
+  </style>
+</head>
+<body class="canvas" data-mode="customer">
+  <div class="page tabbed">
+    <header class="appbar sticky">
+      <span class="spacer"></span>
+      <div class="title">Orders</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <div class="tools">
+        <label class="control search">
+          <svg class="i" data-icon="search"></svg>
+          <input id="q" type="search" placeholder="Search shop or order number" autocomplete="off" aria-label="Search orders" />
+        </label>
+        <div class="chips" role="group" aria-label="Filter">
+          <button class="chip" type="button" aria-pressed="true" data-f="all">All</button>
+          <button class="chip" type="button" aria-pressed="false" data-f="rate"><svg class="i" data-icon="star"></svg>To rate</button>
+          <button class="chip" type="button" aria-pressed="false" data-f="completed">Completed</button>
+          <button class="chip" type="button" aria-pressed="false" data-f="cancelled">Cancelled</button>
+        </div>
+      </div>
+
+      <div class="summary grid">
+        <div class="card"><small>Orders this year</small><b id="s-count">0</b></div>
+        <div class="card"><small>Spent this year</small><b id="s-spent">RM 0</b></div>
+      </div>
+
+      <div id="list"></div>
+    </main>
+    <nav class="tabbar" data-tabbar="orders"></nav>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    const past = D.orders.filter((o) => !D.active(o));
+    let filter = "all";
+
+    const done = past.filter((o) => o.status === "completed");
+    $("s-count").textContent = past.length;
+    $("s-spent").textContent = D.money(done.reduce((a, o) => a + o.amount, 0)).replace(".00", "");
+
+    const esc = (t) => t.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
+    function hi(text, q) {
+      if (!q) return esc(text);
+      const i = text.toLowerCase().indexOf(q.toLowerCase());
+      return i < 0 ? esc(text) : esc(text.slice(0, i)) + "<mark>" + esc(text.slice(i, i + q.length)) + "</mark>" + esc(text.slice(i + q.length));
+    }
+
+    function row(o, q) {
+      const s = D.shops[o.shop];
+      const side =
+        o.status === "cancelled" ? D.pill(o)
+        : !o.rated ? `<span class="rate-btn" data-rate="${o.id}"><svg class="i" data-icon="star"></svg>Rate</span>`
+        : `<span class="rated">${D.stars(o.rated)}</span>`;
+      return `
+        <button class="h-row" type="button" data-id="${o.id}">
+          ${D.tile(s)}
+          <span class="grow">
+            <b class="ellipsis">${hi(s.name, q)}</b>
+            <span class="meta ellipsis" style="display: block">${esc(o.service)} · ${hi(o.id, q)} · ${o.updated}</span>
+          </span>
+          <span class="side"><span class="amt${o.status === "cancelled" ? " void" : ""}">${D.money(o.amount)}</span>${side}</span>
+        </button>`;
+    }
+
+    function render() {
+      const q = $("q").value.trim();
+      const items = past.filter((o) => {
+        const s = D.shops[o.shop];
+        if (q && !(s.name + " " + o.id).toLowerCase().includes(q.toLowerCase())) return false;
+        if (filter === "rate") return o.status === "completed" && !o.rated;
+        if (filter === "all") return true;
+        return o.status === filter;
+      });
+      if (!items.length) {
+        $("list").innerHTML = `<div class="empty"><span class="badge-icon ring"><svg class="i" data-icon="search"></svg></span><h3>No orders found</h3><p>${q ? `Nothing matches “${esc(q)}”. Try a shop name or an order number like ORD-0712.` : "Nothing here yet."}</p></div>`;
+      } else {
+        const months = [...new Set(items.map((o) => o.month))];
+        $("list").innerHTML = months.map((m) => {
+          const inMonth = items.filter((o) => o.month === m);
+          const total = inMonth.filter((o) => o.status === "completed").reduce((a, o) => a + o.amount, 0);
+          return `<div class="month">${m}<span>${D.money(total)}</span></div><div class="rows">${inMonth.map((o) => row(o, q)).join("")}</div>`;
+        }).join("");
+      }
+      PM.hydrateIcons($("list"));
+    }
+
+    $("q").addEventListener("input", render);
+    document.querySelectorAll("[data-f]").forEach((c) => c.addEventListener("click", () => {
+      filter = c.dataset.f;
+      document.querySelectorAll("[data-f]").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+      render();
+    }));
+    $("list").addEventListener("click", (e) => {
+      const r = e.target.closest("[data-rate]");
+      const row = e.target.closest("[data-id]");
+      if (!row) return;
+      PM.store.set("order", row.dataset.id);
+      if (r) return PM.go("CTRK-04");
+      PM.go("CTRK-01");
+    });
+
+    render();
+  </script>
+</body>
+</html>

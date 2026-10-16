@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Set Up Your Shop · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <style>
+    .role-chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px 4px 6px; border-radius: 999px; background: var(--brand-50); color: var(--brand-700); font-size: 12.5px; font-weight: 600; }
+    .role-chip svg.i { width: 16px; height: 16px; }
+    .section { margin-top: 26px; padding-top: 20px; border-top: 1px solid var(--line-2); }
+    .section-head { display: flex; align-items: baseline; justify-content: space-between; }
+    .section-head h2 { margin: 0; font-size: 16px; }
+    .later { font-size: 12px; font-weight: 600; color: var(--ink-3); background: var(--canvas); border-radius: 999px; padding: 2px 9px; }
+    .chips { margin-top: 8px; }
+    .logo-up { display: flex; gap: 14px; align-items: center; margin-top: 12px; }
+    .logo-box {
+      width: 72px; height: 72px; border-radius: 20px; border: 1.5px dashed var(--ink-3); background: var(--canvas);
+      display: grid; place-items: center; color: var(--ink-3); flex: none; overflow: hidden; font-size: 26px; font-weight: 700;
+    }
+    .logo-box.set { border: 0; background: linear-gradient(145deg, #13a4ba, var(--brand-700)); color: #fff; }
+    .logo-up p { margin: 4px 0 0; font-size: 12.5px; color: var(--ink-2); }
+    .logo-up .btn { height: 38px; width: auto; padding: 0 14px; font-size: 14px; border-radius: 11px; }
+    .days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-top: 8px; }
+    .days .chip { justify-content: center; padding: 7px 0; font-size: 13px; }
+    .hours { display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 10px; align-items: center; margin-top: 12px; }
+    .hours .control { height: 48px; }
+    .hours span { color: var(--ink-3); font-size: 13px; }
+    .summary { display: flex; gap: 12px; align-items: center; padding: 12px; border-radius: var(--r); background: var(--canvas); margin-top: 18px; }
+    .summary .avatar { width: 40px; height: 40px; border-radius: 12px; background: var(--brand-50); color: var(--brand-700); display: grid; place-items: center; }
+    .summary b { display: block; font-size: 14px; }
+    .summary small { color: var(--ink-2); font-size: 12.5px; }
+    .summary a { margin-left: auto; font-size: 13px; }
+    .terms { margin-top: 20px; }
+    /* Shop ready */
+    .done { position: fixed; inset: 0; background: #fff; display: flex; flex-direction: column; padding: 0 var(--gutter) calc(var(--safe-bottom) + 8px); opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 5; }
+    .done.on { opacity: 1; pointer-events: auto; }
+    .done .body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .done .h1 { margin-top: 22px; }
+    .next { width: 100%; margin-top: 24px; border: 1px solid var(--line); border-radius: var(--r-lg); text-align: left; overflow: hidden; }
+    .next header { padding: 12px 14px; background: var(--brand-50); color: var(--brand-700); font-size: 13.5px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+    .next header svg.i { width: 18px; height: 18px; }
+    .next ul { margin: 0; padding: 0; list-style: none; }
+    .next li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--line-2); }
+    .next .av { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; flex: none; }
+    .next .av svg.i { width: 18px; height: 18px; }
+    .next b { display: block; font-size: 14px; }
+    .next small { font-size: 12.5px; color: var(--ink-2); }
+    .switch { margin-top: 12px; text-align: center; font-size: 14px; color: var(--ink-2); }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Set up your shop</div>
+      <span style="width: 40px"></span>
+    </header>
+
+    <main class="content">
+      <form id="form" novalidate>
+        <section aria-labelledby="t2">
+          <span class="role-chip"><svg class="i" data-icon="store"></svg>Adds Vendor mode to your account</span>
+          <h1 class="h1" id="t2" style="margin-top: 12px">Tell clients about your shop</h1>
+          <p class="lead">Just the basics so you can start taking orders. Your name, phone and sign-in stay the same; finish the rest in the Shop tab.</p>
+
+          <div class="field" data-rule="shop">
+            <label class="label" for="shop">Shop name</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="store"></svg><input id="shop" autocomplete="organization" placeholder="Bright Laundry" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter your shop name.</div>
+          </div>
+
+          <div class="field" data-rule="category">
+            <span class="label" id="cat-label">Service category</span>
+            <div class="chips" id="cats" role="radiogroup" aria-labelledby="cat-label">
+              <button type="button" class="chip" data-v="Laundry" aria-pressed="false"><svg class="i" data-icon="shirt"></svg>Laundry</button>
+              <button type="button" class="chip" data-v="Tailoring" aria-pressed="false"><svg class="i" data-icon="scissors"></svg>Tailoring</button>
+              <button type="button" class="chip" data-v="Repair" aria-pressed="false"><svg class="i" data-icon="wrench"></svg>Repair</button>
+              <button type="button" class="chip" data-v="Cleaning" aria-pressed="false"><svg class="i" data-icon="sparkle"></svg>Cleaning</button>
+              <button type="button" class="chip" data-v="HVAC" aria-pressed="false"><svg class="i" data-icon="snow"></svg>HVAC</button>
+              <button type="button" class="chip" data-v="Other" aria-pressed="false"><svg class="i" data-icon="dots"></svg>Other</button>
+            </div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Pick the closest match.</div>
+          </div>
+
+          <div class="field" data-rule="address">
+            <label class="label" for="address">Shop address</label>
+            <div class="control" style="margin-top: 6px"><svg class="i" data-icon="pin"></svg><input id="address" autocomplete="street-address" placeholder="12, Jalan SS 2/24, Petaling Jaya" /><svg class="i ok" data-icon="check"></svg></div>
+            <div class="error"><svg class="i" data-icon="alert"></svg>Enter where clients drop off or where you're based.</div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2>Opening hours</h2><span class="later">Optional</span></div>
+            <div class="days" id="days" role="group" aria-label="Open days">
+              <button type="button" class="chip" aria-pressed="true">M</button><button type="button" class="chip" aria-pressed="true">T</button>
+              <button type="button" class="chip" aria-pressed="true">W</button><button type="button" class="chip" aria-pressed="true">T</button>
+              <button type="button" class="chip" aria-pressed="true">F</button><button type="button" class="chip" aria-pressed="true">S</button>
+              <button type="button" class="chip" aria-pressed="false">S</button>
+            </div>
+            <div class="hours">
+              <div class="control"><input type="time" value="09:00" aria-label="Opens at" /></div>
+              <span>to</span>
+              <div class="control"><input type="time" value="19:00" aria-label="Closes at" /></div>
+            </div>
+          </div>
+
+          <div class="section">
+            <div class="section-head"><h2>Shop logo</h2><span class="later">Optional · add later</span></div>
+            <div class="logo-up">
+              <div class="logo-box" id="logo-box"><svg class="i" data-icon="image"></svg></div>
+              <div>
+                <button type="button" class="btn secondary" id="logo-btn"><svg class="i" data-icon="upload"></svg>Upload logo</button>
+                <p>Square image, at least 400 × 400.</p>
+              </div>
+            </div>
+          </div>
+
+          <label class="check terms">
+            <input type="checkbox" id="terms" />
+            <span>I agree to PingMe's <a href="#">Vendor Terms</a>.</span>
+          </label>
+        </section>
+      </form>
+    </main>
+
+    <footer class="foot">
+      <button class="btn primary" id="submit" type="button" disabled>Create my shop <svg class="i" data-icon="arrow"></svg></button>
+    </footer>
+  </div>
+
+  <!-- Shop ready -->
+  <section class="done" id="done" aria-live="polite">
+    <div class="body">
+      <div class="badge-icon ring"><svg class="i" data-icon="store"></svg></div>
+      <h1 class="h1" id="done-title">Your shop is ready</h1>
+      <p class="lead">Create your first order and your client gets a ping straight away.</p>
+      <div class="next">
+        <header><svg class="i" data-icon="sparkle"></svg>Next steps</header>
+        <ul>
+          <li><span class="av" style="background:var(--brand-50);color:var(--brand-700)"><svg class="i" data-icon="package"></svg></span><div><b>Create your first order</b><small>Takes under a minute</small></div></li>
+          <li><span class="av" style="background:#fef3c7;color:#b45309"><svg class="i" data-icon="image"></svg></span><div><b>Finish your shop profile</b><small>Logo, hours and services in the Shop tab</small></div></li>
+          <li><span class="av" style="background:#f1f5f9;color:var(--ink-2)"><svg class="i" data-icon="swap"></svg></span><div><b>Your own orders stay here too</b><small>Switch to Customer mode from Profile</small></div></li>
+        </ul>
+      </div>
+    </div>
+    <button class="btn primary" type="button" id="go-shop">Go to my shop <svg class="i" data-icon="arrow"></svg></button>
+  </section>
+
+  <script src="../kit.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    let category = null;
+    const touched = new Set();
+    const rules = {
+      shop: () => $("shop").value.trim().length >= 2,
+      category: () => !!category,
+      address: () => $("address").value.trim().length >= 6,
+    };
+
+    function validate() {
+      let all = true;
+      for (const f of document.querySelectorAll("[data-rule]")) {
+        const ok = rules[f.dataset.rule]();
+        all = all && ok;
+        f.classList.toggle("valid", ok);
+        f.classList.toggle("invalid", !ok && touched.has(f.dataset.rule));
+      }
+      $("submit").disabled = !(all && $("terms").checked);
+    }
+
+    document.querySelectorAll("[data-rule] input").forEach((input) => {
+      const rule = input.closest("[data-rule]").dataset.rule;
+      input.addEventListener("blur", () => { if (input.value) touched.add(rule); validate(); });
+      input.addEventListener("input", () => { if (input.closest(".invalid")) touched.add(rule); validate(); });
+    });
+    $("cats").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (!c) return;
+      category = c.dataset.v;
+      $("cats").querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+      validate();
+    });
+    $("days").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (c) c.setAttribute("aria-pressed", String(c.getAttribute("aria-pressed") !== "true"));
+    });
+    $("logo-btn").addEventListener("click", () => {
+      const box = $("logo-box");
+      const name = $("shop").value.trim() || "Shop";
+      box.classList.add("set");
+      box.textContent = name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+      $("logo-btn").lastChild.textContent = "Change logo";
+    });
+    $("terms").addEventListener("change", validate);
+
+    // Opened from Choose Mode after sign-up, or from Profile ("Set up a shop").
+    const from = PM.store.get("shopFrom") === "ACCT-01" ? "ACCT-01" : "AUTH-06";
+    $("back").addEventListener("click", () => PM.go(from));
+    $("submit").addEventListener("click", () => {
+      const btn = $("submit");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Creating your shop';
+      setTimeout(() => {
+        PM.store.set("hasShop", "1");
+        PM.store.set("role", "vendor");
+        $("done-title").textContent = ($("shop").value.trim() || "Your shop") + " is ready";
+        PM.hydrateIcons($("done"));
+        $("done").classList.add("on");
+      }, 800);
+    });
+    $("go-shop").addEventListener("click", () => PM.go("VHOME-01"));
+    validate();
+  </script>
+</body>
+</html>

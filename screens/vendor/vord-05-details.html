@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Order Details · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .hcard { background: linear-gradient(160deg, var(--brand-50), #fff 70%); border-color: var(--brand-100); }
+    .hcard .row { align-items: flex-start; }
+    .hcard .pill { margin-bottom: 6px; }
+    .hcard h1 { margin: 0; font-size: 19px; line-height: 1.25; letter-spacing: -0.02em; }
+    .hcard .cat { font-size: 13px; color: var(--ink-2); }
+    .facts { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px 14px; margin: 16px 0 0; padding-top: 14px; border-top: 1px solid var(--brand-100); }
+    .facts div { display: flex; gap: 8px; align-items: flex-start; min-width: 0; }
+    .facts svg.i { width: 17px; height: 17px; color: var(--brand-700); margin-top: 2px; }
+    .facts dt { font-size: 11.5px; color: var(--ink-3); font-weight: 600; }
+    .facts dd { margin: 0; font-size: 14px; font-weight: 600; overflow-wrap: anywhere; }
+    .facts dd small { font-weight: 500; color: var(--ink-3); }
+    .hcard .acts2 { margin-top: 16px; }
+    .call { display: inline-flex; align-items: center; gap: 4px; font-size: 12.5px; }
+
+    .pass { text-align: center; }
+    .pass h2 { margin: 0; font-size: 17px; }
+    .pass p { margin: 4px 0 0; font-size: 13.5px; color: var(--ink-2); }
+    .pass .qr { width: min(180px, 52vw); aspect-ratio: 1; margin: 16px auto 14px; padding: 12px; background: #fff; border-radius: 18px; box-shadow: var(--shadow); border: 1px solid var(--line-2); }
+    .pass .qr svg { display: block; width: 100%; height: 100%; }
+    .codebar { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 10px 12px; border-radius: var(--r); background: var(--canvas); }
+    .codebar code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-weight: 700; letter-spacing: 0.06em; font-size: 14px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .codebar button { display: inline-flex; align-items: center; gap: 6px; border: 0; background: none; color: var(--brand-700); font-weight: 600; font-size: 13.5px; flex: none; padding: 4px; }
+    .codebar button svg.i { width: 16px; height: 16px; }
+    .pass .btn { margin-top: 14px; }
+    .pass .hint { justify-content: center; display: flex; align-items: center; gap: 6px; }
+    .pass .hint svg.i { width: 14px; height: 14px; }
+    .pass .ghost { margin-top: 4px; }
+
+    .proof { position: relative; border-radius: var(--r); overflow: hidden; aspect-ratio: 16 / 10; background: linear-gradient(135deg, #0f3d47, #1e6f7d 55%, #8fc9d1); }
+    .proof svg.art { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .proof time { position: absolute; right: 10px; bottom: 10px; display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; background: rgba(15, 23, 42, 0.72); color: #fff; font-size: 12px; font-weight: 600; }
+    .proof time svg.i { width: 13px; height: 13px; }
+    .proofs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+    .proofs button { aspect-ratio: 1; border-radius: 12px; border: 2px solid transparent; padding: 0; overflow: hidden; background: linear-gradient(135deg, #0f3d47, #1e6f7d 55%, #8fc9d1); color: #fff; display: grid; place-items: center; font-size: 11px; font-weight: 600; }
+    .proofs button[aria-pressed="true"] { border-color: var(--brand); }
+    .proofs button.add { background: var(--brand-50); color: var(--brand-700); border: 1.5px dashed var(--brand); gap: 2px; align-content: center; }
+    .proofs button.add svg.i { width: 18px; height: 18px; }
+    .proof-cap { margin: 10px 0 0; font-size: 12.5px; color: var(--ink-3); }
+
+    .draft { display: flex; gap: 10px; align-items: center; margin-top: 12px; }
+    .draft .grow { flex: 1; min-width: 0; }
+    @media (max-width: 360px) {
+      .facts { grid-template-columns: minmax(0, 1fr); }
+      .codebar code { font-size: 12.5px; letter-spacing: 0.02em; }
+      .codebar button { font-size: 12.5px; }
+    }
+  </style>
+</head>
+<body class="canvas" data-mode="vendor">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="VORD-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title" id="title">Order</div>
+      <button class="icon-btn" type="button" aria-label="Share tracking link" id="share-top"><svg class="i" data-icon="share"></svg></button>
+    </header>
+    <main class="content" id="main"></main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    let o = V.order(PM.store.get("vorder")) || V.order("ORD-1201");
+    let shot = 0;
+    $("title").textContent = "Order #" + o.id.slice(4);
+
+    // Decorative "photo" of the item on the counter (stands in for a real capture).
+    const art = `<svg class="art" viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <rect x="0" y="150" width="320" height="50" fill="rgba(255,255,255,.08)"/>
+      <rect x="70" y="60" width="180" height="100" rx="10" fill="rgba(255,255,255,.18)" stroke="rgba(255,255,255,.5)" stroke-width="2"/>
+      <path d="M110 60 160 92 210 60" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="2"/>
+      <rect x="140" y="110" width="40" height="22" rx="4" fill="rgba(127,240,198,.65)"/>
+      <circle cx="270" cy="40" r="26" fill="rgba(255,255,255,.12)"/></svg>`;
+
+    function render() {
+      const ready = o.status === "ready";
+      const done = o.status === "completed";
+      const live = V.active(o);
+      const n = V.next[o.status];
+      const balance = V.total(o) - o.paid;
+      const photos = o.log.filter((e) => e.kind === "photo").map((e) => e.at);
+      if (!photos.length) photos.push(o.created.replace("Just now", "Today"));
+      const first = (o.customer.name || "").split(" ")[0];
+
+      $("main").innerHTML = `
+        <section class="card hcard rise">
+          <div class="row">
+            ${V.catTile(o.category, "lg")}
+            <div class="grow">
+              ${V.pill(o)}
+              <h1>${V.esc(o.title)}</h1>
+              <div class="cat">Category: ${o.category} · ${o.id}</div>
+            </div>
+          </div>
+          <dl class="facts">
+            <div><svg class="i" data-icon="user"></svg><span><dt>Customer</dt><dd>${o.customer.name ? V.esc(o.customer.name) : "Not claimed yet"}${o.customer.phone ? `<br /><a class="call" href="tel:${o.customer.phone.replace(/[^\d+]/g, "")}">${V.esc(o.customer.phone)}</a>` : ""}</dd></span></div>
+            <div><svg class="i" data-icon="package"></svg><span><dt>Items</dt><dd>${o.qty} ${o.unit} <small>× ${D.money(o.price)}</small></dd></span></div>
+            <div><svg class="i" data-icon="receipt"></svg><span><dt>Paid</dt><dd>${D.money(o.paid)}${balance > 0 ? ` <small>of ${D.money(V.total(o))}</small>` : ""}</dd></span></div>
+            <div><svg class="i" data-icon="calendar"></svg><span><dt>Dropped off</dt><dd>${o.created}</dd></span></div>
+          </dl>
+          ${live ? `<div class="acts2">
+            <button class="btn secondary" type="button" id="notify"${o.customer.name ? "" : " disabled"}><svg class="i" data-icon="send"></svg>Notify</button>
+            <button class="btn primary" type="button" id="status"><svg class="i" data-icon="refresh"></svg>Update Status</button>
+          </div>` : ""}
+          ${o.status === "draft" ? `<div class="alert info draft"><svg class="i" data-icon="edit"></svg><span class="grow">Draft: only you can see this order.</span></div>
+            <button class="btn primary" type="button" id="gen" style="margin-top: 12px"><svg class="i" data-icon="qr"></svg>Generate Order QR</button>` : ""}
+        </section>
+
+        ${o.status !== "draft" && o.status !== "cancelled" ? `
+        <section class="card pass rise" style="margin-top: 12px">
+          <h2>Pickup QR code</h2>
+          <p>${done ? "Collected. This code no longer works." : `The customer shows this at pickup. ${o.customer.name ? "It's also in their tracking link." : "Print it on the receipt so they can claim the order."}`}</p>
+          <div class="qr" style="${done ? "opacity: .35" : ""}">${D.qr(o.id)}</div>
+          <div class="codebar"><code>${V.code(o)}</code><button type="button" id="share"><svg class="i" data-icon="share"></svg>Share Link</button></div>
+          ${done ? "" : `<button class="btn ${ready ? "success" : "primary"}" type="button" id="pickup"${ready ? "" : " disabled"}><svg class="i" data-icon="checkcircle"></svg>Mark as Picked Up</button>
+          ${ready ? `<button class="btn ghost" type="button" data-go="VORD-06"><svg class="i" data-icon="scan"></svg>Scan customer's QR</button>` : `<div class="hint"><svg class="i" data-icon="info"></svg>Available once the order is Ready</div>`}`}
+        </section>` : ""}
+
+        <section class="section">
+          <div class="section-head"><h2>Service proof</h2><span class="meta">${photos.length} photo${photos.length > 1 ? "s" : ""}</span></div>
+          <div class="card">
+            <div class="proof">${art}<time><svg class="i" data-icon="camera"></svg>Captured ${photos[Math.min(shot, photos.length - 1)]}</time></div>
+            <div class="proofs" id="proofs">
+              ${photos.map((p, i) => `<button type="button" aria-label="Photo ${i + 1}, ${p}" aria-pressed="${i === Math.min(shot, photos.length - 1)}" data-shot="${i}">${i + 1}</button>`).join("")}
+              ${live ? `<button type="button" class="add" id="add-photo"><svg class="i" data-icon="camera"></svg>Add</button>` : ""}
+            </div>
+            <p class="proof-cap">Confirms the item's condition before service. ${o.customer.name ? `${V.esc(first)} sees these photos in tracking.` : ""}</p>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><h2>Activity log</h2></div>
+          <div class="card"><ol class="log">${V.logHtml(o.log)}</ol></div>
+        </section>`;
+      PM.hydrateIcons($("main"));
+      wire();
+    }
+
+    function wire() {
+      const on = (id, fn) => { const el = $(id); el && el.addEventListener("click", fn); };
+      on("status", () => V.statusSheet(o, render));
+      on("notify", () => V.notifySheet(o, render));
+      on("share", () => PM.toast("Tracking link copied"));
+      on("gen", () => { V.setStatus(o, "created"); render(); PM.toast(o.customer.phone ? "QR generated. Tracking link sent" : "QR generated"); });
+      on("pickup", () => {
+        V.setStatus(o, "completed");
+        render();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        PM.toast(`Picked up. ${(o.customer.name || "Customer").split(" ")[0]} got a receipt`);
+      });
+      on("add-photo", () => {
+        o.log.unshift({ kind: "photo", text: "Proof photo added during service", at: "Today " + new Date().toLocaleTimeString("en-MY", { hour: "numeric", minute: "2-digit" }) });
+        V.save();
+        shot = 0;
+        render();
+        PM.toast("Photo added to the activity log");
+      });
+      $("proofs").addEventListener("click", (e) => {
+        const b = e.target.closest("[data-shot]");
+        if (b) { shot = Number(b.dataset.shot); render(); }
+      });
+    }
+    $("share-top").addEventListener("click", () => PM.toast("Tracking link copied"));
+
+    render();
+  </script>
+</body>
+</html>

@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Shop Profile · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .cover { position: relative; height: 150px; background: linear-gradient(150deg, #13a4ba, var(--brand-700) 80%); overflow: hidden; }
+    .cover::before { content: ""; position: absolute; inset: 0; background: radial-gradient(50% 80% at 85% 10%, rgba(127, 240, 198, 0.4), transparent 70%), repeating-linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0 12px, transparent 12px 24px); }
+    .cover .appbar { position: relative; background: transparent; }
+    .cover .icon-btn { background: rgba(255, 255, 255, 0.18); border-color: transparent; color: #fff; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+    .cover .acts { display: flex; gap: 8px; justify-content: flex-end; }
+    .cover .appbar { grid-template-columns: 40px minmax(0, 1fr) auto; }
+
+    .ident { position: relative; margin: -46px var(--gutter) 0; padding: 18px; }
+    .ident .logo { width: 72px; height: 72px; border-radius: 22px; margin-top: -48px; box-shadow: 0 0 0 4px var(--surface), var(--shadow); }
+    .ident .logo svg.i { width: 32px; height: 32px; }
+    .ident .head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-top: 12px; }
+    .ident h1 { margin: 0; font-size: 22px; letter-spacing: -0.02em; line-height: 1.2; }
+    .ident .cat { margin: 2px 0 0; font-size: 14px; color: var(--ink-2); }
+    .ident .quick { display: flex; align-items: center; gap: 6px; margin-top: 10px; font-size: 13.5px; color: var(--ink-2); flex-wrap: wrap; }
+    .ident .quick b { color: var(--ink); }
+    .ident .quick .stars svg.i { width: 14px; height: 14px; }
+
+    .info .item { min-height: 60px; }
+    .hours { display: none; padding: 4px 16px 14px 62px; }
+    .hours.open { display: block; }
+    .hours div { display: flex; justify-content: space-between; font-size: 13.5px; padding: 3px 0; color: var(--ink-2); }
+    .hours div.today { color: var(--ink); font-weight: 600; }
+    .item .rot { transition: transform 0.2s; }
+    .item[aria-expanded="true"] .rot { transform: rotate(180deg); }
+
+    .proof { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: center; }
+    .proof .score { text-align: center; }
+    .proof .score b { display: block; font-size: 44px; line-height: 1; letter-spacing: -0.03em; }
+    .proof .score .stars { margin-top: 6px; }
+    .proof .score small { display: block; margin-top: 4px; font-size: 12px; color: var(--ink-3); }
+    .bars { display: grid; gap: 6px; }
+    .bars div { display: grid; grid-template-columns: 10px minmax(0, 1fr) 34px; gap: 8px; align-items: center; font-size: 12px; color: var(--ink-2); font-weight: 600; }
+    .bars i { display: block; height: 6px; border-radius: 6px; background: var(--line-2); overflow: hidden; }
+    .bars i::after { content: ""; display: block; height: 100%; width: var(--w); background: var(--brand); border-radius: 6px; }
+    .bars span:last-child { text-align: right; color: var(--ink-3); font-weight: 500; }
+
+    .review .row { align-items: flex-start; }
+    .review .who b { display: block; font-size: 14.5px; }
+    .review .who .meta { display: flex; gap: 6px; align-items: center; }
+    .review p { margin: 10px 0 0; font-size: 14px; line-height: 1.55; color: var(--ink); }
+    .review .foot-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12.5px; color: var(--ink-3); }
+    .helpful { display: inline-flex; align-items: center; gap: 6px; height: 30px; padding: 0 10px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); font-size: 12.5px; font-weight: 600; color: var(--ink-2); }
+    .helpful svg.i { width: 14px; height: 14px; }
+    .helpful[aria-pressed="true"] { border-color: var(--brand); color: var(--brand-700); background: var(--brand-50); }
+    .reply { margin-top: 10px; padding: 10px 12px; border-radius: 12px; background: var(--canvas); font-size: 13px; color: var(--ink-2); }
+    .reply b { color: var(--ink); font-size: 12px; display: block; }
+
+    body:not(.is-owner) .owner { display: none; }
+    .is-owner .customer { display: none; }
+    .owner-bar { display: none; align-items: center; gap: 8px; margin: 12px var(--gutter) 0; padding: 10px 12px; border-radius: 12px; background: var(--ink); color: #fff; font-size: 13px; }
+    .is-owner .owner-bar { display: flex; }
+    .owner-bar svg.i { width: 16px; height: 16px; color: var(--mint); }
+    .cta { margin-top: 16px; display: grid; gap: 10px; }
+  </style>
+</head>
+<body class="canvas">
+  <div class="page">
+    <div class="cover">
+      <header class="appbar">
+        <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
+        <span></span>
+        <div class="acts">
+          <button class="icon-btn" type="button" aria-label="Share shop" id="share"><svg class="i" data-icon="share"></svg></button>
+          <button class="icon-btn owner" type="button" aria-label="Edit shop" data-go="VSHOP-01"><svg class="i" data-icon="edit"></svg></button>
+        </div>
+      </header>
+    </div>
+
+    <section class="card ident rise">
+      <span class="tile logo" id="logo"></span>
+      <div class="head">
+        <div style="min-width: 0">
+          <h1 id="name"></h1>
+          <p class="cat" id="cat"></p>
+        </div>
+        <span class="pill" id="open"></span>
+      </div>
+      <div class="quick" id="quick"></div>
+    </section>
+    <div class="owner-bar"><svg class="i" data-icon="eye"></svg>This is how customers see your shop.</div>
+
+    <main class="content">
+      <div class="list info">
+        <a class="item" id="addr" target="_blank" rel="noopener"><span class="ii"><svg class="i" data-icon="pin"></svg></span><span class="grow"><span id="addr-text"></span><small>Tap for directions</small></span><svg class="i" data-icon="navigate"></svg></a>
+        <button class="item" type="button" aria-expanded="false" id="hours-btn"><span class="ii"><svg class="i" data-icon="clock"></svg></span><span class="grow">08:00 AM – 09:00 PM<small id="hours-sub">Today</small></span><svg class="i rot" data-icon="down"></svg></button>
+        <div class="hours" id="hours"></div>
+        <a class="item" id="tel"><span class="ii"><svg class="i" data-icon="call"></svg></span><span class="grow"><span id="tel-text"></span><small>Call the shop</small></span><svg class="i" data-icon="chevron"></svg></a>
+      </div>
+
+      <section class="section">
+        <div class="section-head"><h2>Social proof</h2></div>
+        <div class="card proof">
+          <div class="score"><b id="avg"></b><span id="avg-stars"></span><small id="total"></small></div>
+          <div class="bars" id="bars"></div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Recent feedback</h2><a href="#" data-go="SHOP-02">See all</a></div>
+        <div id="reviews"></div>
+      </section>
+
+      <div class="cta">
+        <button class="btn secondary customer" type="button" id="write"><svg class="i" data-icon="star"></svg>Write a review</button>
+        <button class="btn primary owner" type="button" data-go="SHOP-02">Manage All Reviews</button>
+        <a class="item card tap owner" href="#" data-go="VSHOP-02" style="padding: 10px 16px">
+          <span class="ii"><svg class="i" data-icon="message"></svg></span>
+          <span class="grow">Customer Messaging<small>Manage the pings your clients get</small></span>
+          <svg class="i" data-icon="chevron"></svg>
+        </a>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    // Shared by both modes: customers see the shop of the order they opened; in
+    // Vendor mode the owner sees their own shop with the owner controls.
+    const owner = PM.mode() === "vendor";
+    const cur = D.current();
+    const s = owner
+      ? { ...D.shops.luxe, id: "own", name: "Alex's Laundry Corner", category: "Laundry", address: "18 Jalan SS2/55, Petaling Jaya", rating: 4.8, reviews: 126 }
+      : D.shops[(cur && cur.shop) || "pingclean"];
+    document.body.classList.toggle("is-owner", owner);
+
+    $("logo").className = `tile logo ${s.tone}`;
+    $("logo").innerHTML = `<svg class="i" data-icon="${s.icon}"></svg>`;
+    $("name").textContent = s.name;
+    $("cat").textContent = `Professional ${s.category.toLowerCase()}`;
+    $("quick").innerHTML = `${D.stars(s.rating)}<b>${s.rating}</b><span>(${s.reviews.toLocaleString()} reviews)</span>`;
+    $("addr-text").textContent = s.address;
+    $("addr").href = "https://maps.google.com/?q=" + encodeURIComponent(s.address);
+    $("tel-text").textContent = s.phone;
+    $("tel").href = "tel:" + s.phone.replace(/[^\d+]/g, "");
+    $("back").addEventListener("click", () => PM.go(owner ? "VSHOP-01" : cur && cur.type === "onsite" ? "CTRK-02" : "CTRK-01"));
+
+    // Open / closed comes from the opening hours (08:00 – 21:00, closed Sunday).
+    const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+    const now = new Date();
+    const h = now.getHours() + now.getMinutes() / 60;
+    const open = now.getDay() !== 0 && h >= 8 && h < 21;
+    $("open").className = `pill ${open ? "ready" : "cancelled"}`;
+    $("open").textContent = open ? "Open now" : "Closed";
+    $("hours-sub").textContent = open ? `Open today · closes 9:00 PM` : now.getDay() === 0 ? "Closed today · opens Mon 8:00 AM" : h < 8 ? "Opens today at 8:00 AM" : "Closed · opens tomorrow 8:00 AM";
+    $("hours").innerHTML = [1, 2, 3, 4, 5, 6, 0].map((d) => `<div class="${d === now.getDay() ? "today" : ""}"><span>${days[d]}</span><span>${d === 0 ? "Closed" : "08:00 AM – 09:00 PM"}</span></div>`).join("");
+    $("hours-btn").addEventListener("click", (e) => {
+      const on = $("hours").classList.toggle("open");
+      e.currentTarget.setAttribute("aria-expanded", String(on));
+    });
+
+    // Rating breakdown, 5 to 1.
+    const split = [0.82, 0.12, 0.04, 0.01, 0.01];
+    $("avg").textContent = s.rating.toFixed(1);
+    $("avg-stars").innerHTML = D.stars(s.rating);
+    $("total").textContent = `${s.reviews.toLocaleString()} reviews`;
+    $("bars").innerHTML = split.map((p, i) => `<div><span>${5 - i}</span><i style="--w:${Math.max(p * 100, 1)}%"></i><span>${Math.round(p * s.reviews).toLocaleString()}</span></div>`).join("");
+
+    const reviews = [
+      { n: "Sarah Jenkins", i: "SJ", tag: "Regular customer", r: 5, t: "Absolutely the best service in town. My silk dresses were handled with so much care. Highly recommend!", at: "2 days ago", h: 12, c: "linear-gradient(145deg,#f472b6,#db2777)" },
+      { n: "Michael Chen", i: "MC", tag: "Standard wash", r: 4, t: "Fast turnaround time. The tracking feature on PingMe makes it so easy to know when to pick up.", at: "1 week ago", h: 8, c: "linear-gradient(145deg,#60a5fa,#2563eb)", reply: "Thanks Michael! See you next week." },
+      { n: "Elena Rodriguez", i: "ER", tag: "Dry cleaning", r: 5, t: "Friendly staff and clean shop. The QR code pickup system is seamless.", at: "3 weeks ago", h: 3, c: "linear-gradient(145deg,#fbbf24,#d97706)" },
+    ];
+    $("reviews").innerHTML = reviews.map((v, k) => `
+      <article class="card review">
+        <div class="row">
+          <span class="avatar sm" style="background:${v.c}">${v.i}</span>
+          <div class="grow who"><b class="ellipsis">${v.n}</b><span class="meta">${v.tag}</span></div>
+          ${D.stars(v.r)}
+        </div>
+        <p>“${v.t}”</p>
+        ${v.reply ? `<div class="reply"><b>Reply from ${s.name}</b>${v.reply}</div>` : ""}
+        <div class="foot-row"><span>${v.at}</span><button class="helpful" type="button" aria-pressed="false" data-h="${v.h}"><svg class="i" data-icon="thumb"></svg>Helpful · <span>${v.h}</span></button></div>
+      </article>`).join("");
+
+    $("reviews").addEventListener("click", (e) => {
+      const b = e.target.closest(".helpful");
+      if (!b) return;
+      const on = b.getAttribute("aria-pressed") !== "true";
+      b.setAttribute("aria-pressed", String(on));
+      b.querySelector("span").textContent = +b.dataset.h + (on ? 1 : 0);
+    });
+
+    // Only customers with a completed order here can review the shop.
+    const done = D.orders.find((o) => o.shop === s.id && o.status === "completed");
+    if (!done) {
+      $("write").disabled = true;
+      $("write").innerHTML = '<svg class="i" data-icon="lock"></svg>Review after your first completed order';
+    }
+    $("write").addEventListener("click", () => { PM.store.set("order", done.id); PM.go("CTRK-04"); });
+
+    $("share").addEventListener("click", () => PM.toast("Shop link copied"));
+
+    PM.hydrateIcons();
+  </script>
+</body>
+</html>

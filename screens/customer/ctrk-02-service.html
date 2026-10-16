@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Service Status · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .hd { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+    .hd .h1 { font-size: 26px; }
+    .hd .ref { margin: 4px 0 0; font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+    .tabs.main { margin-top: 18px; }
+
+    .stepper { list-style: none; margin: 0; padding: 16px 8px 14px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+    .stepper li { position: relative; display: flex; flex-direction: column; align-items: center; gap: 8px; font-size: 12px; font-weight: 600; color: var(--ink-3); text-align: center; }
+    .stepper li::before { content: ""; position: absolute; top: 15px; right: 50%; width: 100%; height: 3px; background: var(--line); z-index: 0; }
+    .stepper li:first-child::before { display: none; }
+    .stepper li.done::before, .stepper li.now::before { background: var(--brand); }
+    .stepper .c { position: relative; z-index: 1; width: 32px; height: 32px; border-radius: 50%; display: grid; place-items: center; background: var(--surface); border: 2px solid var(--line); color: var(--ink-3); }
+    .stepper .c svg.i { width: 15px; height: 15px; stroke-width: 2.5; }
+    .stepper li.done .c { background: var(--brand); border-color: var(--brand); color: #fff; }
+    .stepper li.now { color: var(--brand-700); }
+    .stepper li.now .c { border-color: var(--brand); color: var(--brand-700); box-shadow: 0 0 0 5px var(--brand-50); }
+
+    .count { position: relative; overflow: hidden; display: flex; align-items: center; gap: 14px; margin-top: 12px; padding: 18px; border-radius: var(--r-lg); color: #fff; background: linear-gradient(150deg, #13a4ba, var(--brand-700) 75%); box-shadow: 0 12px 26px rgba(14, 143, 163, 0.26); }
+    .count .grow { flex: 1; min-width: 0; }
+    .count small { display: block; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mint); }
+    .count b { display: block; margin-top: 4px; font-size: 28px; line-height: 1.1; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+    .count span.sub { font-size: 13px; color: rgba(255, 255, 255, 0.78); }
+    .count .ic { width: 52px; height: 52px; border-radius: 16px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.16); flex: none; }
+    .count .ic svg.i { width: 26px; height: 26px; }
+    .count.wait { background: linear-gradient(150deg, #334155, #0f172a); box-shadow: none; }
+
+    .tech .grow b { display: block; font-size: 16px; }
+    .tech .meta { display: flex; align-items: center; gap: 6px; }
+    .tech .stars svg.i { width: 13px; height: 13px; }
+    .tech .acts { display: flex; gap: 8px; flex: none; }
+    .tech .acts .icon-btn { color: var(--brand-700); background: var(--brand-50); border-color: transparent; }
+    .tech .acts .icon-btn.call { background: var(--brand); color: #fff; }
+    .tech .avatar { position: relative; }
+    .tech .avatar::after { content: ""; position: absolute; right: 0; bottom: 0; width: 12px; height: 12px; border-radius: 50%; background: var(--success); box-shadow: 0 0 0 2px var(--surface); }
+
+    .feed { list-style: none; margin: 0; padding: 0; }
+    .feed li { position: relative; display: grid; grid-template-columns: 16px minmax(0, 1fr) auto; gap: 12px; padding-bottom: 16px; }
+    .feed li:last-child { padding-bottom: 0; }
+    .feed li::before { content: ""; position: absolute; left: 7px; top: 16px; bottom: -2px; width: 2px; background: var(--line-2); }
+    .feed li:last-child::before { display: none; }
+    .feed .d { width: 16px; height: 16px; margin-top: 3px; border-radius: 50%; border: 2px solid var(--line); background: var(--surface); }
+    .feed li:first-child .d { border-color: var(--brand); background: var(--brand); box-shadow: 0 0 0 4px var(--brand-50); }
+    .feed b { display: block; font-size: 14.5px; font-weight: 600; }
+    .feed li:not(:first-child) b { font-weight: 500; color: var(--ink-2); }
+    .feed p { margin: 2px 0 0; font-size: 13px; color: var(--ink-2); }
+    .feed time { font-size: 12px; color: var(--ink-3); white-space: nowrap; padding-top: 2px; }
+
+    .facts { display: grid; gap: 12px; margin: 0; }
+    .facts div { display: grid; grid-template-columns: 100px minmax(0, 1fr); gap: 12px; font-size: 14px; }
+    .facts dt { color: var(--ink-2); }
+    .facts dd { margin: 0; font-weight: 600; text-align: right; }
+
+    .manage { display: flex; align-items: center; gap: 12px; border-style: dashed; border-color: var(--line); box-shadow: none; background: transparent; }
+    .manage .grow { flex: 1; min-width: 0; }
+    .manage b { display: block; }
+    .manage .btn { width: auto; height: 40px; padding: 0 16px; font-size: 14px; flex: none; }
+
+    .hist .row + .row { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line-2); }
+    .hist b { display: block; font-size: 14.5px; }
+    .hist .amt { font-weight: 700; font-size: 14px; flex: none; }
+
+    .sheet .opts { display: grid; gap: 10px; margin-top: 16px; }
+    .sheet .alert { margin-top: 14px; }
+    .slots { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+    .slots .chip { justify-content: center; border-radius: 12px; padding: 10px 8px; }
+    .sheet section[hidden] { display: none; }
+    .proto { display: block; margin: 20px auto 0; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+    @media (max-width: 360px) { .facts div { grid-template-columns: 84px minmax(0, 1fr); } .count b { font-size: 24px; } }
+  </style>
+</head>
+<body class="canvas" data-mode="customer">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="CHOME-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Service Status</div>
+      <button class="icon-btn" type="button" aria-label="Notifications" data-go="NOTI-01"><svg class="i" data-icon="bell"></svg><span class="dot"></span></button>
+    </header>
+
+    <main class="content">
+      <div class="hd rise">
+        <div style="min-width: 0">
+          <h1 class="h1" id="headline">Service in progress</h1>
+          <p class="ref" id="ref"></p>
+        </div>
+        <span class="pill progress live" id="live">Live</span>
+      </div>
+
+      <div class="tabs main" role="tablist" aria-label="Service">
+        <button type="button" role="tab" aria-selected="true" data-tab="status">Status</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="history">History</button>
+        <button type="button" role="tab" aria-selected="false" data-tab="support">Support</button>
+      </div>
+
+      <div id="panel" role="tabpanel"></div>
+    </main>
+  </div>
+
+  <div class="sheet-bg" id="sheet-bg"></div>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <div class="grab"></div>
+    <section id="m-menu">
+      <h3 id="m-title">Change this visit</h3>
+      <p class="lead small" id="m-sub"></p>
+      <div class="alert info" id="m-locked"><svg class="i" data-icon="lock"></svg><span>Your technician has already started, so this visit can't be rescheduled or cancelled in the app. Call the shop if something's wrong.</span></div>
+      <div class="opts">
+        <button class="btn secondary" type="button" id="m-resched"><svg class="i" data-icon="calendar"></svg>Reschedule</button>
+        <button class="btn secondary" type="button" id="m-cancel" style="color: var(--danger)"><svg class="i" data-icon="close"></svg>Cancel service</button>
+      </div>
+    </section>
+    <section id="m-slots" hidden>
+      <h3>Pick a new time</h3>
+      <p class="lead small">AquaPure will confirm the new slot by push.</p>
+      <div class="slots" id="slots"></div>
+      <div class="opts"><button class="btn primary" type="button" id="m-save" disabled>Confirm new time</button></div>
+    </section>
+    <section id="m-confirm" hidden>
+      <h3>Cancel this service?</h3>
+      <p class="lead small">The shop is told right away. Cancelling now is free because the technician hasn't started.</p>
+      <div class="opts">
+        <button class="btn primary" type="button" id="m-yes" style="background: var(--danger); box-shadow: none">Yes, cancel service</button>
+        <button class="btn ghost" type="button" id="m-no">Keep my booking</button>
+      </div>
+    </section>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    let o = D.current();
+    if (!o || o.type !== "onsite") o = D.orders.find((x) => x.type === "onsite");
+    const s = D.shops[o.shop];
+    let tab = "status";
+    let secs = 18 * 60;
+    const stepIcons = ["checkcircle", "wrench", "shield", "check"];
+
+    const fmt = (n) => `${Math.floor(n / 60)}:${String(n % 60).padStart(2, "0")}`;
+
+    function status() {
+      const started = o.step >= 2;
+      const steps = D.steps(o);
+      return `
+        <div class="card" style="margin-top: 14px; padding: 0">
+          <ol class="stepper">${steps.map((n, i) => {
+            const st = i + 1 < o.step ? "done" : i + 1 === o.step ? "now" : "";
+            return `<li class="${st}"><span class="c"><svg class="i" data-icon="${st === "done" ? "check" : stepIcons[i]}"></svg></span>${n}</li>`;
+          }).join("")}</ol>
+        </div>
+
+        ${started ? `
+        <div class="count">
+          <div class="grow"><small>Estimated completion</small><b id="clock">${fmt(secs)}</b><span class="sub">minutes remaining</span></div>
+          <span class="ic"><svg class="i" data-icon="clock"></svg></span>
+        </div>` : `
+        <div class="count wait">
+          <div class="grow"><small>Scheduled visit</small><b style="font-size: 20px">${o.when}</b><span class="sub">We'll ping you when the technician is on the way.</span></div>
+          <span class="ic"><svg class="i" data-icon="calendar"></svg></span>
+        </div>`}
+
+        <div class="card tech row" style="margin-top: 12px">
+          <span class="avatar">${o.tech.initials}</span>
+          <div class="grow">
+            <b class="ellipsis">${o.tech.name}</b>
+            <span class="meta"><span class="stars"><svg class="i" data-icon="star"></svg></span>${o.tech.rating} · ${o.tech.role}</span>
+          </div>
+          <div class="acts">
+            <button class="icon-btn" type="button" aria-label="Message ${o.tech.name}" id="chat"><svg class="i" data-icon="message"></svg></button>
+            <a class="icon-btn call" href="tel:${s.phone.replace(/[^\d+]/g, "")}" aria-label="Call ${o.tech.name}"><svg class="i" data-icon="call"></svg></a>
+          </div>
+        </div>
+
+        <section class="section">
+          <div class="section-head"><h2>Recent updates</h2></div>
+          <div class="card">
+            <ol class="feed">${(started ? o.feed : o.feed.slice(-1)).map((f) => `<li><span class="d"></span><div><b>${f.t}</b>${f.d ? `<p>${f.d}</p>` : ""}</div><time>${f.at}</time></li>`).join("")}</ol>
+          </div>
+        </section>
+
+        <section class="section">
+          <div class="section-head"><h2>Service information</h2></div>
+          <div class="card">
+            <dl class="facts">
+              <div><dt>Vendor</dt><dd><a href="#" data-go="SHOP-01">${s.name}</a></dd></div>
+              <div><dt>Service</dt><dd>${o.service}</dd></div>
+              <div><dt>Location</dt><dd>${o.location}</dd></div>
+              <div><dt>Visit</dt><dd>${o.when}</dd></div>
+              <div><dt>Quoted</dt><dd>${D.money(o.amount)}</dd></div>
+            </dl>
+          </div>
+        </section>
+
+        <div class="card manage" style="margin-top: 12px">
+          <div class="grow"><b>Need to change?</b><span class="meta">${started ? "Changes close once work starts" : "Reschedule or cancel before work starts"}</span></div>
+          <button class="btn secondary" type="button" id="manage">Manage</button>
+        </div>
+
+        <button class="text-btn proto" type="button" id="proto">${started ? "Prototype: view before the technician starts" : "Prototype: view with the technician working"}</button>`;
+    }
+
+    function history() {
+      const past = [
+        ["Aircond servicing · 2 units", "12 Apr 2026", 180],
+        ["Gas top-up · 1 unit", "3 Nov 2025", 120],
+        ["Aircond install", "18 Jun 2025", 450],
+      ];
+      return `
+        <section class="section">
+          <div class="section-head"><h2>Your visits with ${s.name}</h2></div>
+          <div class="card hist">${past.map(([n, d, a]) => `
+            <div class="row">${D.tile(s)}<div class="grow"><b class="ellipsis">${n}</b><span class="meta">${d} · Completed</span></div><span class="amt">${D.money(a)}</span></div>`).join("")}
+          </div>
+        </section>
+        <div class="more" style="text-align: center; margin-top: 14px"><a href="#" data-go="CTRK-03">See all order history</a></div>`;
+    }
+
+    function support() {
+      return `
+        <section class="section">
+          <div class="list">
+            <a class="item" href="tel:${s.phone.replace(/[^\d+]/g, "")}"><span class="ii"><svg class="i" data-icon="call"></svg></span><span class="grow">Call ${s.name}<small>${s.phone}</small></span><svg class="i" data-icon="chevron"></svg></a>
+            <button class="item" type="button" id="report"><span class="ii"><svg class="i" data-icon="alert"></svg></span><span class="grow">Report a problem with this visit<small>The shop and PingMe both see it</small></span><svg class="i" data-icon="chevron"></svg></button>
+            <a class="item" href="#" data-go="ACCT-02"><span class="ii"><svg class="i" data-icon="headset"></svg></span><span class="grow">PingMe Help &amp; Support<small>FAQ and contact form</small></span><svg class="i" data-icon="chevron"></svg></a>
+          </div>
+        </section>`;
+    }
+
+    function render() {
+      const started = o.step >= 2;
+      $("headline").textContent = started ? "Service in progress" : "Visit confirmed";
+      $("live").className = started ? "pill progress live" : "pill";
+      $("live").textContent = started ? "Live" : "Received";
+      $("ref").textContent = `Ref ${o.id} · ${s.name}`;
+      $("panel").innerHTML = tab === "status" ? status() : tab === "history" ? history() : support();
+      PM.hydrateIcons($("panel"));
+      const on = (id, fn) => { const el = $(id); el && el.addEventListener("click", fn); };
+      on("chat", () => PM.toast(`Opening a message to ${o.tech.name}`));
+      on("manage", openManage);
+      on("report", () => PM.toast("Report sent to AquaPure and PingMe"));
+      on("proto", () => { o.step = o.step >= 2 ? 1 : 2; render(); });
+    }
+
+    document.querySelectorAll("[data-tab]").forEach((b) => b.addEventListener("click", () => {
+      tab = b.dataset.tab;
+      document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+      render();
+    }));
+
+    setInterval(() => {
+      if (secs > 60) secs--;
+      const c = $("clock");
+      if (c) c.textContent = fmt(secs);
+    }, 1000);
+
+    // Manage sheet: reschedule and cancel are only allowed before work starts.
+    const sheet = (on) => document.body.classList.toggle("open", on);
+    function step(id) { ["m-menu", "m-slots", "m-confirm"].forEach((x) => ($(x).hidden = x !== id)); }
+    function openManage() {
+      const locked = o.step >= 2;
+      $("m-sub").textContent = `${o.service} · ${o.when}`;
+      $("m-locked").style.display = locked ? "flex" : "none";
+      $("m-resched").disabled = locked;
+      $("m-cancel").disabled = locked;
+      step("m-menu");
+      sheet(true);
+    }
+    $("sheet-bg").addEventListener("click", () => sheet(false));
+    $("m-resched").addEventListener("click", () => {
+      const slots = ["Tomorrow · 9–11 AM", "Tomorrow · 2–4 PM", "Thu · 10–12 PM", "Thu · 3–5 PM", "Fri · 9–11 AM", "Sat · 10–12 PM"];
+      $("slots").innerHTML = slots.map((t) => `<button class="chip" type="button" aria-pressed="false">${t}</button>`).join("");
+      $("m-save").disabled = true;
+      step("m-slots");
+    });
+    $("slots").addEventListener("click", (e) => {
+      const c = e.target.closest(".chip");
+      if (!c) return;
+      $("slots").querySelectorAll(".chip").forEach((x) => x.setAttribute("aria-pressed", String(x === c)));
+      $("m-save").disabled = false;
+      $("m-save").dataset.slot = c.textContent;
+    });
+    $("m-save").addEventListener("click", () => {
+      o.when = $("m-save").dataset.slot.replace(" · ", ", ");
+      sheet(false);
+      render();
+      PM.toast("Reschedule request sent");
+    });
+    $("m-cancel").addEventListener("click", () => step("m-confirm"));
+    $("m-no").addEventListener("click", () => sheet(false));
+    $("m-yes").addEventListener("click", () => { sheet(false); PM.toast("Service cancelled. AquaPure has been told."); setTimeout(() => PM.go("CHOME-01"), 1400); });
+
+    render();
+  </script>
+</body>
+</html>

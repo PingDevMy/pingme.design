@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Customer Messaging · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .content { padding-top: 4px; }
+    .sms { display: flex; align-items: center; gap: 12px; }
+    .sms .grow { flex: 1; min-width: 0; }
+    .sms b { display: block; font-size: 15px; }
+    .sms small { display: block; font-size: 12.5px; color: var(--ink-2); line-height: 1.4; }
+    .tabs.st { grid-auto-columns: minmax(0, 1fr); }
+    .tabs.st button { font-size: 12.5px; padding: 0 4px; }
+    .editor { margin-top: 12px; }
+    .editor .top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .editor .top b { font-size: 14px; }
+    .editor .top small { display: block; font-size: 12px; color: var(--ink-3); font-weight: 400; }
+    .ph-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .ph-chips button { height: 28px; padding: 0 10px; border-radius: 8px; border: 1px dashed var(--brand); background: var(--brand-50); color: var(--brand-700); font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: 12px; font-weight: 600; }
+    .editor .control.area { margin-top: 10px; }
+    .editor textarea { min-height: 84px; }
+    .off .control, .off .ph-chips { opacity: 0.5; pointer-events: none; }
+    .pv-h { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; font-size: 12px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--ink-3); }
+    .pv-h .meta { text-transform: none; letter-spacing: 0; font-weight: 500; }
+    .bubble { margin-top: 8px; max-width: 92%; padding: 10px 12px; border-radius: 16px 16px 16px 4px; background: #e9e9eb; font-size: 14px; line-height: 1.4; overflow-wrap: anywhere; }
+    .bubble .link { color: #0a64d8; text-decoration: underline; }
+    .seg-note { font-size: 12px; color: var(--ink-3); margin-top: 6px; }
+    .seg-note.over { color: var(--warn); }
+
+    .tpl-row { display: grid; grid-template-columns: minmax(0, 1fr) 32px; align-items: center; gap: 8px; padding: 10px 10px 10px 16px; font-size: 14px; }
+    .tpl-row span { overflow-wrap: anywhere; }
+    .tpl-row button { width: 32px; height: 32px; border: 0; border-radius: 9px; background: none; color: var(--ink-3); display: grid; place-items: center; }
+    .tpl-row button:hover { color: var(--danger); background: var(--danger-50); }
+    .tpl-row button svg.i { width: 17px; height: 17px; }
+    .add-tpl { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px; }
+    .add-tpl input { min-width: 0; height: 42px; border: 1.5px solid var(--line); border-radius: 12px; padding: 0 12px; font-size: 14px; outline: 0; }
+    .add-tpl input:focus { border-color: var(--brand); }
+    .add-tpl .btn { height: 42px; width: auto; padding: 0 14px; font-size: 14px; }
+  </style>
+</head>
+<body class="canvas" data-mode="vendor">
+  <div class="page">
+    <header class="appbar sticky">
+      <button class="icon-btn" type="button" aria-label="Back" data-go="VSHOP-01"><svg class="i" data-icon="back"></svg></button>
+      <div class="title">Customer Messaging</div>
+      <span class="spacer"></span>
+    </header>
+
+    <main class="content">
+      <section class="card sms rise">
+        <span class="tile"><svg class="i" data-icon="message"></svg></span>
+        <span class="grow"><b>SMS fallback</b><small>Text customers who don't have the PingMe app. Push is used whenever they do.</small></span>
+        <label class="switch"><input type="checkbox" id="sms" checked aria-label="SMS fallback" /><span></span></label>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Status messages</h2></div>
+        <div class="tabs st" role="tablist" aria-label="Status" id="tabs"></div>
+        <div class="card editor" id="editor">
+          <div class="top">
+            <b id="ed-title"></b>
+            <label class="switch"><input type="checkbox" id="auto" aria-label="Send automatically" /><span></span></label>
+          </div>
+          <small class="meta" id="ed-sub"></small>
+          <div class="ph-chips" id="phs" aria-label="Insert a placeholder"></div>
+          <div class="control area"><textarea id="msg" maxlength="320" aria-label="Message"></textarea></div>
+          <div class="pv-h"><span>Preview</span><span class="meta">Sarah · ORD-1204</span></div>
+          <div class="preview" id="pv-push">
+            <span class="mark sm"><svg class="i" data-icon="bolt"></svg></span>
+            <div class="grow"><b id="pv-shop"></b><span id="pv-text"></span></div>
+            <time>now</time>
+          </div>
+          <div id="pv-sms-wrap">
+            <div class="bubble" id="pv-sms"></div>
+            <div class="seg-note" id="seg"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><h2>Quick replies</h2><span class="meta">Used by Notify</span></div>
+        <div class="list" id="tpls"></div>
+      </section>
+    </main>
+
+    <div class="foot"><button class="btn primary" type="button" id="save" disabled>Save changes</button></div>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script src="../vendor.js"></script>
+  <script>
+    const V = PM.V;
+    const $ = (id) => document.getElementById(id);
+    const sample = V.order("ORD-1204") || V.orders[0];
+    const sts = [["created", "Created", "When you generate the order QR"], ["progress", "In Progress", "When you tap Start Work"], ["ready", "Ready", "When you tap Mark Ready"], ["completed", "Done", "When the order is picked up"]];
+    const msgs = Object.assign({}, V.auto);
+    const on = { created: true, progress: true, ready: true, completed: true };
+    let cur = "ready";
+
+    $("pv-shop").textContent = V.shop.name;
+    $("phs").innerHTML = ["{customer}", "{order}", "{shop}", "{eta}"].map((p) => `<button type="button" data-ph="${p}">${p}</button>`).join("");
+
+    function mark() { $("save").disabled = false; }
+    function preview() {
+      const t = msgs[cur];
+      const filled = V.fill(t, sample);
+      $("pv-text").textContent = filled;
+      $("pv-sms").innerHTML = V.esc(filled).replace(/(pingme\.my\/t\/\S+)/, '<span class="link">$1</span>');
+      const segs = Math.ceil(filled.length / 160) || 1;
+      $("seg").textContent = `SMS: ${filled.length} characters · ${segs} message${segs > 1 ? "s" : ""}`;
+      $("seg").classList.toggle("over", segs > 1);
+      $("pv-sms-wrap").hidden = !$("sms").checked;
+    }
+    function render() {
+      $("tabs").innerHTML = sts.map(([k, l]) => `<button type="button" role="tab" aria-selected="${k === cur}" data-st="${k}">${l}</button>`).join("");
+      const s = sts.find((x) => x[0] === cur);
+      $("ed-title").textContent = `${s[1]} message`;
+      $("ed-sub").textContent = `${s[2]}. ${on[cur] ? "Sent automatically." : "Off: customers only see the status change."}`;
+      $("auto").checked = on[cur];
+      $("editor").classList.toggle("off", !on[cur]);
+      $("msg").value = msgs[cur];
+      preview();
+    }
+    function renderTpls() {
+      $("tpls").innerHTML = V.templates.map((t, i) => `<div class="tpl-row"><span>${V.esc(t)}</span><button type="button" aria-label="Delete quick reply" data-del="${i}"><svg class="i" data-icon="trash"></svg></button></div>`).join("")
+        + `<form class="add-tpl" id="add"><input id="new" placeholder="New quick reply, e.g. Back in 10 min" maxlength="160" aria-label="New quick reply" /><button class="btn secondary" type="submit">Add</button></form>`;
+      PM.hydrateIcons($("tpls"));
+    }
+
+    $("tabs").addEventListener("click", (e) => { const b = e.target.closest("[data-st]"); if (b) { cur = b.dataset.st; render(); } });
+    $("auto").addEventListener("change", (e) => { on[cur] = e.target.checked; mark(); render(); });
+    $("sms").addEventListener("change", () => { mark(); preview(); PM.toast($("sms").checked ? "SMS fallback on" : "SMS fallback off. Customers without the app get no pings"); });
+    $("msg").addEventListener("input", (e) => { msgs[cur] = e.target.value; mark(); preview(); });
+    $("phs").addEventListener("click", (e) => {
+      const b = e.target.closest("[data-ph]");
+      if (!b) return;
+      const ta = $("msg");
+      const a = ta.selectionStart ?? ta.value.length, z = ta.selectionEnd ?? ta.value.length;
+      ta.value = ta.value.slice(0, a) + b.dataset.ph + ta.value.slice(z);
+      ta.focus();
+      ta.setSelectionRange(a + b.dataset.ph.length, a + b.dataset.ph.length);
+      msgs[cur] = ta.value;
+      mark();
+      preview();
+    });
+    $("tpls").addEventListener("click", (e) => {
+      const d = e.target.closest("[data-del]");
+      if (!d) return;
+      V.templates.splice(Number(d.dataset.del), 1);
+      V.save();
+      renderTpls();
+      PM.toast("Quick reply deleted");
+    });
+    $("tpls").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const v = $("new").value.trim();
+      if (!v) return PM.shake($("new"));
+      V.templates.push(v);
+      V.save();
+      renderTpls();
+      PM.toast("Quick reply added");
+    });
+    $("save").addEventListener("click", () => { $("save").disabled = true; PM.toast("Messages saved"); });
+
+    render();
+    renderTpls();
+  </script>
+</body>
+</html>

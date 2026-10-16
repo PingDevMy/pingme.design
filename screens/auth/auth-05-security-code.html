@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Security Code · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <style>
+    .badge-icon { margin: 12px 0 22px; }
+    .num { color: var(--ink); font-weight: 600; white-space: nowrap; }
+    .edit { font-size: 14px; display: inline-flex; gap: 4px; align-items: center; margin-top: 4px; }
+    .edit svg.i { width: 14px; height: 14px; }
+    .otp { display: grid; grid-template-columns: repeat(3, 1fr) 10px repeat(3, 1fr); gap: 8px; margin-top: 28px; align-items: center; }
+    .otp .sep { height: 2px; background: var(--line); border-radius: 2px; }
+    .otp input {
+      width: 100%; height: 60px; border: 1.5px solid var(--line); border-radius: var(--r); background: var(--canvas);
+      text-align: center; font-size: 26px; font-weight: 700; color: var(--ink); outline: 0; caret-color: var(--brand);
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+    .otp input:focus { border-color: var(--brand); background: #fff; box-shadow: 0 0 0 4px var(--brand-50); }
+    .otp input.filled { background: #fff; border-color: var(--ink-3); }
+    .otp.bad input { border-color: var(--danger); background: var(--danger-50); color: var(--danger); }
+    .otp:has(input:disabled) input { opacity: 0.5; }
+    .status { margin-top: 14px; min-height: 22px; font-size: 13.5px; display: flex; gap: 6px; align-items: center; color: var(--ink-2); }
+    .status svg.i { width: 16px; height: 16px; }
+    .status.bad { color: var(--danger); }
+    .resend-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 22px; }
+    .resend-row .btn { height: 48px; font-size: 14.5px; }
+    .resend-row svg.i { width: 18px; height: 18px; }
+    .fine { margin-top: 14px; text-align: center; font-size: 12px; color: var(--ink-3); }
+    .fine a { font-weight: 500; color: var(--ink-2); }
+
+    /* Success */
+    .done { position: fixed; inset: 0; background: #fff; display: flex; flex-direction: column; padding: 0 var(--gutter) calc(var(--safe-bottom) + 8px); opacity: 0; pointer-events: none; transition: opacity 0.25s; z-index: 5; }
+    .done.on { opacity: 1; pointer-events: auto; }
+    .done .body { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+    .tick { width: 96px; height: 96px; border-radius: 50%; background: var(--success-50); color: var(--success); display: grid; place-items: center; box-shadow: 0 0 0 12px rgba(5, 150, 105, 0.06); }
+    .on .tick { animation: pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+    .tick svg.i { width: 46px; height: 46px; stroke-width: 2.5; }
+    @keyframes pop { from { transform: scale(0.4); opacity: 0; } }
+    .done .h1 { margin-top: 26px; }
+    .found { width: 100%; margin-top: 26px; border: 1px solid var(--line); border-radius: var(--r-lg); text-align: left; overflow: hidden; }
+    .found header { padding: 12px 14px; background: var(--brand-50); color: var(--brand-700); font-size: 13.5px; font-weight: 600; display: flex; gap: 8px; align-items: center; }
+    .found header svg.i { width: 18px; height: 18px; }
+    .found ul { margin: 0; padding: 0; list-style: none; }
+    .found li { display: flex; gap: 12px; align-items: center; padding: 12px 14px; border-top: 1px solid var(--line-2); }
+    .found .av { width: 38px; height: 38px; border-radius: 11px; display: grid; place-items: center; flex: none; }
+    .found .av svg.i { width: 18px; height: 18px; }
+    .found b { display: block; font-size: 14px; }
+    .found small { font-size: 12.5px; color: var(--ink-2); }
+    .pill { margin-left: auto; font-size: 11.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <header class="topbar">
+      <button class="icon-btn" type="button" aria-label="Back" id="back"><svg class="i" data-icon="back"></svg></button>
+      <div class="steps" style="width: 120px" id="steps" aria-label="Step 2 of 3"><span class="on"></span><span class="on"></span><span></span></div>
+      <span style="width: 40px"></span>
+    </header>
+
+    <main class="content">
+      <div class="badge-icon ring rise"><svg class="i" data-icon="shield"></svg></div>
+      <h1 class="h1">Verify your phone</h1>
+      <p class="lead">Enter the 6-digit code we sent by SMS to <span class="num" id="num"></span></p>
+      <a href="#" class="edit" id="edit"><svg class="i" data-icon="edit"></svg>Wrong number? Edit</a>
+
+      <div class="otp" id="otp" role="group" aria-label="6-digit code">
+        <input inputmode="numeric" autocomplete="one-time-code" aria-label="Digit 1" />
+        <input inputmode="numeric" aria-label="Digit 2" />
+        <input inputmode="numeric" aria-label="Digit 3" />
+        <span class="sep" aria-hidden="true"></span>
+        <input inputmode="numeric" aria-label="Digit 4" />
+        <input inputmode="numeric" aria-label="Digit 5" />
+        <input inputmode="numeric" aria-label="Digit 6" />
+      </div>
+      <div class="status" id="status" aria-live="polite"></div>
+
+      <div class="resend-row">
+        <button class="btn secondary" type="button" id="resend" disabled><svg class="i" data-icon="refresh"></svg><span>Resend SMS</span></button>
+        <button class="btn secondary" type="button" id="call" disabled><svg class="i" data-icon="call"></svg>Call me</button>
+      </div>
+    </main>
+
+    <footer class="foot">
+      <button class="btn primary" id="verify" type="button" disabled>Verify Now <svg class="i" data-icon="arrow"></svg></button>
+      <p class="fine">By verifying, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>.</p>
+    </footer>
+  </div>
+
+  <!-- Success -->
+  <section class="done" id="done" aria-live="polite">
+    <div class="body">
+      <div class="tick"><svg class="i" data-icon="check"></svg></div>
+      <h1 class="h1">Phone verified</h1>
+      <p class="lead" id="done-lead"></p>
+      <div class="found" id="found"></div>
+    </div>
+    <button class="btn primary" type="button" id="go-home"></button>
+  </section>
+
+  <script src="../kit.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const boxes = [...document.querySelectorAll(".otp input")];
+    // signup: new account, continues to Choose Mode. phone: number changed from Profile.
+    const purpose = PM.store.get("verifyFor") === "phone" ? "phone" : "signup";
+    const phone = PM.store.get("phone") || "+60 12-345 4291";
+    let tries = 5;
+    let timer;
+
+    // Mask all but the last 4 digits: +60 1•-••• 4291
+    const digits = phone.replace(/\D/g, "");
+    $("num").textContent = "+60 " + digits.slice(2, 3) + "•-••• " + digits.slice(-4);
+    if (purpose === "phone") $("steps").style.visibility = "hidden";
+
+    const code = () => boxes.map((b) => b.value).join("");
+    function sync() {
+      boxes.forEach((b) => b.classList.toggle("filled", !!b.value));
+      $("verify").disabled = code().length !== 6 || tries === 0;
+      $("otp").classList.remove("bad");
+      if (tries > 0) setStatus("");
+    }
+    function setStatus(text, bad = false, icon = "") {
+      $("status").className = "status" + (bad ? " bad" : "");
+      $("status").innerHTML = text ? (icon ? `<svg class="i" data-icon="${icon}"></svg>` : "") + text : "";
+      PM.hydrateIcons($("status"));
+    }
+    function fill(from, str) {
+      const d = str.replace(/\D/g, "").slice(0, 6 - from).split("");
+      d.forEach((c, i) => (boxes[from + i].value = c));
+      boxes[Math.min(from + d.length, 5)].focus();
+      sync();
+    }
+
+    boxes.forEach((b, i) => {
+      b.addEventListener("input", () => {
+        const v = b.value.replace(/\D/g, "");
+        b.value = "";
+        if (v) fill(i, v);
+        else sync();
+      });
+      b.addEventListener("keydown", (e) => {
+        if (e.key === "Backspace" && !b.value && i > 0) { boxes[i - 1].value = ""; boxes[i - 1].focus(); sync(); e.preventDefault(); }
+        if (e.key === "ArrowLeft" && i > 0) boxes[i - 1].focus();
+        if (e.key === "ArrowRight" && i < 5) boxes[i + 1].focus();
+        if (e.key === "Enter" && !$("verify").disabled) $("verify").click();
+      });
+      b.addEventListener("paste", (e) => { e.preventDefault(); fill(i, e.clipboardData.getData("text")); });
+      b.addEventListener("focus", () => b.select());
+    });
+
+    function countdown(s) {
+      clearInterval(timer);
+      const label = $("resend").querySelector("span");
+      const paint = () => {
+        $("resend").disabled = $("call").disabled = s > 0;
+        label.textContent = s > 0 ? `Resend in 0:${String(s).padStart(2, "0")}` : "Resend SMS";
+      };
+      paint();
+      timer = setInterval(() => { s--; paint(); if (s <= 0) clearInterval(timer); }, 1000);
+    }
+
+    $("resend").addEventListener("click", () => {
+      boxes.forEach((b) => (b.value = ""));
+      sync();
+      boxes[0].focus();
+      setStatus("New code sent. It expires in 10 minutes.", false, "send");
+      countdown(59);
+    });
+    $("call").addEventListener("click", () => { setStatus("Calling you now with your code.", false, "call"); countdown(59); });
+
+    $("verify").addEventListener("click", () => {
+      const btn = $("verify");
+      btn.disabled = true;
+      btn.innerHTML = '<span class="spinner"></span>Verifying';
+      setTimeout(() => {
+        btn.innerHTML = 'Verify Now <svg class="i" data-icon="arrow"></svg>';
+        PM.hydrateIcons(btn);
+        // Prototype: 000000 is a wrong code; any other code verifies.
+        if (code() === "000000") {
+          tries--;
+          $("otp").classList.add("bad");
+          PM.shake($("otp"));
+          if (tries === 0) {
+            boxes.forEach((b) => (b.disabled = true));
+            setStatus("Too many tries. Try again in 15 minutes.", true, "lock");
+          } else {
+            setStatus(`That code isn't right. ${tries} ${tries === 1 ? "try" : "tries"} left.`, true, "alert");
+          }
+          btn.disabled = true;
+          return;
+        }
+        success();
+      }, 800);
+    });
+
+    function success() {
+      clearInterval(timer);
+      const signup = purpose === "signup";
+      $("done-lead").textContent = signup
+        ? "Shops can now reach you on this number. One more step and you're in."
+        : "Your new number is saved. Shops will use it from now on.";
+      // Any account can follow orders, so orders a shop already made for this number are linked here.
+      $("found").innerHTML = `<header><svg class="i" data-icon="package"></svg>We found 2 orders for this number</header><ul>
+             <li><span class="av" style="background:var(--brand-50);color:var(--brand-700)"><svg class="i" data-icon="shirt"></svg></span><div><b>Bright Laundry</b><small>Wash &amp; Press · #A102</small></div><span class="pill" style="background:#ecfdf5;color:#047857">Ready</span></li>
+             <li><span class="av" style="background:#f3e8ff;color:#7c3aed"><svg class="i" data-icon="scissors"></svg></span><div><b>Aminah Tailoring</b><small>Hemming · #T58</small></div><span class="pill" style="background:#eff6ff;color:#1d4ed8">In progress</span></li></ul>`;
+      $("found").hidden = !signup;
+      $("go-home").innerHTML = (signup ? "Continue" : "Back to Profile") + ' <svg class="i" data-icon="arrow"></svg>';
+      PM.hydrateIcons($("done"));
+      $("done").classList.add("on");
+    }
+    $("go-home").addEventListener("click", () => PM.go(purpose === "signup" ? "AUTH-06" : "ACCT-01"));
+
+    const backTo = () => PM.go(purpose === "signup" ? "AUTH-04" : "ACCT-01");
+    $("back").addEventListener("click", backTo);
+    $("edit").addEventListener("click", (e) => { e.preventDefault(); backTo(); });
+
+    countdown(59);
+  </script>
+</body>
+</html>

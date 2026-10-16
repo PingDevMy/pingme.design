@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Home · PingMe</title>
+  <link rel="stylesheet" href="../kit.css" />
+  <link rel="stylesheet" href="../app.css" />
+  <style>
+    .head { display: flex; align-items: center; gap: 12px; padding: 14px var(--gutter) 6px; }
+    .head .grow { flex: 1; min-width: 0; }
+    .head .h1 { font-size: 26px; }
+    .head .lead { margin: 2px 0 0; font-size: 14px; }
+
+    .hero {
+      position: relative; overflow: hidden; margin-top: 16px; padding: 20px; border-radius: 24px; color: #fff;
+      background: linear-gradient(150deg, #13a4ba 0%, var(--brand-700) 70%); box-shadow: 0 14px 30px rgba(14, 143, 163, 0.28);
+    }
+    .hero::after { content: ""; position: absolute; right: -50px; top: -60px; width: 200px; height: 200px; border-radius: 50%; background: radial-gradient(closest-side, rgba(127, 240, 198, 0.35), transparent); }
+    .hero .live { display: inline-flex; align-items: center; gap: 7px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--mint); }
+    .hero .live::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--mint); box-shadow: 0 0 0 4px rgba(127, 240, 198, 0.2); animation: pulse 1.6s ease-in-out infinite; }
+    .hero .count { display: flex; align-items: baseline; gap: 8px; margin-top: 8px; }
+    .hero .count b { font-size: 44px; line-height: 1; font-weight: 800; letter-spacing: -0.03em; }
+    .hero .count span { font-size: 17px; font-weight: 600; opacity: 0.9; }
+    .hero p { position: relative; margin: 6px 0 16px; font-size: 14px; color: rgba(255, 255, 255, 0.82); max-width: 250px; }
+    .hero .art { position: absolute; right: 16px; top: 18px; width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center; background: rgba(255, 255, 255, 0.14); }
+    .hero .art svg.i { width: 32px; height: 32px; color: #fff; }
+    .hero .btn { position: relative; height: 50px; }
+    .ready-strip { position: relative; display: flex; align-items: center; gap: 10px; margin: -2px 0 14px; padding: 10px 12px; border-radius: 14px; background: rgba(255, 255, 255, 0.14); font-size: 13.5px; color: #fff; text-decoration: none; font-weight: 500; }
+    .ready-strip:hover { text-decoration: none; background: rgba(255, 255, 255, 0.2); }
+    .ready-strip svg.i { width: 18px; height: 18px; color: var(--mint); }
+    .ready-strip .grow { flex: 1; min-width: 0; }
+
+    .orders-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 26px 0 12px; }
+    .orders-head h2 { margin: 0; font-size: 18px; letter-spacing: -0.01em; white-space: nowrap; }
+    .orders-head .tabs { flex: 0 1 230px; min-width: 0; }
+
+    @media (max-width: 360px) {
+      .orders-head { flex-wrap: wrap; }
+      .orders-head .tabs { flex: 1 1 100%; }
+    }
+    .order .stepmeta span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .order .top { display: flex; align-items: flex-start; gap: 12px; }
+    .order .top .grow { flex: 1; min-width: 0; }
+    .order .vendor { font-size: 12.5px; color: var(--ink-3); font-weight: 500; }
+    .order .svc { margin: 1px 0 0; font-size: 16px; font-weight: 700; letter-spacing: -0.01em; }
+    .order .prog { margin-top: 14px; }
+    .order .foot-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; padding-top: 12px; border-top: 1px dashed var(--line); font-size: 12.5px; color: var(--ink-3); }
+    .order .foot-row .ellipsis { display: flex; align-items: center; gap: 6px; }
+    .order .foot-row svg.i { width: 15px; height: 15px; }
+    .order .details { display: inline-flex; align-items: center; gap: 2px; color: var(--brand-700); font-weight: 600; font-size: 13.5px; flex: none; }
+    .order .details svg.i { width: 16px; height: 16px; }
+    .order.ready { border-color: #a7f3d0; background: linear-gradient(180deg, #fff, #f0fdf8); }
+    .order.flash { animation: flash 1.2s; }
+    @keyframes flash { 0%, 100% { box-shadow: var(--shadow-sm); } 30% { box-shadow: 0 0 0 4px var(--brand-100); } }
+
+    .done-row { display: flex; align-items: center; gap: 12px; }
+    .done-row .grow { flex: 1; min-width: 0; }
+    .done-row b { display: block; font-size: 15px; }
+    .done-row .amt { text-align: right; flex: none; font-weight: 700; font-size: 14px; }
+    .done-row .amt .pill { margin-top: 4px; }
+    .more { display: flex; justify-content: center; margin-top: 14px; }
+
+    /* Pull to refresh */
+    .ptr { height: 0; overflow: hidden; display: grid; place-items: center; color: var(--brand-700); transition: height 0.2s; }
+    .ptr .ring { width: 26px; height: 26px; border-radius: 50%; border: 2.5px solid var(--brand-100); border-top-color: var(--brand); transform: rotate(calc(var(--p, 0) * 360deg)); }
+    .ptr.spin .ring { animation: spin 0.7s linear infinite; }
+    .pulling .ptr { transition: none; }
+    .proto { display: block; margin: 18px auto 0; font-size: 12px; font-weight: 500; color: var(--ink-3); }
+  </style>
+</head>
+<body class="canvas" data-mode="customer">
+  <div class="page tabbed">
+    <div class="ptr" id="ptr" aria-hidden="true"><span class="ring"></span></div>
+    <header class="head">
+      <span class="avatar" id="avatar">AT</span>
+      <div class="grow">
+        <h1 class="h1 ellipsis" id="hello">Hi Alex 👋</h1>
+        <p class="lead">Manage your active service orders here</p>
+      </div>
+      <button class="icon-btn" type="button" aria-label="Notifications, 3 unread" data-go="NOTI-01"><svg class="i" data-icon="bell"></svg><span class="count">3</span></button>
+    </header>
+
+    <main class="content" id="content">
+      <section class="hero rise" id="hero"></section>
+
+      <div class="orders-head">
+        <h2>Your orders</h2>
+        <div class="tabs" role="tablist" aria-label="Orders">
+          <button type="button" role="tab" aria-selected="true" data-tab="pending">Pending <span class="n" id="n-pending">0</span></button>
+          <button type="button" role="tab" aria-selected="false" data-tab="completed">Completed</button>
+        </div>
+      </div>
+      <div id="list" role="tabpanel"></div>
+      <button class="text-btn proto" type="button" id="proto">Prototype: preview a new account with no orders</button>
+    </main>
+
+    <nav class="tabbar" data-tabbar="home"></nav>
+  </div>
+
+  <script src="../kit.js"></script>
+  <script src="../data.js"></script>
+  <script>
+    const D = PM.data;
+    const $ = (id) => document.getElementById(id);
+    let tab = "pending";
+    let empty = false;
+
+    $("hello").textContent = `Hi ${D.user.first} 👋`;
+
+    function open(o) {
+      PM.store.set("order", o.id);
+      PM.go(o.type === "onsite" ? "CTRK-02" : "CTRK-01");
+    }
+
+    function renderHero() {
+      const act = empty ? [] : D.orders.filter(D.active);
+      const ready = act.filter((o) => o.status === "ready");
+      // "Track Your Order Now" opens the most recently updated active order.
+      const latest = act.slice().sort((a, b) => (b.ts || 0) - (a.ts || 0))[0];
+      $("hero").innerHTML = `
+        <span class="art"><svg class="i" data-icon="package"></svg></span>
+        <span class="live">Active tracking</span>
+        <div class="count"><b>${act.length}</b><span>${act.length === 1 ? "order" : "orders"}</span></div>
+        <p>${act.length ? "Your items are being handled with care. We'll ping you on every step." : "No active orders right now. New ones show up here the moment a shop adds them."}</p>
+        ${ready.length ? `<a href="#" class="ready-strip" data-open="${ready[0].id}"><svg class="i" data-icon="checkcircle"></svg><span class="grow"><b>${D.shops[ready[0].shop].name}</b> is ready for pickup</span><svg class="i" data-icon="chevron"></svg></a>` : ""}
+        ${latest ? `<button class="btn light" type="button" data-open="${latest.id}">Track Your Order Now <svg class="i" data-icon="arrow"></svg></button>` : `<button class="btn light" type="button" data-go="CHOME-02"><svg class="i" data-icon="scan"></svg>Scan a receipt QR</button>`}`;
+      PM.hydrateIcons($("hero"));
+      $("n-pending").textContent = act.length;
+    }
+
+    function card(o) {
+      const s = D.shops[o.shop];
+      const pct = D.percent(o);
+      return `
+        <a href="#" class="card tap order rise${o.status === "ready" ? " ready" : ""}" data-open="${o.id}" id="card-${o.id}">
+          <div class="top">
+            ${D.tile(s)}
+            <div class="grow">
+              <div class="vendor ellipsis">${s.name}</div>
+              <div class="svc ellipsis">${o.service}</div>
+            </div>
+            ${D.pill(o)}
+          </div>
+          <div class="prog">
+            <div class="stepmeta"><span>Step ${o.step} of 4 · ${D.steps(o)[o.step - 1]}</span><b>${pct}%</b></div>
+            ${D.stepbar(o)}
+          </div>
+          <div class="foot-row">
+            <span class="ellipsis"><svg class="i" data-icon="receipt"></svg>${o.id} · ${o.created}</span>
+            <span class="details">Details<svg class="i" data-icon="chevron"></svg></span>
+          </div>
+        </a>`;
+    }
+
+    function doneRow(o) {
+      const s = D.shops[o.shop];
+      return `
+        <a href="#" class="card tap rise" data-open-history="${o.id}">
+          <div class="done-row">
+            ${D.tile(s)}
+            <div class="grow"><b class="ellipsis">${o.service}</b><span class="meta ellipsis">${s.name} · ${o.updated}</span></div>
+            <div class="amt">${D.money(o.amount)}<br />${D.pill(o)}</div>
+          </div>
+        </a>`;
+    }
+
+    function renderList() {
+      const list = $("list");
+      if (empty) {
+        list.innerHTML = `
+          <div class="card empty">
+            <span class="badge-icon ring"><svg class="i" data-icon="inbox"></svg></span>
+            <h3>No orders yet</h3>
+            <p>Orders appear here automatically when a shop adds your phone number, <b>${PM.store.get("phone") || D.user.phone}</b>. Got a receipt with a QR code? Scan it to add the order.</p>
+            <button class="btn secondary" type="button" data-go="CHOME-02" style="margin-top: 18px"><svg class="i" data-icon="scan"></svg>Scan receipt QR</button>
+          </div>`;
+      } else if (tab === "pending") {
+        const act = D.orders.filter(D.active);
+        list.innerHTML = act.map(card).join("");
+      } else {
+        const past = D.orders.filter((o) => !D.active(o)).slice(0, 3);
+        list.innerHTML = past.map(doneRow).join("") + `<div class="more"><a href="#" data-go="CTRK-03">See all order history</a></div>`;
+      }
+      PM.hydrateIcons(list);
+      $("proto").textContent = empty ? "Prototype: bring the sample orders back" : "Prototype: preview a new account with no orders";
+    }
+
+    document.querySelectorAll("[data-tab]").forEach((b) =>
+      b.addEventListener("click", () => {
+        tab = b.dataset.tab;
+        document.querySelectorAll("[data-tab]").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+        renderList();
+      })
+    );
+
+    document.addEventListener("click", (e) => {
+      const el = e.target.closest("[data-open], [data-open-history]");
+      if (!el) return;
+      e.preventDefault();
+      if (el.dataset.openHistory) return PM.go("CTRK-03");
+      open(D.order(el.dataset.open));
+    });
+
+    $("proto").addEventListener("click", () => { empty = !empty; renderHero(); renderList(); });
+
+    // Sample: most recently updated first.
+    const order = ["ORD-0921", "SVC-88201", "ORD-1204", "ORD-0877"];
+    order.forEach((id, i) => (D.order(id).ts = 10 - i));
+    renderHero();
+    renderList();
+
+    // Live update: the tailor starts the hemming job a few seconds after the screen opens.
+    setTimeout(() => {
+      const o = D.order("ORD-0877");
+      if (o.status !== "created") return;
+      Object.assign(o, { status: "progress", step: 2, ts: 11 });
+      renderHero();
+      if (!empty && tab === "pending") {
+        renderList();
+        const c = $("card-ORD-0877");
+        c && c.classList.add("flash");
+      }
+      PM.toast("The Tailor Studio started your order");
+    }, 6000);
+
+    // Pull to refresh (touch or mouse drag from the top).
+    const ptr = $("ptr");
+    let y0 = null, pull = 0;
+    const scroller = document.scrollingElement;
+    const yOf = (e) => (e.touches ? e.touches[0].clientY : e.clientY);
+    function start(e) { if (scroller.scrollTop <= 0 && !e.target.closest("button, a")) { y0 = yOf(e); pull = 0; document.body.classList.add("pulling"); } }
+    function move(e) {
+      if (y0 === null) return;
+      pull = Math.max(0, Math.min(90, (yOf(e) - y0) * 0.6));
+      ptr.style.height = pull + "px";
+      ptr.style.setProperty("--p", (pull / 90).toFixed(2));
+    }
+    function end() {
+      if (y0 === null) return;
+      y0 = null;
+      document.body.classList.remove("pulling");
+      if (pull < 60) { ptr.style.height = "0"; return; }
+      ptr.style.height = "56px";
+      ptr.classList.add("spin");
+      setTimeout(() => {
+        ptr.classList.remove("spin");
+        ptr.style.height = "0";
+        renderHero();
+        renderList();
+        PM.toast("Orders up to date");
+      }, 900);
+    }
+    window.addEventListener("touchstart", start, { passive: true });
+    window.addEventListener("touchmove", move, { passive: true });
+    window.addEventListener("touchend", end);
+    window.addEventListener("mousedown", start);
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", end);
+  </script>
+</body>
+</html>
